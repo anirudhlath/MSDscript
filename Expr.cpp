@@ -5,6 +5,7 @@
 #include "Expr.h"
 #include "catch.hpp"
 #include <stdexcept>
+#include <sstream>
 
 Num::Num(int val) {
     this->val = val;
@@ -104,6 +105,36 @@ Expr* Var::subst(std::string var, Expr* e) {
     return this;
 }
 
+void Num::print(std::ostream &out) {
+    out << val;
+}
+
+void Mult::print(std::ostream &out) {
+    out << '(';
+    lhs->print(out);
+    out << '*';
+    rhs->print(out);
+    out << ')';
+}
+
+void Add::print(std::ostream &out) {
+    out << '(';
+    lhs->print(out);
+    out << '+';
+    rhs->print(out);
+    out << ')';
+}
+
+void Var::print(std::ostream &out) {
+    out << val;
+}
+
+std::string Expr::to_string() {
+    std::stringstream out("");
+    this->print(out);
+    return out.str();
+}
+
 TEST_CASE( "equals" ) {
     // Num
     Expr *two = new Num(2);
@@ -162,6 +193,7 @@ TEST_CASE( "equals" ) {
     Expr *e1 = new Mult(add1, mult1);
     Expr *e2 = new Mult(add1, mult1);
     Expr *e3 = new Mult(two, mult1);
+    Expr *e5 = new Mult(new Add(add1, mult1), mult1);
     Expr *e4 = new Mult(new Var("x"), mult1);
     CHECK(e1->equals(e1) == true);
     CHECK(e1->equals(e2) == true);
@@ -171,6 +203,8 @@ TEST_CASE( "equals" ) {
     CHECK( (new Add(new Var("x"), new Num(7)))
                    ->subst("x", new Var("y"))
                    ->equals(new Add(new Var("y"), new Num(7))) );
+    CHECK(e1->to_string() == "((3+2)*(2*3))");
+    CHECK(e5->to_string() == "(((3+2)+(2*3))*(2*3))");
 
 
 
