@@ -11,6 +11,9 @@
 class Expr {
 public:
     virtual bool equals(Expr *e) = 0;
+    virtual int interp() = 0;
+    bool has_variable();
+    virtual Expr* subst(std::string var, Expr* e);
 };
 
 class Num : public Expr {
@@ -19,6 +22,8 @@ public:
     Num(int val);
 
     bool equals(Expr *e);
+    int interp();
+    Expr* subst(std::string var, Expr* e);
 };
 
 class Add : public Expr {
@@ -28,6 +33,8 @@ public:
     Add(Expr *lhs, Expr *rhs);
 
     bool equals(Expr *e);
+    int interp();
+    Expr* subst(std::string var, Expr* e);
 };
 
 class Mult : public Expr {
@@ -37,6 +44,8 @@ public:
     Mult(Expr *lhs, Expr *rhs);
 
     bool equals(Expr *e);
+    int interp();
+    Expr* subst(std::string var, Expr* e);
 };
 
 class Var : public Expr {
@@ -44,6 +53,8 @@ public:
     std::string val;
     Var(std::string val);
     bool equals(Expr *e);
+    int interp();
+    Expr* subst(std::string var, Expr* e);
 };
 
 #endif //ASSIGNMENT02_EXPR_H
