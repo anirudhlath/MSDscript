@@ -160,6 +160,8 @@ TEST_CASE( "equals" ) {
     CHECK_THROWS_WITH( (new Var("x"))->interp(), "Error occurred, a variable cannot be interpreted." );
     CHECK(var1->has_variable() == true);
     CHECK(var1->subst("hello", var2)->equals(var2));
+    CHECK(var1->subst("hell", var2)->equals(var1));
+    CHECK(var1->to_string() == "hello");
 
     // Mult
     Expr *mult1 = new Mult(two, three);
@@ -205,6 +207,12 @@ TEST_CASE( "equals" ) {
                    ->equals(new Add(new Var("y"), new Num(7))) );
     CHECK(e1->to_string() == "((3+2)*(2*3))");
     CHECK(e5->to_string() == "(((3+2)+(2*3))*(2*3))");
+
+    // Nullptr
+    CHECK(two->equals(add3) == false);
+    CHECK(mult1->equals(add3) == false);
+    CHECK(add1->equals(mult1) == false);
+    CHECK(var1->equals(mult1) == false);
 
 
 
