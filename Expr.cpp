@@ -5,6 +5,7 @@
 #include "Expr.h"
 #include "catch.hpp"
 #include <stdexcept>
+#include <sstream>
 
 Num::Num(int val) {
     this->val = val;
@@ -104,6 +105,75 @@ Expr* Var::subst(std::string var, Expr* e) {
     return this;
 }
 
+void Num::print(std::ostream &out) {
+    out << val;
+}
+
+void Num::pretty_print(std::ostream &out, int precedence) {
+    this->print(out);
+
+}
+
+void Mult::print(std::ostream &out) {
+    out << '(';
+    lhs->print(out);
+    out << '*';
+    rhs->print(out);
+    out << ')';
+}
+
+void Mult::pretty_print(std::ostream &out, int precedence) {
+    if (precedence >= 2) {
+        out << '(';
+    }
+    lhs->pretty_print(out, precedence+1);
+    out << " * ";
+    rhs->pretty_print(out, precedence+1);
+    if (precedence >= 2) {
+        out << ')';
+    }
+}
+
+void Add::print(std::ostream &out) {
+    out << '(';
+    lhs->print(out);
+    out << '+';
+    rhs->print(out);
+    out << ')';
+}
+
+void Add::pretty_print(std::ostream &out, int precedence) {
+    if (precedence >= 1) {
+        out << '(';
+    }
+    lhs->pretty_print(out, precedence+1);
+    out << " + ";
+    rhs->pretty_print(out, precedence+1);
+    if (precedence >= 1) {
+        out << ')';
+    }
+
+}
+
+void Var::print(std::ostream &out) {
+    out << val;
+}
+
+void Var::pretty_print(std::ostream &out, int precedence) {
+    this->print(out);
+
+}
+
+std::string Expr::to_string(bool isPretty) {
+    std::stringstream out("");
+    if (!isPretty) {
+        this->print(out);
+    } else {
+        this->pretty_print(out, 0);
+    }
+    return out.str();
+}
+
 TEST_CASE( "equals" ) {
     // Num
     Expr *two = new Num(2);
@@ -129,6 +199,8 @@ TEST_CASE( "equals" ) {
     CHECK_THROWS_WITH( (new Var("x"))->interp(), "Error occurred, a variable cannot be interpreted." );
     CHECK(var1->has_variable() == true);
     CHECK(var1->subst("hello", var2)->equals(var2));
+    CHECK(var1->subst("hell", var2)->equals(var1));
+    CHECK(var1->to_string(false) == "hello");
 
     // Mult
     Expr *mult1 = new Mult(two, three);
@@ -162,7 +234,9 @@ TEST_CASE( "equals" ) {
     Expr *e1 = new Mult(add1, mult1);
     Expr *e2 = new Mult(add1, mult1);
     Expr *e3 = new Mult(two, mult1);
+    Expr *e5 = new Mult(new Add(add1, mult1), mult1);
     Expr *e4 = new Mult(new Var("x"), mult1);
+    Expr *e6 = new Mult(new Mult(new Mult(two, two),new Add(var1, three)), new Mult(new Add(two, two),new Mult(two, three)));
     CHECK(e1->equals(e1) == true);
     CHECK(e1->equals(e2) == true);
     CHECK(e1->equals(e3) == false);
@@ -171,6 +245,19 @@ TEST_CASE( "equals" ) {
     CHECK( (new Add(new Var("x"), new Num(7)))
                    ->subst("x", new Var("y"))
                    ->equals(new Add(new Var("y"), new Num(7))) );
+    CHECK(e1->to_string(false) == "((3+2)*(2*3))");
+    CHECK(e1->to_string(true) == "(3 + 2) * 2 * 3");
+    CHECK(e5->to_string(false) == "(((3+2)+(2*3))*(2*3))");
+    CHECK(e6->to_string(true) == "(2 * 2) * (hello + 3) * (2 + 2) * (2 * 3)");
+    CHECK((new Add(new Num(1), new Mult(new Num(2), new Num(3))))->to_string(true) == "1 + 2 * 3");
+    CHECK((new Mult(new Num(1), new Mult(new Num(2), new Num(3))))->to_string(true) == "1 * 2 * 3");
+    CHECK((new Mult(new Num(1), new Add(new Num(2), new Num(3))))->to_string(true) == "1 * (2 + 3)");
+
+    // Nullptr
+    CHECK(two->equals(add3) == false);
+    CHECK(mult1->equals(add3) == false);
+    CHECK(add1->equals(mult1) == false);
+    CHECK(var1->equals(mult1) == false);
 
 
 
