@@ -1,0 +1,4127 @@
+        -:    0:Source:C:/Users/aniru/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/213.6461.75/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/bits/regex_compiler.tcc
+        -:    0:Graph:C:\Users\aniru\Desktop\code\src\private\cs6015\msdscript\cmake-build-debug-coverage\CMakeFiles\msdscript.dir\main.cpp.gcno
+        -:    0:Data:C:\Users\aniru\Desktop\code\src\private\cs6015\msdscript\cmake-build-debug-coverage\CMakeFiles\msdscript.dir\main.cpp.gcda
+        -:    0:Runs:1
+        -:    1:// class template regex -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 2013-2021 Free Software Foundation, Inc.
+        -:    4://
+        -:    5:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    6:// software; you can redistribute it and/or modify it under the
+        -:    7:// terms of the GNU General Public License as published by the
+        -:    8:// Free Software Foundation; either version 3, or (at your option)
+        -:    9:// any later version.
+        -:   10:
+        -:   11:// This library is distributed in the hope that it will be useful,
+        -:   12:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   13:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   14:// GNU General Public License for more details.
+        -:   15:
+        -:   16:// Under Section 7 of GPL version 3, you are granted additional
+        -:   17:// permissions described in the GCC Runtime Library Exception, version
+        -:   18:// 3.1, as published by the Free Software Foundation.
+        -:   19:
+        -:   20:// You should have received a copy of the GNU General Public License and
+        -:   21:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   22:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   23:// <http://www.gnu.org/licenses/>.
+        -:   24:
+        -:   25:/**
+        -:   26: *  @file bits/regex_compiler.tcc
+        -:   27: *  This is an internal header file, included by other library headers.
+        -:   28: *  Do not attempt to use it directly. @headername{regex}
+        -:   29: */
+        -:   30:
+        -:   31:// FIXME make comments doxygen format.
+        -:   32:
+        -:   33:/*
+        -:   34:// This compiler refers to "Regular Expression Matching Can Be Simple And Fast"
+        -:   35:// (http://swtch.com/~rsc/regexp/regexp1.html),
+        -:   36:// but doesn't strictly follow it.
+        -:   37://
+        -:   38:// When compiling, states are *chained* instead of tree- or graph-constructed.
+        -:   39:// It's more like structured programs: there's if statement and loop statement.
+        -:   40://
+        -:   41:// For alternative structure (say "a|b"), aka "if statement", two branches
+        -:   42:// should be constructed. However, these two shall merge to an "end_tag" at
+        -:   43:// the end of this operator:
+        -:   44://
+        -:   45://                branch1
+        -:   46://              /        \
+        -:   47:// => begin_tag            end_tag =>
+        -:   48://              \        /
+        -:   49://                branch2
+        -:   50://
+        -:   51:// This is the difference between this implementation and that in Russ's
+        -:   52:// article.
+        -:   53://
+        -:   54:// That's why we introduced dummy node here ------ "end_tag" is a dummy node.
+        -:   55:// All dummy nodes will be eliminated at the end of compilation.
+        -:   56:*/
+        -:   57:
+        -:   58:namespace std _GLIBCXX_VISIBILITY(default)
+        -:   59:{
+        -:   60:_GLIBCXX_BEGIN_NAMESPACE_VERSION
+        -:   61:
+        -:   62:namespace __detail
+        -:   63:{
+        -:   64:  template<typename _TraitsT>
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEEC1EPKcS6_RKSt6localeNSt15regex_constants18syntax_option_typeE called 0 returned 0% blocks executed 0%
+    #####:   65:    _Compiler<_TraitsT>::
+        -:   66:    _Compiler(_IterT __b, _IterT __e,
+        -:   67:	      const typename _TraitsT::locale_type& __loc, _FlagT __flags)
+    #####:   68:    : _M_flags((__flags
+    #####:   69:		& (regex_constants::ECMAScript
+    %%%%%:   69-block  0
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+call    4 never executed
+call    5 never executed
+        -:   70:		   | regex_constants::basic
+        -:   71:		   | regex_constants::extended
+        -:   72:		   | regex_constants::grep
+        -:   73:		   | regex_constants::egrep
+        -:   74:		   | regex_constants::awk))
+    #####:   75:	       ? __flags
+branch  0 never executed
+branch  1 never executed
+    %%%%%:   75-block  0
+    #####:   76:	       : __flags | regex_constants::ECMAScript),
+    %%%%%:   76-block  0
+call    0 never executed
+    #####:   77:      _M_scanner(__b, __e, _M_flags, __loc),
+    %%%%%:   77-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:   77-block  1
+call    4 never executed
+    $$$$$:   77-block  2
+call    5 never executed
+    $$$$$:   77-block  3
+call    6 never executed
+    #####:   78:      _M_nfa(make_shared<_RegexT>(__loc, _M_flags)),
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:   79:      _M_traits(_M_nfa->_M_traits),
+    %%%%%:   79-block  0
+call    0 never executed
+    #####:   80:      _M_ctype(std::use_facet<_CtypeT>(__loc))
+    %%%%%:   80-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+        -:   81:    {
+    #####:   82:      _StateSeqT __r(*_M_nfa, _M_nfa->_M_start());
+    %%%%%:   82-block  0
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+    #####:   83:      __r._M_append(_M_nfa->_M_insert_subexpr_begin());
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:   83-block  0
+call    4 never executed
+    #####:   84:      this->_M_disjunction();
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:   85:      if (!_M_match_token(_ScannerT::_S_token_eof))
+    %%%%%:   85-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:   85-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:   86:	__throw_regex_error(regex_constants::error_paren);
+    %%%%%:   86-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:   87:      __r._M_append(_M_pop());
+    %%%%%:   87-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:   87-block  1
+call    3 never executed
+    #####:   88:      __glibcxx_assert(_M_stack.empty());
+    %%%%%:   88-block  0
+branch  0 never executed
+branch  1 never executed
+    %%%%%:   88-block  1
+call    2 never executed
+    #####:   89:      __r._M_append(_M_nfa->_M_insert_subexpr_end());
+    %%%%%:   89-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:   89-block  1
+call    4 never executed
+    #####:   90:      __r._M_append(_M_nfa->_M_insert_accept());
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:   90-block  0
+call    4 never executed
+    #####:   91:      _M_nfa->_M_eliminate_dummy();
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:   92:    }
+    %%%%%:   92-block  0
+    $$$$$:   92-block  1
+call    0 never executed
+    $$$$$:   92-block  2
+call    1 never executed
+    $$$$$:   92-block  3
+call    2 never executed
+    $$$$$:   92-block  4
+call    3 never executed
+        -:   93:
+        -:   94:  template<typename _TraitsT>
+        -:   95:    void
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE14_M_disjunctionEv called 0 returned 0% blocks executed 0%
+    #####:   96:    _Compiler<_TraitsT>::
+        -:   97:    _M_disjunction()
+        -:   98:    {
+    #####:   99:      this->_M_alternative();
+    %%%%%:   99-block  0
+call    0 never executed
+    #####:  100:      while (_M_match_token(_ScannerT::_S_token_or))
+    %%%%%:  100-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  101:	{
+    #####:  102:	  _StateSeqT __alt1 = _M_pop();
+    %%%%%:  102-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  103:	  this->_M_alternative();
+    %%%%%:  103-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  104:	  _StateSeqT __alt2 = _M_pop();
+    %%%%%:  104-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  105:	  auto __end = _M_nfa->_M_insert_dummy();
+    %%%%%:  105-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:  106:	  __alt1._M_append(__end);
+    %%%%%:  106-block  0
+call    0 never executed
+    #####:  107:	  __alt2._M_append(__end);
+call    0 never executed
+        -:  108:	  // __alt2 is state._M_next, __alt1 is state._M_alt. The executor
+        -:  109:	  // executes _M_alt before _M_next, as well as executing left
+        -:  110:	  // alternative before right one.
+    #####:  111:	  _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  111-block  0
+call    3 never executed
+call    4 never executed
+call    5 never executed
+branch  6 never executed
+branch  7 never executed
+    %%%%%:  111-block  1
+    $$$$$:  111-block  2
+    #####:  112:				   _M_nfa->_M_insert_alt(
+call    0 never executed
+        -:  113:				     __alt2._M_start, __alt1._M_start, false),
+        -:  114:				   __end));
+        -:  115:	}
+    #####:  116:    }
+    %%%%%:  116-block  0
+        -:  117:
+        -:  118:  template<typename _TraitsT>
+        -:  119:    void
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE14_M_alternativeEv called 0 returned 0% blocks executed 0%
+    #####:  120:    _Compiler<_TraitsT>::
+        -:  121:    _M_alternative()
+        -:  122:    {
+    #####:  123:      if (this->_M_term())
+    %%%%%:  123-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  124:	{
+    #####:  125:	  _StateSeqT __re = _M_pop();
+    %%%%%:  125-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  126:	  this->_M_alternative();
+    %%%%%:  126-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  127:	  __re._M_append(_M_pop());
+    %%%%%:  127-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  127-block  1
+call    3 never executed
+    #####:  128:	  _M_stack.push(__re);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  129:	}
+        -:  130:      else
+    #####:  131:	_M_stack.push(_StateSeqT(*_M_nfa, _M_nfa->_M_insert_dummy()));
+    %%%%%:  131-block  0
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  131-block  1
+    #####:  132:    }
+    %%%%%:  132-block  0
+        -:  133:
+        -:  134:  template<typename _TraitsT>
+        -:  135:    bool
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE7_M_termEv called 0 returned 0% blocks executed 0%
+    #####:  136:    _Compiler<_TraitsT>::
+        -:  137:    _M_term()
+        -:  138:    {
+    #####:  139:      if (this->_M_assertion())
+    %%%%%:  139-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  140:	return true;
+    %%%%%:  140-block  0
+    #####:  141:      if (this->_M_atom())
+    %%%%%:  141-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  142:	{
+    #####:  143:	  while (this->_M_quantifier());
+    %%%%%:  143-block  0
+    %%%%%:  143-block  1
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  144:	  return true;
+    %%%%%:  144-block  0
+        -:  145:	}
+    #####:  146:      return false;
+    %%%%%:  146-block  0
+        -:  147:    }
+        -:  148:
+        -:  149:  template<typename _TraitsT>
+        -:  150:    bool
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE12_M_assertionEv called 0 returned 0% blocks executed 0%
+    #####:  151:    _Compiler<_TraitsT>::
+        -:  152:    _M_assertion()
+        -:  153:    {
+    #####:  154:      if (_M_match_token(_ScannerT::_S_token_line_begin))
+    %%%%%:  154-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  155:	_M_stack.push(_StateSeqT(*_M_nfa, _M_nfa->_M_insert_line_begin()));
+    %%%%%:  155-block  0
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  155-block  1
+    $$$$$:  155-block  2
+call    7 never executed
+    #####:  156:      else if (_M_match_token(_ScannerT::_S_token_line_end))
+    %%%%%:  156-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  157:	_M_stack.push(_StateSeqT(*_M_nfa, _M_nfa->_M_insert_line_end()));
+    %%%%%:  157-block  0
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  157-block  1
+    $$$$$:  157-block  2
+call    7 never executed
+    #####:  158:      else if (_M_match_token(_ScannerT::_S_token_word_bound))
+    %%%%%:  158-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  159:	// _M_value[0] == 'n' means it's negative, say "not word boundary".
+    #####:  160:	_M_stack.push(_StateSeqT(*_M_nfa, _M_nfa->
+    %%%%%:  160-block  0
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  160-block  1
+    $$$$$:  160-block  2
+call    6 never executed
+    #####:  161:	      _M_insert_word_bound(_M_value[0] == 'n')));
+call    0 never executed
+call    1 never executed
+    #####:  162:      else if (_M_match_token(_ScannerT::_S_token_subexpr_lookahead_begin))
+    %%%%%:  162-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  163:	{
+    #####:  164:	  auto __neg = _M_value[0] == 'n';
+    %%%%%:  164-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  165:	  this->_M_disjunction();
+    %%%%%:  165-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  166:	  if (!_M_match_token(_ScannerT::_S_token_subexpr_end))
+    %%%%%:  166-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  166-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  167:	    __throw_regex_error(regex_constants::error_paren,
+    %%%%%:  167-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  168:				"Parenthesis is not closed.");
+    #####:  169:	  auto __tmp = _M_pop();
+    %%%%%:  169-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  170:	  __tmp._M_append(_M_nfa->_M_insert_accept());
+    %%%%%:  170-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  170-block  1
+call    4 never executed
+    #####:  171:	  _M_stack.push(
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  172:	      _StateSeqT(
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+call    3 never executed
+    %%%%%:  172-block  0
+    $$$$$:  172-block  1
+    #####:  173:		*_M_nfa,
+    %%%%%:  173-block  0
+call    0 never executed
+    #####:  174:		_M_nfa->_M_insert_lookahead(__tmp._M_start, __neg)));
+call    0 never executed
+        -:  175:	}
+        -:  176:      else
+    #####:  177:	return false;
+    %%%%%:  177-block  0
+    #####:  178:      return true;
+    %%%%%:  178-block  0
+        -:  179:    }
+        -:  180:
+        -:  181:  template<typename _TraitsT>
+        -:  182:    bool
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE13_M_quantifierEv called 0 returned 0% blocks executed 0%
+    #####:  183:    _Compiler<_TraitsT>::
+        -:  184:    _M_quantifier()
+        -:  185:    {
+    #####:  186:      bool __neg = (_M_flags & regex_constants::ECMAScript);
+    %%%%%:  186-block  0
+call    0 never executed
+function _ZZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE13_M_quantifierEvENKUlvE_clEv called 0 returned 0% blocks executed 0%
+    #####:  187:      auto __init = [this, &__neg]()
+        -:  188:	{
+    #####:  189:	  if (_M_stack.empty())
+    %%%%%:  189-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  190:	    __throw_regex_error(regex_constants::error_badrepeat,
+    %%%%%:  190-block  0
+call    0 never executed
+        -:  191:				"Nothing to repeat before a quantifier.");
+    #####:  192:	  __neg = __neg && _M_match_token(_ScannerT::_S_token_opt);
+    %%%%%:  192-block  0
+branch  0 never executed
+branch  1 never executed
+    %%%%%:  192-block  1
+call    2 never executed
+branch  3 never executed
+branch  4 never executed
+    %%%%%:  192-block  2
+    %%%%%:  192-block  3
+        -:  193:	};
+    #####:  194:      if (_M_match_token(_ScannerT::_S_token_closure0))
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  194-block  0
+branch  3 never executed
+branch  4 never executed
+        -:  195:	{
+    #####:  196:	  __init();
+    %%%%%:  196-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  197:	  auto __e = _M_pop();
+    %%%%%:  197-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  198:	  _StateSeqT __r(*_M_nfa,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  198-block  0
+call    3 never executed
+call    4 never executed
+    #####:  199:			 _M_nfa->_M_insert_repeat(_S_invalid_state_id,
+    %%%%%:  199-block  0
+call    0 never executed
+        -:  200:						  __e._M_start, __neg));
+    #####:  201:	  __e._M_append(__r);
+call    0 never executed
+    #####:  202:	  _M_stack.push(__r);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  203:	}
+    #####:  204:      else if (_M_match_token(_ScannerT::_S_token_closure1))
+    %%%%%:  204-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  204-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  205:	{
+    #####:  206:	  __init();
+    %%%%%:  206-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  207:	  auto __e = _M_pop();
+    %%%%%:  207-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  208:	  __e._M_append(_M_nfa->_M_insert_repeat(_S_invalid_state_id,
+    %%%%%:  208-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  208-block  1
+call    4 never executed
+        -:  209:						 __e._M_start, __neg));
+    #####:  210:	  _M_stack.push(__e);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  211:	}
+    #####:  212:      else if (_M_match_token(_ScannerT::_S_token_opt))
+    %%%%%:  212-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  212-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  213:	{
+    #####:  214:	  __init();
+    %%%%%:  214-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  215:	  auto __e = _M_pop();
+    %%%%%:  215-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  216:	  auto __end = _M_nfa->_M_insert_dummy();
+    %%%%%:  216-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    #####:  217:	  _StateSeqT __r(*_M_nfa,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  217-block  0
+call    3 never executed
+call    4 never executed
+    #####:  218:			 _M_nfa->_M_insert_repeat(_S_invalid_state_id,
+    %%%%%:  218-block  0
+call    0 never executed
+        -:  219:						  __e._M_start, __neg));
+    #####:  220:	  __e._M_append(__end);
+call    0 never executed
+    #####:  221:	  __r._M_append(__end);
+call    0 never executed
+    #####:  222:	  _M_stack.push(__r);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  223:	}
+    #####:  224:      else if (_M_match_token(_ScannerT::_S_token_interval_begin))
+    %%%%%:  224-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  224-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  225:	{
+    #####:  226:	  if (_M_stack.empty())
+    %%%%%:  226-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  227:	    __throw_regex_error(regex_constants::error_badrepeat,
+    %%%%%:  227-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  228:				"Nothing to repeat before a quantifier.");
+    #####:  229:	  if (!_M_match_token(_ScannerT::_S_token_dup_count))
+    %%%%%:  229-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  229-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  230:	    __throw_regex_error(regex_constants::error_badbrace,
+    %%%%%:  230-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  231:				"Unexpected token in brace expression.");
+    #####:  232:	  _StateSeqT __r(_M_pop());
+    %%%%%:  232-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  233:	  _StateSeqT __e(*_M_nfa, _M_nfa->_M_insert_dummy());
+    %%%%%:  233-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  233-block  1
+call    4 never executed
+call    5 never executed
+    #####:  234:	  long __min_rep = _M_cur_int_value(10);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  235:	  bool __infi = false;
+    #####:  236:	  long __n = 0;
+        -:  237:
+        -:  238:	  // {3
+    #####:  239:	  if (_M_match_token(_ScannerT::_S_token_comma))
+    %%%%%:  239-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  239-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  240:	    {
+    #####:  241:	      if (_M_match_token(_ScannerT::_S_token_dup_count)) // {3,7}
+    %%%%%:  241-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  241-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  242:		__n = _M_cur_int_value(10) - __min_rep;
+    %%%%%:  242-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  242-block  1
+        -:  243:	      else
+    #####:  244:		__infi = true;
+    %%%%%:  244-block  0
+        -:  245:	    }
+    #####:  246:	  if (!_M_match_token(_ScannerT::_S_token_interval_end))
+    %%%%%:  246-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  246-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  247:	    __throw_regex_error(regex_constants::error_brace,
+    %%%%%:  247-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  248:				"Unexpected end of brace expression.");
+        -:  249:
+    #####:  250:	  __neg = __neg && _M_match_token(_ScannerT::_S_token_opt);
+    %%%%%:  250-block  0
+branch  0 never executed
+branch  1 never executed
+    %%%%%:  250-block  1
+call    2 never executed
+branch  3 never executed
+branch  4 never executed
+    %%%%%:  250-block  2
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  250-block  3
+    %%%%%:  250-block  4
+        -:  251:
+    #####:  252:	  for (long __i = 0; __i < __min_rep; ++__i)
+    %%%%%:  252-block  0
+    %%%%%:  252-block  1
+branch  0 never executed
+branch  1 never executed
+    #####:  253:	    __e._M_append(__r._M_clone());
+    %%%%%:  253-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  253-block  1
+call    3 never executed
+        -:  254:
+    #####:  255:	  if (__infi)
+    %%%%%:  255-block  0
+branch  0 never executed
+branch  1 never executed
+        -:  256:	    {
+    #####:  257:	      auto __tmp = __r._M_clone();
+    %%%%%:  257-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  258:	      _StateSeqT __s(*_M_nfa,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  258-block  0
+call    3 never executed
+call    4 never executed
+    #####:  259:			     _M_nfa->_M_insert_repeat(_S_invalid_state_id,
+    %%%%%:  259-block  0
+call    0 never executed
+        -:  260:						      __tmp._M_start, __neg));
+    #####:  261:	      __tmp._M_append(__s);
+call    0 never executed
+    #####:  262:	      __e._M_append(__s);
+call    0 never executed
+        -:  263:	    }
+        -:  264:	  else
+        -:  265:	    {
+    #####:  266:	      if (__n < 0)
+    %%%%%:  266-block  0
+branch  0 never executed
+branch  1 never executed
+    #####:  267:		__throw_regex_error(regex_constants::error_badbrace,
+    %%%%%:  267-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  268:				    "Invalid range in brace expression.");
+    #####:  269:	      auto __end = _M_nfa->_M_insert_dummy();
+    %%%%%:  269-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+        -:  270:	      // _M_alt is the "match more" branch, and _M_next is the
+        -:  271:	      // "match less" one. Switch _M_alt and _M_next of all created
+        -:  272:	      // nodes. This is a hack but IMO works well.
+    #####:  273:	      std::stack<_StateIdT> __stack;
+    %%%%%:  273-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  274:	      for (long __i = 0; __i < __n; ++__i)
+    %%%%%:  274-block  0
+    %%%%%:  274-block  1
+branch  0 never executed
+branch  1 never executed
+        -:  275:		{
+    #####:  276:		  auto __tmp = __r._M_clone();
+    %%%%%:  276-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  277:		  auto __alt = _M_nfa->_M_insert_repeat(__tmp._M_start,
+    %%%%%:  277-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+        -:  278:							__end, __neg);
+    #####:  279:		  __stack.push(__alt);
+    %%%%%:  279-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  280:		  __e._M_append(_StateSeqT(*_M_nfa, __alt, __tmp._M_end));
+    %%%%%:  280-block  0
+call    0 never executed
+call    1 never executed
+call    2 never executed
+        -:  281:		}
+    #####:  282:	      __e._M_append(__end);
+    %%%%%:  282-block  0
+call    0 never executed
+    #####:  283:	      while (!__stack.empty())
+    %%%%%:  283-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  284:		{
+    #####:  285:		  auto& __tmp = (*_M_nfa)[__stack.top()];
+    %%%%%:  285-block  0
+call    0 never executed
+call    1 never executed
+call    2 never executed
+    #####:  286:		  __stack.pop();
+call    0 never executed
+    #####:  287:		  std::swap(__tmp._M_next, __tmp._M_alt);
+call    0 never executed
+        -:  288:		}
+    #####:  289:	    }
+    %%%%%:  289-block  0
+call    0 never executed
+    $$$$$:  289-block  1
+call    1 never executed
+    #####:  290:	  _M_stack.push(__e);
+    %%%%%:  290-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  291:	}
+        -:  292:      else
+    #####:  293:	return false;
+    %%%%%:  293-block  0
+    #####:  294:      return true;
+    %%%%%:  294-block  0
+        -:  295:    }
+        -:  296:
+        -:  297:#define __INSERT_REGEX_MATCHER(__func, ...)\
+        -:  298:	do {\
+        -:  299:	  if (!(_M_flags & regex_constants::icase))\
+        -:  300:	    if (!(_M_flags & regex_constants::collate))\
+        -:  301:	      __func<false, false>(__VA_ARGS__);\
+        -:  302:	    else\
+        -:  303:	      __func<false, true>(__VA_ARGS__);\
+        -:  304:	  else\
+        -:  305:	    if (!(_M_flags & regex_constants::collate))\
+        -:  306:	      __func<true, false>(__VA_ARGS__);\
+        -:  307:	    else\
+        -:  308:	      __func<true, true>(__VA_ARGS__);\
+        -:  309:	} while (false)
+        -:  310:
+        -:  311:  template<typename _TraitsT>
+        -:  312:    bool
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE7_M_atomEv called 0 returned 0% blocks executed 0%
+    #####:  313:    _Compiler<_TraitsT>::
+        -:  314:    _M_atom()
+        -:  315:    {
+    #####:  316:      if (_M_match_token(_ScannerT::_S_token_anychar))
+    %%%%%:  316-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  317:	{
+    #####:  318:	  if (!(_M_flags & regex_constants::ECMAScript))
+    %%%%%:  318-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  319:	    __INSERT_REGEX_MATCHER(_M_insert_any_matcher_posix);
+    %%%%%:  319-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  319-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  319-block  2
+call    6 never executed
+    %%%%%:  319-block  3
+call    7 never executed
+    %%%%%:  319-block  4
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  319-block  5
+call   11 never executed
+    %%%%%:  319-block  6
+call   12 never executed
+        -:  320:	  else
+    #####:  321:	    __INSERT_REGEX_MATCHER(_M_insert_any_matcher_ecma);
+    %%%%%:  321-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  321-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  321-block  2
+call    6 never executed
+    %%%%%:  321-block  3
+call    7 never executed
+    %%%%%:  321-block  4
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  321-block  5
+call   11 never executed
+    %%%%%:  321-block  6
+call   12 never executed
+        -:  322:	}
+    #####:  323:      else if (_M_try_char())
+    %%%%%:  323-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  324:	__INSERT_REGEX_MATCHER(_M_insert_char_matcher);
+    %%%%%:  324-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  324-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  324-block  2
+call    6 never executed
+    %%%%%:  324-block  3
+call    7 never executed
+    %%%%%:  324-block  4
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  324-block  5
+call   11 never executed
+    %%%%%:  324-block  6
+call   12 never executed
+    #####:  325:      else if (_M_match_token(_ScannerT::_S_token_backref))
+    %%%%%:  325-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  326:	_M_stack.push(_StateSeqT(*_M_nfa, _M_nfa->
+    %%%%%:  326-block  0
+call    0 never executed
+call    1 never executed
+call    2 never executed
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  326-block  1
+    $$$$$:  326-block  2
+call    6 never executed
+    #####:  327:				 _M_insert_backref(_M_cur_int_value(10))));
+call    0 never executed
+call    1 never executed
+    #####:  328:      else if (_M_match_token(_ScannerT::_S_token_quoted_class))
+    %%%%%:  328-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  329:	__INSERT_REGEX_MATCHER(_M_insert_character_class_matcher);
+    %%%%%:  329-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  329-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  329-block  2
+call    6 never executed
+    %%%%%:  329-block  3
+call    7 never executed
+    %%%%%:  329-block  4
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  329-block  5
+call   11 never executed
+    %%%%%:  329-block  6
+call   12 never executed
+    #####:  330:      else if (_M_match_token(_ScannerT::_S_token_subexpr_no_group_begin))
+    %%%%%:  330-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  331:	{
+    #####:  332:	  _StateSeqT __r(*_M_nfa, _M_nfa->_M_insert_dummy());
+    %%%%%:  332-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  332-block  1
+call    4 never executed
+call    5 never executed
+    #####:  333:	  this->_M_disjunction();
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  334:	  if (!_M_match_token(_ScannerT::_S_token_subexpr_end))
+    %%%%%:  334-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  334-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  335:	    __throw_regex_error(regex_constants::error_paren,
+    %%%%%:  335-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  336:				"Parenthesis is not closed.");
+    #####:  337:	  __r._M_append(_M_pop());
+    %%%%%:  337-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  337-block  1
+call    3 never executed
+    #####:  338:	  _M_stack.push(__r);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  339:	}
+    #####:  340:      else if (_M_match_token(_ScannerT::_S_token_subexpr_begin))
+    %%%%%:  340-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  341:	{
+    #####:  342:	  _StateSeqT __r(*_M_nfa, _M_nfa->_M_insert_subexpr_begin());
+    %%%%%:  342-block  0
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  342-block  1
+call    4 never executed
+call    5 never executed
+    #####:  343:	  this->_M_disjunction();
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  344:	  if (!_M_match_token(_ScannerT::_S_token_subexpr_end))
+    %%%%%:  344-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  344-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  345:	    __throw_regex_error(regex_constants::error_paren,
+    %%%%%:  345-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  346:				"Parenthesis is not closed.");
+    #####:  347:	  __r._M_append(_M_pop());
+    %%%%%:  347-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  347-block  1
+call    3 never executed
+    #####:  348:	  __r._M_append(_M_nfa->_M_insert_subexpr_end());
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  348-block  0
+call    4 never executed
+    #####:  349:	  _M_stack.push(__r);
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  350:	}
+    #####:  351:      else if (!_M_bracket_expression())
+    %%%%%:  351-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  352:	return false;
+    %%%%%:  352-block  0
+    #####:  353:      return true;
+    %%%%%:  353-block  0
+        -:  354:    }
+        -:  355:
+        -:  356:  template<typename _TraitsT>
+        -:  357:    bool
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE21_M_bracket_expressionEv called 0 returned 0% blocks executed 0%
+    #####:  358:    _Compiler<_TraitsT>::
+        -:  359:    _M_bracket_expression()
+        -:  360:    {
+        -:  361:      bool __neg =
+    #####:  362:	_M_match_token(_ScannerT::_S_token_bracket_neg_begin);
+    %%%%%:  362-block  0
+call    0 never executed
+    #####:  363:      if (!(__neg || _M_match_token(_ScannerT::_S_token_bracket_begin)))
+branch  0 never executed
+branch  1 never executed
+    %%%%%:  363-block  0
+call    2 never executed
+branch  3 never executed
+branch  4 never executed
+    %%%%%:  363-block  1
+    %%%%%:  363-block  2
+    %%%%%:  363-block  3
+branch  5 never executed
+branch  6 never executed
+    #####:  364:	return false;
+    %%%%%:  364-block  0
+    #####:  365:      __INSERT_REGEX_MATCHER(_M_insert_bracket_matcher, __neg);
+    %%%%%:  365-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  365-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  365-block  2
+call    6 never executed
+    %%%%%:  365-block  3
+call    7 never executed
+    %%%%%:  365-block  4
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  365-block  5
+call   11 never executed
+    %%%%%:  365-block  6
+call   12 never executed
+    #####:  366:      return true;
+    %%%%%:  366-block  0
+        -:  367:    }
+        -:  368:#undef __INSERT_REGEX_MATCHER
+        -:  369:
+        -:  370:  template<typename _TraitsT>
+        -:  371:  template<bool __icase, bool __collate>
+        -:  372:    void
+    #####:  373:    _Compiler<_TraitsT>::
+        -:  374:    _M_insert_any_matcher_ecma()
+        -:  375:    {
+    #####:  376:      _M_stack.push(_StateSeqT(*_M_nfa,
+    #####:  377:	_M_nfa->_M_insert_matcher
+        -:  378:	  (_AnyMatcher<_TraitsT, true, __icase, __collate>
+        -:  379:	    (_M_traits))));
+    #####:  380:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE26_M_insert_any_matcher_ecmaILb1ELb1EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE26_M_insert_any_matcher_ecmaILb1ELb1EEEvv called 0 returned 0% blocks executed 0%
+    #####:  373:    _Compiler<_TraitsT>::
+        -:  374:    _M_insert_any_matcher_ecma()
+        -:  375:    {
+    #####:  376:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  376-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  376-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  376-block  2
+call   12 never executed
+    $$$$$:  376-block  3
+    $$$$$:  376-block  4
+call   13 never executed
+    $$$$$:  376-block  5
+    #####:  377:	_M_nfa->_M_insert_matcher
+    %%%%%:  377-block  0
+call    0 never executed
+        -:  378:	  (_AnyMatcher<_TraitsT, true, __icase, __collate>
+        -:  379:	    (_M_traits))));
+    #####:  380:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE26_M_insert_any_matcher_ecmaILb1ELb0EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE26_M_insert_any_matcher_ecmaILb1ELb0EEEvv called 0 returned 0% blocks executed 0%
+    #####:  373:    _Compiler<_TraitsT>::
+        -:  374:    _M_insert_any_matcher_ecma()
+        -:  375:    {
+    #####:  376:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  376-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  376-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  376-block  2
+call   12 never executed
+    $$$$$:  376-block  3
+    $$$$$:  376-block  4
+call   13 never executed
+    $$$$$:  376-block  5
+    #####:  377:	_M_nfa->_M_insert_matcher
+    %%%%%:  377-block  0
+call    0 never executed
+        -:  378:	  (_AnyMatcher<_TraitsT, true, __icase, __collate>
+        -:  379:	    (_M_traits))));
+    #####:  380:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE26_M_insert_any_matcher_ecmaILb0ELb1EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE26_M_insert_any_matcher_ecmaILb0ELb1EEEvv called 0 returned 0% blocks executed 0%
+    #####:  373:    _Compiler<_TraitsT>::
+        -:  374:    _M_insert_any_matcher_ecma()
+        -:  375:    {
+    #####:  376:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  376-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  376-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  376-block  2
+call   12 never executed
+    $$$$$:  376-block  3
+    $$$$$:  376-block  4
+call   13 never executed
+    $$$$$:  376-block  5
+    #####:  377:	_M_nfa->_M_insert_matcher
+    %%%%%:  377-block  0
+call    0 never executed
+        -:  378:	  (_AnyMatcher<_TraitsT, true, __icase, __collate>
+        -:  379:	    (_M_traits))));
+    #####:  380:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE26_M_insert_any_matcher_ecmaILb0ELb0EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE26_M_insert_any_matcher_ecmaILb0ELb0EEEvv called 0 returned 0% blocks executed 0%
+    #####:  373:    _Compiler<_TraitsT>::
+        -:  374:    _M_insert_any_matcher_ecma()
+        -:  375:    {
+    #####:  376:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  376-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  376-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  376-block  2
+call   12 never executed
+    $$$$$:  376-block  3
+    $$$$$:  376-block  4
+call   13 never executed
+    $$$$$:  376-block  5
+    #####:  377:	_M_nfa->_M_insert_matcher
+    %%%%%:  377-block  0
+call    0 never executed
+        -:  378:	  (_AnyMatcher<_TraitsT, true, __icase, __collate>
+        -:  379:	    (_M_traits))));
+    #####:  380:    }
+------------------
+        -:  381:
+        -:  382:  template<typename _TraitsT>
+        -:  383:  template<bool __icase, bool __collate>
+        -:  384:    void
+    #####:  385:    _Compiler<_TraitsT>::
+        -:  386:    _M_insert_any_matcher_posix()
+        -:  387:    {
+    #####:  388:      _M_stack.push(_StateSeqT(*_M_nfa,
+    #####:  389:	_M_nfa->_M_insert_matcher
+        -:  390:	  (_AnyMatcher<_TraitsT, false, __icase, __collate>
+        -:  391:	    (_M_traits))));
+    #####:  392:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE27_M_insert_any_matcher_posixILb1ELb1EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE27_M_insert_any_matcher_posixILb1ELb1EEEvv called 0 returned 0% blocks executed 0%
+    #####:  385:    _Compiler<_TraitsT>::
+        -:  386:    _M_insert_any_matcher_posix()
+        -:  387:    {
+    #####:  388:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  388-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  388-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  388-block  2
+call   12 never executed
+    $$$$$:  388-block  3
+    $$$$$:  388-block  4
+call   13 never executed
+    $$$$$:  388-block  5
+    #####:  389:	_M_nfa->_M_insert_matcher
+    %%%%%:  389-block  0
+call    0 never executed
+        -:  390:	  (_AnyMatcher<_TraitsT, false, __icase, __collate>
+        -:  391:	    (_M_traits))));
+    #####:  392:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE27_M_insert_any_matcher_posixILb1ELb0EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE27_M_insert_any_matcher_posixILb1ELb0EEEvv called 0 returned 0% blocks executed 0%
+    #####:  385:    _Compiler<_TraitsT>::
+        -:  386:    _M_insert_any_matcher_posix()
+        -:  387:    {
+    #####:  388:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  388-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  388-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  388-block  2
+call   12 never executed
+    $$$$$:  388-block  3
+    $$$$$:  388-block  4
+call   13 never executed
+    $$$$$:  388-block  5
+    #####:  389:	_M_nfa->_M_insert_matcher
+    %%%%%:  389-block  0
+call    0 never executed
+        -:  390:	  (_AnyMatcher<_TraitsT, false, __icase, __collate>
+        -:  391:	    (_M_traits))));
+    #####:  392:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE27_M_insert_any_matcher_posixILb0ELb1EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE27_M_insert_any_matcher_posixILb0ELb1EEEvv called 0 returned 0% blocks executed 0%
+    #####:  385:    _Compiler<_TraitsT>::
+        -:  386:    _M_insert_any_matcher_posix()
+        -:  387:    {
+    #####:  388:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  388-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  388-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  388-block  2
+call   12 never executed
+    $$$$$:  388-block  3
+    $$$$$:  388-block  4
+call   13 never executed
+    $$$$$:  388-block  5
+    #####:  389:	_M_nfa->_M_insert_matcher
+    %%%%%:  389-block  0
+call    0 never executed
+        -:  390:	  (_AnyMatcher<_TraitsT, false, __icase, __collate>
+        -:  391:	    (_M_traits))));
+    #####:  392:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE27_M_insert_any_matcher_posixILb0ELb0EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE27_M_insert_any_matcher_posixILb0ELb0EEEvv called 0 returned 0% blocks executed 0%
+    #####:  385:    _Compiler<_TraitsT>::
+        -:  386:    _M_insert_any_matcher_posix()
+        -:  387:    {
+    #####:  388:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  388-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  388-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  388-block  2
+call   12 never executed
+    $$$$$:  388-block  3
+    $$$$$:  388-block  4
+call   13 never executed
+    $$$$$:  388-block  5
+    #####:  389:	_M_nfa->_M_insert_matcher
+    %%%%%:  389-block  0
+call    0 never executed
+        -:  390:	  (_AnyMatcher<_TraitsT, false, __icase, __collate>
+        -:  391:	    (_M_traits))));
+    #####:  392:    }
+------------------
+        -:  393:
+        -:  394:  template<typename _TraitsT>
+        -:  395:  template<bool __icase, bool __collate>
+        -:  396:    void
+    #####:  397:    _Compiler<_TraitsT>::
+        -:  398:    _M_insert_char_matcher()
+        -:  399:    {
+    #####:  400:      _M_stack.push(_StateSeqT(*_M_nfa,
+    #####:  401:	_M_nfa->_M_insert_matcher
+        -:  402:	  (_CharMatcher<_TraitsT, __icase, __collate>
+    #####:  403:	    (_M_value[0], _M_traits))));
+    #####:  404:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE22_M_insert_char_matcherILb1ELb1EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE22_M_insert_char_matcherILb1ELb1EEEvv called 0 returned 0% blocks executed 0%
+    #####:  397:    _Compiler<_TraitsT>::
+        -:  398:    _M_insert_char_matcher()
+        -:  399:    {
+    #####:  400:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  400-block  0
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  400-block  1
+call    6 never executed
+call    7 never executed
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  400-block  2
+call   11 never executed
+    $$$$$:  400-block  3
+    $$$$$:  400-block  4
+call   12 never executed
+    $$$$$:  400-block  5
+    #####:  401:	_M_nfa->_M_insert_matcher
+    %%%%%:  401-block  0
+call    0 never executed
+        -:  402:	  (_CharMatcher<_TraitsT, __icase, __collate>
+    #####:  403:	    (_M_value[0], _M_traits))));
+call    0 never executed
+call    1 never executed
+    #####:  404:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE22_M_insert_char_matcherILb1ELb0EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE22_M_insert_char_matcherILb1ELb0EEEvv called 0 returned 0% blocks executed 0%
+    #####:  397:    _Compiler<_TraitsT>::
+        -:  398:    _M_insert_char_matcher()
+        -:  399:    {
+    #####:  400:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  400-block  0
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  400-block  1
+call    6 never executed
+call    7 never executed
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  400-block  2
+call   11 never executed
+    $$$$$:  400-block  3
+    $$$$$:  400-block  4
+call   12 never executed
+    $$$$$:  400-block  5
+    #####:  401:	_M_nfa->_M_insert_matcher
+    %%%%%:  401-block  0
+call    0 never executed
+        -:  402:	  (_CharMatcher<_TraitsT, __icase, __collate>
+    #####:  403:	    (_M_value[0], _M_traits))));
+call    0 never executed
+call    1 never executed
+    #####:  404:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE22_M_insert_char_matcherILb0ELb1EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE22_M_insert_char_matcherILb0ELb1EEEvv called 0 returned 0% blocks executed 0%
+    #####:  397:    _Compiler<_TraitsT>::
+        -:  398:    _M_insert_char_matcher()
+        -:  399:    {
+    #####:  400:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  400-block  0
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  400-block  1
+call    6 never executed
+call    7 never executed
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  400-block  2
+call   11 never executed
+    $$$$$:  400-block  3
+    $$$$$:  400-block  4
+call   12 never executed
+    $$$$$:  400-block  5
+    #####:  401:	_M_nfa->_M_insert_matcher
+    %%%%%:  401-block  0
+call    0 never executed
+        -:  402:	  (_CharMatcher<_TraitsT, __icase, __collate>
+    #####:  403:	    (_M_value[0], _M_traits))));
+call    0 never executed
+call    1 never executed
+    #####:  404:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE22_M_insert_char_matcherILb0ELb0EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE22_M_insert_char_matcherILb0ELb0EEEvv called 0 returned 0% blocks executed 0%
+    #####:  397:    _Compiler<_TraitsT>::
+        -:  398:    _M_insert_char_matcher()
+        -:  399:    {
+    #####:  400:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  400-block  0
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  400-block  1
+call    6 never executed
+call    7 never executed
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  400-block  2
+call   11 never executed
+    $$$$$:  400-block  3
+    $$$$$:  400-block  4
+call   12 never executed
+    $$$$$:  400-block  5
+    #####:  401:	_M_nfa->_M_insert_matcher
+    %%%%%:  401-block  0
+call    0 never executed
+        -:  402:	  (_CharMatcher<_TraitsT, __icase, __collate>
+    #####:  403:	    (_M_value[0], _M_traits))));
+call    0 never executed
+call    1 never executed
+    #####:  404:    }
+------------------
+        -:  405:
+        -:  406:  template<typename _TraitsT>
+        -:  407:  template<bool __icase, bool __collate>
+        -:  408:    void
+    #####:  409:    _Compiler<_TraitsT>::
+        -:  410:    _M_insert_character_class_matcher()
+        -:  411:    {
+    #####:  412:      __glibcxx_assert(_M_value.size() == 1);
+    #####:  413:      _BracketMatcher<_TraitsT, __icase, __collate> __matcher
+    #####:  414:	(_M_ctype.is(_CtypeT::upper, _M_value[0]), _M_traits);
+    #####:  415:      __matcher._M_add_character_class(_M_value, false);
+    #####:  416:      __matcher._M_ready();
+    #####:  417:      _M_stack.push(_StateSeqT(*_M_nfa,
+    #####:  418:	_M_nfa->_M_insert_matcher(std::move(__matcher))));
+    #####:  419:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE33_M_insert_character_class_matcherILb1ELb1EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE33_M_insert_character_class_matcherILb1ELb1EEEvv called 0 returned 0% blocks executed 0%
+    #####:  409:    _Compiler<_TraitsT>::
+    %%%%%:  409-block  0
+        -:  410:    _M_insert_character_class_matcher()
+        -:  411:    {
+    #####:  412:      __glibcxx_assert(_M_value.size() == 1);
+    %%%%%:  412-block  0
+branch  0 never executed
+branch  1 never executed
+    %%%%%:  412-block  1
+call    2 never executed
+    #####:  413:      _BracketMatcher<_TraitsT, __icase, __collate> __matcher
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  414:	(_M_ctype.is(_CtypeT::upper, _M_value[0]), _M_traits);
+    %%%%%:  414-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  414-block  1
+call    3 never executed
+    #####:  415:      __matcher._M_add_character_class(_M_value, false);
+    %%%%%:  415-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  416:      __matcher._M_ready();
+    %%%%%:  416-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  417:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  417-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  417-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  417-block  2
+call   12 never executed
+call   13 never executed
+    $$$$$:  417-block  3
+    $$$$$:  417-block  4
+call   14 never executed
+    $$$$$:  417-block  5
+    $$$$$:  417-block  6
+call   15 never executed
+    $$$$$:  417-block  7
+    #####:  418:	_M_nfa->_M_insert_matcher(std::move(__matcher))));
+    %%%%%:  418-block  0
+call    0 never executed
+call    1 never executed
+    #####:  419:    }
+call    0 never executed
+    $$$$$:  419-block  0
+call    1 never executed
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE33_M_insert_character_class_matcherILb1ELb0EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE33_M_insert_character_class_matcherILb1ELb0EEEvv called 0 returned 0% blocks executed 0%
+    #####:  409:    _Compiler<_TraitsT>::
+    %%%%%:  409-block  0
+        -:  410:    _M_insert_character_class_matcher()
+        -:  411:    {
+    #####:  412:      __glibcxx_assert(_M_value.size() == 1);
+    %%%%%:  412-block  0
+branch  0 never executed
+branch  1 never executed
+    %%%%%:  412-block  1
+call    2 never executed
+    #####:  413:      _BracketMatcher<_TraitsT, __icase, __collate> __matcher
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  414:	(_M_ctype.is(_CtypeT::upper, _M_value[0]), _M_traits);
+    %%%%%:  414-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  414-block  1
+call    3 never executed
+    #####:  415:      __matcher._M_add_character_class(_M_value, false);
+    %%%%%:  415-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  416:      __matcher._M_ready();
+    %%%%%:  416-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  417:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  417-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  417-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  417-block  2
+call   12 never executed
+call   13 never executed
+    $$$$$:  417-block  3
+    $$$$$:  417-block  4
+call   14 never executed
+    $$$$$:  417-block  5
+    $$$$$:  417-block  6
+call   15 never executed
+    $$$$$:  417-block  7
+    #####:  418:	_M_nfa->_M_insert_matcher(std::move(__matcher))));
+    %%%%%:  418-block  0
+call    0 never executed
+call    1 never executed
+    #####:  419:    }
+call    0 never executed
+    $$$$$:  419-block  0
+call    1 never executed
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE33_M_insert_character_class_matcherILb0ELb1EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE33_M_insert_character_class_matcherILb0ELb1EEEvv called 0 returned 0% blocks executed 0%
+    #####:  409:    _Compiler<_TraitsT>::
+    %%%%%:  409-block  0
+        -:  410:    _M_insert_character_class_matcher()
+        -:  411:    {
+    #####:  412:      __glibcxx_assert(_M_value.size() == 1);
+    %%%%%:  412-block  0
+branch  0 never executed
+branch  1 never executed
+    %%%%%:  412-block  1
+call    2 never executed
+    #####:  413:      _BracketMatcher<_TraitsT, __icase, __collate> __matcher
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  414:	(_M_ctype.is(_CtypeT::upper, _M_value[0]), _M_traits);
+    %%%%%:  414-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  414-block  1
+call    3 never executed
+    #####:  415:      __matcher._M_add_character_class(_M_value, false);
+    %%%%%:  415-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  416:      __matcher._M_ready();
+    %%%%%:  416-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  417:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  417-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  417-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  417-block  2
+call   12 never executed
+call   13 never executed
+    $$$$$:  417-block  3
+    $$$$$:  417-block  4
+call   14 never executed
+    $$$$$:  417-block  5
+    $$$$$:  417-block  6
+call   15 never executed
+    $$$$$:  417-block  7
+    #####:  418:	_M_nfa->_M_insert_matcher(std::move(__matcher))));
+    %%%%%:  418-block  0
+call    0 never executed
+call    1 never executed
+    #####:  419:    }
+call    0 never executed
+    $$$$$:  419-block  0
+call    1 never executed
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE33_M_insert_character_class_matcherILb0ELb0EEEvv:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE33_M_insert_character_class_matcherILb0ELb0EEEvv called 0 returned 0% blocks executed 0%
+    #####:  409:    _Compiler<_TraitsT>::
+    %%%%%:  409-block  0
+        -:  410:    _M_insert_character_class_matcher()
+        -:  411:    {
+    #####:  412:      __glibcxx_assert(_M_value.size() == 1);
+    %%%%%:  412-block  0
+branch  0 never executed
+branch  1 never executed
+    %%%%%:  412-block  1
+call    2 never executed
+    #####:  413:      _BracketMatcher<_TraitsT, __icase, __collate> __matcher
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  414:	(_M_ctype.is(_CtypeT::upper, _M_value[0]), _M_traits);
+    %%%%%:  414-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  414-block  1
+call    3 never executed
+    #####:  415:      __matcher._M_add_character_class(_M_value, false);
+    %%%%%:  415-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  416:      __matcher._M_ready();
+    %%%%%:  416-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  417:      _M_stack.push(_StateSeqT(*_M_nfa,
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  417-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  417-block  1
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    %%%%%:  417-block  2
+call   12 never executed
+call   13 never executed
+    $$$$$:  417-block  3
+    $$$$$:  417-block  4
+call   14 never executed
+    $$$$$:  417-block  5
+    $$$$$:  417-block  6
+call   15 never executed
+    $$$$$:  417-block  7
+    #####:  418:	_M_nfa->_M_insert_matcher(std::move(__matcher))));
+    %%%%%:  418-block  0
+call    0 never executed
+call    1 never executed
+    #####:  419:    }
+call    0 never executed
+    $$$$$:  419-block  0
+call    1 never executed
+------------------
+        -:  420:
+        -:  421:  template<typename _TraitsT>
+        -:  422:  template<bool __icase, bool __collate>
+        -:  423:    void
+    #####:  424:    _Compiler<_TraitsT>::
+        -:  425:    _M_insert_bracket_matcher(bool __neg)
+        -:  426:    {
+    #####:  427:      _BracketMatcher<_TraitsT, __icase, __collate> __matcher(__neg, _M_traits);
+    #####:  428:      pair<bool, _CharT> __last_char; // Optional<_CharT>
+    #####:  429:      __last_char.first = false;
+    #####:  430:      if (!(_M_flags & regex_constants::ECMAScript))
+        -:  431:	{
+    #####:  432:	  if (_M_try_char())
+        -:  433:	    {
+    #####:  434:	      __last_char.first = true;
+    #####:  435:	      __last_char.second = _M_value[0];
+        -:  436:	    }
+    #####:  437:	  else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+        -:  438:	    {
+    #####:  439:	      __last_char.first = true;
+    #####:  440:	      __last_char.second = '-';
+        -:  441:	    }
+        -:  442:	}
+    #####:  443:      while (_M_expression_term(__last_char, __matcher));
+    #####:  444:      if (__last_char.first)
+    #####:  445:	__matcher._M_add_char(__last_char.second);
+    #####:  446:      __matcher._M_ready();
+    #####:  447:      _M_stack.push(_StateSeqT(
+    #####:  448:		      *_M_nfa,
+    #####:  449:		      _M_nfa->_M_insert_matcher(std::move(__matcher))));
+    #####:  450:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE25_M_insert_bracket_matcherILb1ELb1EEEvb:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE25_M_insert_bracket_matcherILb1ELb1EEEvb called 0 returned 0% blocks executed 0%
+    #####:  424:    _Compiler<_TraitsT>::
+        -:  425:    _M_insert_bracket_matcher(bool __neg)
+        -:  426:    {
+    #####:  427:      _BracketMatcher<_TraitsT, __icase, __collate> __matcher(__neg, _M_traits);
+    %%%%%:  427-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  428:      pair<bool, _CharT> __last_char; // Optional<_CharT>
+    #####:  429:      __last_char.first = false;
+    #####:  430:      if (!(_M_flags & regex_constants::ECMAScript))
+    %%%%%:  430-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  431:	{
+    #####:  432:	  if (_M_try_char())
+    %%%%%:  432-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  432-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  433:	    {
+    #####:  434:	      __last_char.first = true;
+    #####:  435:	      __last_char.second = _M_value[0];
+    %%%%%:  435-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  435-block  1
+        -:  436:	    }
+    #####:  437:	  else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  437-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  437-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  438:	    {
+    #####:  439:	      __last_char.first = true;
+    #####:  440:	      __last_char.second = '-';
+    %%%%%:  440-block  0
+        -:  441:	    }
+        -:  442:	}
+    #####:  443:      while (_M_expression_term(__last_char, __matcher));
+    %%%%%:  443-block  0
+    %%%%%:  443-block  1
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  443-block  2
+branch  3 never executed
+branch  4 never executed
+    #####:  444:      if (__last_char.first)
+    %%%%%:  444-block  0
+branch  0 never executed
+branch  1 never executed
+    #####:  445:	__matcher._M_add_char(__last_char.second);
+    %%%%%:  445-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  446:      __matcher._M_ready();
+    %%%%%:  446-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  447:      _M_stack.push(_StateSeqT(
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  447-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+call    7 never executed
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  447-block  1
+call   11 never executed
+call   12 never executed
+    $$$$$:  447-block  2
+    $$$$$:  447-block  3
+call   13 never executed
+    $$$$$:  447-block  4
+    $$$$$:  447-block  5
+call   14 never executed
+    $$$$$:  447-block  6
+    #####:  448:		      *_M_nfa,
+    %%%%%:  448-block  0
+call    0 never executed
+    #####:  449:		      _M_nfa->_M_insert_matcher(std::move(__matcher))));
+    %%%%%:  449-block  0
+call    0 never executed
+call    1 never executed
+    #####:  450:    }
+call    0 never executed
+    $$$$$:  450-block  0
+call    1 never executed
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE25_M_insert_bracket_matcherILb1ELb0EEEvb:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE25_M_insert_bracket_matcherILb1ELb0EEEvb called 0 returned 0% blocks executed 0%
+    #####:  424:    _Compiler<_TraitsT>::
+        -:  425:    _M_insert_bracket_matcher(bool __neg)
+        -:  426:    {
+    #####:  427:      _BracketMatcher<_TraitsT, __icase, __collate> __matcher(__neg, _M_traits);
+    %%%%%:  427-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  428:      pair<bool, _CharT> __last_char; // Optional<_CharT>
+    #####:  429:      __last_char.first = false;
+    #####:  430:      if (!(_M_flags & regex_constants::ECMAScript))
+    %%%%%:  430-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  431:	{
+    #####:  432:	  if (_M_try_char())
+    %%%%%:  432-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  432-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  433:	    {
+    #####:  434:	      __last_char.first = true;
+    #####:  435:	      __last_char.second = _M_value[0];
+    %%%%%:  435-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  435-block  1
+        -:  436:	    }
+    #####:  437:	  else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  437-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  437-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  438:	    {
+    #####:  439:	      __last_char.first = true;
+    #####:  440:	      __last_char.second = '-';
+    %%%%%:  440-block  0
+        -:  441:	    }
+        -:  442:	}
+    #####:  443:      while (_M_expression_term(__last_char, __matcher));
+    %%%%%:  443-block  0
+    %%%%%:  443-block  1
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  443-block  2
+branch  3 never executed
+branch  4 never executed
+    #####:  444:      if (__last_char.first)
+    %%%%%:  444-block  0
+branch  0 never executed
+branch  1 never executed
+    #####:  445:	__matcher._M_add_char(__last_char.second);
+    %%%%%:  445-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  446:      __matcher._M_ready();
+    %%%%%:  446-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  447:      _M_stack.push(_StateSeqT(
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  447-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+call    7 never executed
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  447-block  1
+call   11 never executed
+call   12 never executed
+    $$$$$:  447-block  2
+    $$$$$:  447-block  3
+call   13 never executed
+    $$$$$:  447-block  4
+    $$$$$:  447-block  5
+call   14 never executed
+    $$$$$:  447-block  6
+    #####:  448:		      *_M_nfa,
+    %%%%%:  448-block  0
+call    0 never executed
+    #####:  449:		      _M_nfa->_M_insert_matcher(std::move(__matcher))));
+    %%%%%:  449-block  0
+call    0 never executed
+call    1 never executed
+    #####:  450:    }
+call    0 never executed
+    $$$$$:  450-block  0
+call    1 never executed
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE25_M_insert_bracket_matcherILb0ELb1EEEvb:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE25_M_insert_bracket_matcherILb0ELb1EEEvb called 0 returned 0% blocks executed 0%
+    #####:  424:    _Compiler<_TraitsT>::
+        -:  425:    _M_insert_bracket_matcher(bool __neg)
+        -:  426:    {
+    #####:  427:      _BracketMatcher<_TraitsT, __icase, __collate> __matcher(__neg, _M_traits);
+    %%%%%:  427-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  428:      pair<bool, _CharT> __last_char; // Optional<_CharT>
+    #####:  429:      __last_char.first = false;
+    #####:  430:      if (!(_M_flags & regex_constants::ECMAScript))
+    %%%%%:  430-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  431:	{
+    #####:  432:	  if (_M_try_char())
+    %%%%%:  432-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  432-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  433:	    {
+    #####:  434:	      __last_char.first = true;
+    #####:  435:	      __last_char.second = _M_value[0];
+    %%%%%:  435-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  435-block  1
+        -:  436:	    }
+    #####:  437:	  else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  437-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  437-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  438:	    {
+    #####:  439:	      __last_char.first = true;
+    #####:  440:	      __last_char.second = '-';
+    %%%%%:  440-block  0
+        -:  441:	    }
+        -:  442:	}
+    #####:  443:      while (_M_expression_term(__last_char, __matcher));
+    %%%%%:  443-block  0
+    %%%%%:  443-block  1
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  443-block  2
+branch  3 never executed
+branch  4 never executed
+    #####:  444:      if (__last_char.first)
+    %%%%%:  444-block  0
+branch  0 never executed
+branch  1 never executed
+    #####:  445:	__matcher._M_add_char(__last_char.second);
+    %%%%%:  445-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  446:      __matcher._M_ready();
+    %%%%%:  446-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  447:      _M_stack.push(_StateSeqT(
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  447-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+call    7 never executed
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  447-block  1
+call   11 never executed
+call   12 never executed
+    $$$$$:  447-block  2
+    $$$$$:  447-block  3
+call   13 never executed
+    $$$$$:  447-block  4
+    $$$$$:  447-block  5
+call   14 never executed
+    $$$$$:  447-block  6
+    #####:  448:		      *_M_nfa,
+    %%%%%:  448-block  0
+call    0 never executed
+    #####:  449:		      _M_nfa->_M_insert_matcher(std::move(__matcher))));
+    %%%%%:  449-block  0
+call    0 never executed
+call    1 never executed
+    #####:  450:    }
+call    0 never executed
+    $$$$$:  450-block  0
+call    1 never executed
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE25_M_insert_bracket_matcherILb0ELb0EEEvb:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE25_M_insert_bracket_matcherILb0ELb0EEEvb called 0 returned 0% blocks executed 0%
+    #####:  424:    _Compiler<_TraitsT>::
+        -:  425:    _M_insert_bracket_matcher(bool __neg)
+        -:  426:    {
+    #####:  427:      _BracketMatcher<_TraitsT, __icase, __collate> __matcher(__neg, _M_traits);
+    %%%%%:  427-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  428:      pair<bool, _CharT> __last_char; // Optional<_CharT>
+    #####:  429:      __last_char.first = false;
+    #####:  430:      if (!(_M_flags & regex_constants::ECMAScript))
+    %%%%%:  430-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  431:	{
+    #####:  432:	  if (_M_try_char())
+    %%%%%:  432-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  432-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  433:	    {
+    #####:  434:	      __last_char.first = true;
+    #####:  435:	      __last_char.second = _M_value[0];
+    %%%%%:  435-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  435-block  1
+        -:  436:	    }
+    #####:  437:	  else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  437-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  437-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  438:	    {
+    #####:  439:	      __last_char.first = true;
+    #####:  440:	      __last_char.second = '-';
+    %%%%%:  440-block  0
+        -:  441:	    }
+        -:  442:	}
+    #####:  443:      while (_M_expression_term(__last_char, __matcher));
+    %%%%%:  443-block  0
+    %%%%%:  443-block  1
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  443-block  2
+branch  3 never executed
+branch  4 never executed
+    #####:  444:      if (__last_char.first)
+    %%%%%:  444-block  0
+branch  0 never executed
+branch  1 never executed
+    #####:  445:	__matcher._M_add_char(__last_char.second);
+    %%%%%:  445-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  446:      __matcher._M_ready();
+    %%%%%:  446-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  447:      _M_stack.push(_StateSeqT(
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  447-block  0
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+call    7 never executed
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  447-block  1
+call   11 never executed
+call   12 never executed
+    $$$$$:  447-block  2
+    $$$$$:  447-block  3
+call   13 never executed
+    $$$$$:  447-block  4
+    $$$$$:  447-block  5
+call   14 never executed
+    $$$$$:  447-block  6
+    #####:  448:		      *_M_nfa,
+    %%%%%:  448-block  0
+call    0 never executed
+    #####:  449:		      _M_nfa->_M_insert_matcher(std::move(__matcher))));
+    %%%%%:  449-block  0
+call    0 never executed
+call    1 never executed
+    #####:  450:    }
+call    0 never executed
+    $$$$$:  450-block  0
+call    1 never executed
+------------------
+        -:  451:
+        -:  452:  template<typename _TraitsT>
+        -:  453:  template<bool __icase, bool __collate>
+        -:  454:    bool
+    #####:  455:    _Compiler<_TraitsT>::
+        -:  456:    _M_expression_term(pair<bool, _CharT>& __last_char,
+        -:  457:		       _BracketMatcher<_TraitsT, __icase, __collate>& __matcher)
+        -:  458:    {
+    #####:  459:      if (_M_match_token(_ScannerT::_S_token_bracket_end))
+    #####:  460:	return false;
+        -:  461:
+    #####:  462:      const auto __push_char = [&](_CharT __ch)
+        -:  463:      {
+    #####:  464:	if (__last_char.first)
+    %%%%%:  464-block  0
+branch  0 never executed
+branch  1 never executed
+    %%%%%:  464-block  1
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  464-block  2
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  464-block  3
+branch  6 never executed
+branch  7 never executed
+    #####:  465:	  __matcher._M_add_char(__last_char.second);
+    %%%%%:  465-block  0
+call    0 never executed
+    %%%%%:  465-block  1
+call    1 never executed
+    %%%%%:  465-block  2
+call    2 never executed
+    %%%%%:  465-block  3
+call    3 never executed
+        -:  466:	else
+    #####:  467:	  __last_char.first = true;
+    %%%%%:  467-block  0
+    %%%%%:  467-block  1
+    %%%%%:  467-block  2
+    %%%%%:  467-block  3
+    #####:  468:	__last_char.second = __ch;
+        -:  469:      };
+    #####:  470:      const auto __flush = [&]
+        -:  471:      {
+    #####:  472:	if (__last_char.first)
+    %%%%%:  472-block  0
+branch  0 never executed
+branch  1 never executed
+    %%%%%:  472-block  1
+branch  2 never executed
+branch  3 never executed
+    %%%%%:  472-block  2
+branch  4 never executed
+branch  5 never executed
+    %%%%%:  472-block  3
+branch  6 never executed
+branch  7 never executed
+        -:  473:	  {
+    #####:  474:	    __matcher._M_add_char(__last_char.second);
+    %%%%%:  474-block  0
+call    0 never executed
+    %%%%%:  474-block  1
+call    1 never executed
+    %%%%%:  474-block  2
+call    2 never executed
+    %%%%%:  474-block  3
+call    3 never executed
+    #####:  475:	    __last_char.first = false;
+        -:  476:	  }
+        -:  477:      };
+        -:  478:
+    #####:  479:      if (_M_match_token(_ScannerT::_S_token_collsymbol))
+        -:  480:	{
+    #####:  481:	  auto __symbol = __matcher._M_add_collate_element(_M_value);
+    #####:  482:	  if (__symbol.size() == 1)
+    #####:  483:	    __push_char(__symbol[0]);
+        -:  484:	  else
+    #####:  485:	    __flush();
+    #####:  486:	}
+    #####:  487:      else if (_M_match_token(_ScannerT::_S_token_equiv_class_name))
+        -:  488:	{
+    #####:  489:	  __flush();
+    #####:  490:	  __matcher._M_add_equivalence_class(_M_value);
+        -:  491:	}
+    #####:  492:      else if (_M_match_token(_ScannerT::_S_token_char_class_name))
+        -:  493:	{
+    #####:  494:	  __flush();
+    #####:  495:	  __matcher._M_add_character_class(_M_value, false);
+        -:  496:	}
+    #####:  497:      else if (_M_try_char())
+    #####:  498:	__push_char(_M_value[0]);
+        -:  499:      // POSIX doesn't allow '-' as a start-range char (say [a-z--0]),
+        -:  500:      // except when the '-' is the first or last character in the bracket
+        -:  501:      // expression ([--0]). ECMAScript treats all '-' after a range as a
+        -:  502:      // normal character. Also see above, where _M_expression_term gets called.
+        -:  503:      //
+        -:  504:      // As a result, POSIX rejects [-----], but ECMAScript doesn't.
+        -:  505:      // Boost (1.57.0) always uses POSIX style even in its ECMAScript syntax.
+        -:  506:      // Clang (3.5) always uses ECMAScript style even in its POSIX syntax.
+        -:  507:      //
+        -:  508:      // It turns out that no one reads BNFs ;)
+    #####:  509:      else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+        -:  510:	{
+    #####:  511:	  if (!__last_char.first)
+        -:  512:	    {
+    #####:  513:	      if (!(_M_flags & regex_constants::ECMAScript))
+        -:  514:		{
+    #####:  515:		  if (_M_match_token(_ScannerT::_S_token_bracket_end))
+        -:  516:		    {
+    #####:  517:		      __push_char('-');
+    #####:  518:		      return false;
+        -:  519:		    }
+    #####:  520:		  __throw_regex_error(
+        -:  521:		    regex_constants::error_range,
+        -:  522:		    "Unexpected dash in bracket expression. For POSIX syntax, "
+        -:  523:		    "a dash is not treated literally only when it is at "
+        -:  524:		    "beginning or end.");
+        -:  525:		}
+    #####:  526:	      __push_char('-');
+        -:  527:	    }
+        -:  528:	  else
+        -:  529:	    {
+    #####:  530:	      if (_M_try_char())
+        -:  531:		{
+    #####:  532:		  __matcher._M_make_range(__last_char.second, _M_value[0]);
+    #####:  533:		  __last_char.first = false;
+        -:  534:		}
+    #####:  535:	      else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+        -:  536:		{
+    #####:  537:		  __matcher._M_make_range(__last_char.second, '-');
+    #####:  538:		  __last_char.first = false;
+        -:  539:		}
+        -:  540:	      else
+        -:  541:		{
+    #####:  542:		  if (_M_scanner._M_get_token()
+    #####:  543:		      != _ScannerT::_S_token_bracket_end)
+    #####:  544:		    __throw_regex_error(
+        -:  545:		      regex_constants::error_range,
+        -:  546:		      "Character is expected after a dash.");
+    #####:  547:		  __push_char('-');
+        -:  548:		}
+        -:  549:	    }
+        -:  550:	}
+    #####:  551:      else if (_M_match_token(_ScannerT::_S_token_quoted_class))
+        -:  552:	{
+    #####:  553:	  __flush();
+    #####:  554:	  __matcher._M_add_character_class(_M_value,
+    #####:  555:					   _M_ctype.is(_CtypeT::upper,
+    #####:  556:						       _M_value[0]));
+        -:  557:	}
+        -:  558:      else
+    #####:  559:	__throw_regex_error(regex_constants::error_brack,
+        -:  560:			    "Unexpected character in bracket expression.");
+        -:  561:
+    #####:  562:      return true;
+        -:  563:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE18_M_expression_termILb1ELb1EEEbRSt4pairIbcERNS_15_BracketMatcherIS3_XT_EXT0_EEE:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE18_M_expression_termILb1ELb1EEEbRSt4pairIbcERNS_15_BracketMatcherIS3_XT_EXT0_EEE called 0 returned 0% blocks executed 0%
+    #####:  455:    _Compiler<_TraitsT>::
+        -:  456:    _M_expression_term(pair<bool, _CharT>& __last_char,
+        -:  457:		       _BracketMatcher<_TraitsT, __icase, __collate>& __matcher)
+        -:  458:    {
+    #####:  459:      if (_M_match_token(_ScannerT::_S_token_bracket_end))
+    %%%%%:  459-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  459-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  460:	return false;
+    %%%%%:  460-block  0
+        -:  461:
+    #####:  462:      const auto __push_char = [&](_CharT __ch)
+        -:  463:      {
+        -:  464:	if (__last_char.first)
+        -:  465:	  __matcher._M_add_char(__last_char.second);
+        -:  466:	else
+        -:  467:	  __last_char.first = true;
+        -:  468:	__last_char.second = __ch;
+        -:  469:      };
+    #####:  470:      const auto __flush = [&]
+        -:  471:      {
+        -:  472:	if (__last_char.first)
+        -:  473:	  {
+        -:  474:	    __matcher._M_add_char(__last_char.second);
+        -:  475:	    __last_char.first = false;
+        -:  476:	  }
+        -:  477:      };
+        -:  478:
+    #####:  479:      if (_M_match_token(_ScannerT::_S_token_collsymbol))
+    %%%%%:  479-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  479-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  480:	{
+    #####:  481:	  auto __symbol = __matcher._M_add_collate_element(_M_value);
+    %%%%%:  481-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  482:	  if (__symbol.size() == 1)
+    %%%%%:  482-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  483:	    __push_char(__symbol[0]);
+    %%%%%:  483-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  483-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+        -:  484:	  else
+    #####:  485:	    __flush();
+    %%%%%:  485-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  486:	}
+    %%%%%:  486-block  0
+call    0 never executed
+    $$$$$:  486-block  1
+call    1 never executed
+    #####:  487:      else if (_M_match_token(_ScannerT::_S_token_equiv_class_name))
+    %%%%%:  487-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  487-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  488:	{
+    #####:  489:	  __flush();
+    %%%%%:  489-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  490:	  __matcher._M_add_equivalence_class(_M_value);
+    %%%%%:  490-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  491:	}
+    #####:  492:      else if (_M_match_token(_ScannerT::_S_token_char_class_name))
+    %%%%%:  492-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  492-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  493:	{
+    #####:  494:	  __flush();
+    %%%%%:  494-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  495:	  __matcher._M_add_character_class(_M_value, false);
+    %%%%%:  495-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  496:	}
+    #####:  497:      else if (_M_try_char())
+    %%%%%:  497-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  497-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  498:	__push_char(_M_value[0]);
+    %%%%%:  498-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  498-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+        -:  499:      // POSIX doesn't allow '-' as a start-range char (say [a-z--0]),
+        -:  500:      // except when the '-' is the first or last character in the bracket
+        -:  501:      // expression ([--0]). ECMAScript treats all '-' after a range as a
+        -:  502:      // normal character. Also see above, where _M_expression_term gets called.
+        -:  503:      //
+        -:  504:      // As a result, POSIX rejects [-----], but ECMAScript doesn't.
+        -:  505:      // Boost (1.57.0) always uses POSIX style even in its ECMAScript syntax.
+        -:  506:      // Clang (3.5) always uses ECMAScript style even in its POSIX syntax.
+        -:  507:      //
+        -:  508:      // It turns out that no one reads BNFs ;)
+    #####:  509:      else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  509-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  509-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  510:	{
+    #####:  511:	  if (!__last_char.first)
+    %%%%%:  511-block  0
+branch  0 never executed
+branch  1 never executed
+        -:  512:	    {
+    #####:  513:	      if (!(_M_flags & regex_constants::ECMAScript))
+    %%%%%:  513-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  514:		{
+    #####:  515:		  if (_M_match_token(_ScannerT::_S_token_bracket_end))
+    %%%%%:  515-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  515-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  516:		    {
+    #####:  517:		      __push_char('-');
+    %%%%%:  517-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  518:		      return false;
+    %%%%%:  518-block  0
+        -:  519:		    }
+    #####:  520:		  __throw_regex_error(
+    %%%%%:  520-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  521:		    regex_constants::error_range,
+        -:  522:		    "Unexpected dash in bracket expression. For POSIX syntax, "
+        -:  523:		    "a dash is not treated literally only when it is at "
+        -:  524:		    "beginning or end.");
+        -:  525:		}
+    #####:  526:	      __push_char('-');
+    %%%%%:  526-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  527:	    }
+        -:  528:	  else
+        -:  529:	    {
+    #####:  530:	      if (_M_try_char())
+    %%%%%:  530-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  530-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  531:		{
+    #####:  532:		  __matcher._M_make_range(__last_char.second, _M_value[0]);
+    %%%%%:  532-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  532-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    #####:  533:		  __last_char.first = false;
+    %%%%%:  533-block  0
+        -:  534:		}
+    #####:  535:	      else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  535-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  535-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  536:		{
+    #####:  537:		  __matcher._M_make_range(__last_char.second, '-');
+    %%%%%:  537-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  538:		  __last_char.first = false;
+    %%%%%:  538-block  0
+        -:  539:		}
+        -:  540:	      else
+        -:  541:		{
+    #####:  542:		  if (_M_scanner._M_get_token()
+    %%%%%:  542-block  0
+call    0 never executed
+    #####:  543:		      != _ScannerT::_S_token_bracket_end)
+branch  0 never executed
+branch  1 never executed
+    #####:  544:		    __throw_regex_error(
+    %%%%%:  544-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  545:		      regex_constants::error_range,
+        -:  546:		      "Character is expected after a dash.");
+    #####:  547:		  __push_char('-');
+    %%%%%:  547-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  548:		}
+        -:  549:	    }
+        -:  550:	}
+    #####:  551:      else if (_M_match_token(_ScannerT::_S_token_quoted_class))
+    %%%%%:  551-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  551-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  552:	{
+    #####:  553:	  __flush();
+    %%%%%:  553-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  554:	  __matcher._M_add_character_class(_M_value,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  555:					   _M_ctype.is(_CtypeT::upper,
+    #####:  556:						       _M_value[0]));
+    %%%%%:  556-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  556-block  1
+call    3 never executed
+        -:  557:	}
+        -:  558:      else
+    #####:  559:	__throw_regex_error(regex_constants::error_brack,
+    %%%%%:  559-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  560:			    "Unexpected character in bracket expression.");
+        -:  561:
+    #####:  562:      return true;
+    %%%%%:  562-block  0
+        -:  563:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE18_M_expression_termILb1ELb0EEEbRSt4pairIbcERNS_15_BracketMatcherIS3_XT_EXT0_EEE:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE18_M_expression_termILb1ELb0EEEbRSt4pairIbcERNS_15_BracketMatcherIS3_XT_EXT0_EEE called 0 returned 0% blocks executed 0%
+    #####:  455:    _Compiler<_TraitsT>::
+        -:  456:    _M_expression_term(pair<bool, _CharT>& __last_char,
+        -:  457:		       _BracketMatcher<_TraitsT, __icase, __collate>& __matcher)
+        -:  458:    {
+    #####:  459:      if (_M_match_token(_ScannerT::_S_token_bracket_end))
+    %%%%%:  459-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  459-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  460:	return false;
+    %%%%%:  460-block  0
+        -:  461:
+    #####:  462:      const auto __push_char = [&](_CharT __ch)
+        -:  463:      {
+        -:  464:	if (__last_char.first)
+        -:  465:	  __matcher._M_add_char(__last_char.second);
+        -:  466:	else
+        -:  467:	  __last_char.first = true;
+        -:  468:	__last_char.second = __ch;
+        -:  469:      };
+    #####:  470:      const auto __flush = [&]
+        -:  471:      {
+        -:  472:	if (__last_char.first)
+        -:  473:	  {
+        -:  474:	    __matcher._M_add_char(__last_char.second);
+        -:  475:	    __last_char.first = false;
+        -:  476:	  }
+        -:  477:      };
+        -:  478:
+    #####:  479:      if (_M_match_token(_ScannerT::_S_token_collsymbol))
+    %%%%%:  479-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  479-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  480:	{
+    #####:  481:	  auto __symbol = __matcher._M_add_collate_element(_M_value);
+    %%%%%:  481-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  482:	  if (__symbol.size() == 1)
+    %%%%%:  482-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  483:	    __push_char(__symbol[0]);
+    %%%%%:  483-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  483-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+        -:  484:	  else
+    #####:  485:	    __flush();
+    %%%%%:  485-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  486:	}
+    %%%%%:  486-block  0
+call    0 never executed
+    $$$$$:  486-block  1
+call    1 never executed
+    #####:  487:      else if (_M_match_token(_ScannerT::_S_token_equiv_class_name))
+    %%%%%:  487-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  487-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  488:	{
+    #####:  489:	  __flush();
+    %%%%%:  489-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  490:	  __matcher._M_add_equivalence_class(_M_value);
+    %%%%%:  490-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  491:	}
+    #####:  492:      else if (_M_match_token(_ScannerT::_S_token_char_class_name))
+    %%%%%:  492-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  492-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  493:	{
+    #####:  494:	  __flush();
+    %%%%%:  494-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  495:	  __matcher._M_add_character_class(_M_value, false);
+    %%%%%:  495-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  496:	}
+    #####:  497:      else if (_M_try_char())
+    %%%%%:  497-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  497-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  498:	__push_char(_M_value[0]);
+    %%%%%:  498-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  498-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+        -:  499:      // POSIX doesn't allow '-' as a start-range char (say [a-z--0]),
+        -:  500:      // except when the '-' is the first or last character in the bracket
+        -:  501:      // expression ([--0]). ECMAScript treats all '-' after a range as a
+        -:  502:      // normal character. Also see above, where _M_expression_term gets called.
+        -:  503:      //
+        -:  504:      // As a result, POSIX rejects [-----], but ECMAScript doesn't.
+        -:  505:      // Boost (1.57.0) always uses POSIX style even in its ECMAScript syntax.
+        -:  506:      // Clang (3.5) always uses ECMAScript style even in its POSIX syntax.
+        -:  507:      //
+        -:  508:      // It turns out that no one reads BNFs ;)
+    #####:  509:      else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  509-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  509-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  510:	{
+    #####:  511:	  if (!__last_char.first)
+    %%%%%:  511-block  0
+branch  0 never executed
+branch  1 never executed
+        -:  512:	    {
+    #####:  513:	      if (!(_M_flags & regex_constants::ECMAScript))
+    %%%%%:  513-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  514:		{
+    #####:  515:		  if (_M_match_token(_ScannerT::_S_token_bracket_end))
+    %%%%%:  515-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  515-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  516:		    {
+    #####:  517:		      __push_char('-');
+    %%%%%:  517-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  518:		      return false;
+    %%%%%:  518-block  0
+        -:  519:		    }
+    #####:  520:		  __throw_regex_error(
+    %%%%%:  520-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  521:		    regex_constants::error_range,
+        -:  522:		    "Unexpected dash in bracket expression. For POSIX syntax, "
+        -:  523:		    "a dash is not treated literally only when it is at "
+        -:  524:		    "beginning or end.");
+        -:  525:		}
+    #####:  526:	      __push_char('-');
+    %%%%%:  526-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  527:	    }
+        -:  528:	  else
+        -:  529:	    {
+    #####:  530:	      if (_M_try_char())
+    %%%%%:  530-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  530-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  531:		{
+    #####:  532:		  __matcher._M_make_range(__last_char.second, _M_value[0]);
+    %%%%%:  532-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  532-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    #####:  533:		  __last_char.first = false;
+    %%%%%:  533-block  0
+        -:  534:		}
+    #####:  535:	      else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  535-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  535-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  536:		{
+    #####:  537:		  __matcher._M_make_range(__last_char.second, '-');
+    %%%%%:  537-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  538:		  __last_char.first = false;
+    %%%%%:  538-block  0
+        -:  539:		}
+        -:  540:	      else
+        -:  541:		{
+    #####:  542:		  if (_M_scanner._M_get_token()
+    %%%%%:  542-block  0
+call    0 never executed
+    #####:  543:		      != _ScannerT::_S_token_bracket_end)
+branch  0 never executed
+branch  1 never executed
+    #####:  544:		    __throw_regex_error(
+    %%%%%:  544-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  545:		      regex_constants::error_range,
+        -:  546:		      "Character is expected after a dash.");
+    #####:  547:		  __push_char('-');
+    %%%%%:  547-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  548:		}
+        -:  549:	    }
+        -:  550:	}
+    #####:  551:      else if (_M_match_token(_ScannerT::_S_token_quoted_class))
+    %%%%%:  551-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  551-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  552:	{
+    #####:  553:	  __flush();
+    %%%%%:  553-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  554:	  __matcher._M_add_character_class(_M_value,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  555:					   _M_ctype.is(_CtypeT::upper,
+    #####:  556:						       _M_value[0]));
+    %%%%%:  556-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  556-block  1
+call    3 never executed
+        -:  557:	}
+        -:  558:      else
+    #####:  559:	__throw_regex_error(regex_constants::error_brack,
+    %%%%%:  559-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  560:			    "Unexpected character in bracket expression.");
+        -:  561:
+    #####:  562:      return true;
+    %%%%%:  562-block  0
+        -:  563:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE18_M_expression_termILb0ELb1EEEbRSt4pairIbcERNS_15_BracketMatcherIS3_XT_EXT0_EEE:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE18_M_expression_termILb0ELb1EEEbRSt4pairIbcERNS_15_BracketMatcherIS3_XT_EXT0_EEE called 0 returned 0% blocks executed 0%
+    #####:  455:    _Compiler<_TraitsT>::
+        -:  456:    _M_expression_term(pair<bool, _CharT>& __last_char,
+        -:  457:		       _BracketMatcher<_TraitsT, __icase, __collate>& __matcher)
+        -:  458:    {
+    #####:  459:      if (_M_match_token(_ScannerT::_S_token_bracket_end))
+    %%%%%:  459-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  459-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  460:	return false;
+    %%%%%:  460-block  0
+        -:  461:
+    #####:  462:      const auto __push_char = [&](_CharT __ch)
+        -:  463:      {
+        -:  464:	if (__last_char.first)
+        -:  465:	  __matcher._M_add_char(__last_char.second);
+        -:  466:	else
+        -:  467:	  __last_char.first = true;
+        -:  468:	__last_char.second = __ch;
+        -:  469:      };
+    #####:  470:      const auto __flush = [&]
+        -:  471:      {
+        -:  472:	if (__last_char.first)
+        -:  473:	  {
+        -:  474:	    __matcher._M_add_char(__last_char.second);
+        -:  475:	    __last_char.first = false;
+        -:  476:	  }
+        -:  477:      };
+        -:  478:
+    #####:  479:      if (_M_match_token(_ScannerT::_S_token_collsymbol))
+    %%%%%:  479-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  479-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  480:	{
+    #####:  481:	  auto __symbol = __matcher._M_add_collate_element(_M_value);
+    %%%%%:  481-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  482:	  if (__symbol.size() == 1)
+    %%%%%:  482-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  483:	    __push_char(__symbol[0]);
+    %%%%%:  483-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  483-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+        -:  484:	  else
+    #####:  485:	    __flush();
+    %%%%%:  485-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  486:	}
+    %%%%%:  486-block  0
+call    0 never executed
+    $$$$$:  486-block  1
+call    1 never executed
+    #####:  487:      else if (_M_match_token(_ScannerT::_S_token_equiv_class_name))
+    %%%%%:  487-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  487-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  488:	{
+    #####:  489:	  __flush();
+    %%%%%:  489-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  490:	  __matcher._M_add_equivalence_class(_M_value);
+    %%%%%:  490-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  491:	}
+    #####:  492:      else if (_M_match_token(_ScannerT::_S_token_char_class_name))
+    %%%%%:  492-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  492-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  493:	{
+    #####:  494:	  __flush();
+    %%%%%:  494-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  495:	  __matcher._M_add_character_class(_M_value, false);
+    %%%%%:  495-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  496:	}
+    #####:  497:      else if (_M_try_char())
+    %%%%%:  497-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  497-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  498:	__push_char(_M_value[0]);
+    %%%%%:  498-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  498-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+        -:  499:      // POSIX doesn't allow '-' as a start-range char (say [a-z--0]),
+        -:  500:      // except when the '-' is the first or last character in the bracket
+        -:  501:      // expression ([--0]). ECMAScript treats all '-' after a range as a
+        -:  502:      // normal character. Also see above, where _M_expression_term gets called.
+        -:  503:      //
+        -:  504:      // As a result, POSIX rejects [-----], but ECMAScript doesn't.
+        -:  505:      // Boost (1.57.0) always uses POSIX style even in its ECMAScript syntax.
+        -:  506:      // Clang (3.5) always uses ECMAScript style even in its POSIX syntax.
+        -:  507:      //
+        -:  508:      // It turns out that no one reads BNFs ;)
+    #####:  509:      else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  509-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  509-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  510:	{
+    #####:  511:	  if (!__last_char.first)
+    %%%%%:  511-block  0
+branch  0 never executed
+branch  1 never executed
+        -:  512:	    {
+    #####:  513:	      if (!(_M_flags & regex_constants::ECMAScript))
+    %%%%%:  513-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  514:		{
+    #####:  515:		  if (_M_match_token(_ScannerT::_S_token_bracket_end))
+    %%%%%:  515-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  515-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  516:		    {
+    #####:  517:		      __push_char('-');
+    %%%%%:  517-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  518:		      return false;
+    %%%%%:  518-block  0
+        -:  519:		    }
+    #####:  520:		  __throw_regex_error(
+    %%%%%:  520-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  521:		    regex_constants::error_range,
+        -:  522:		    "Unexpected dash in bracket expression. For POSIX syntax, "
+        -:  523:		    "a dash is not treated literally only when it is at "
+        -:  524:		    "beginning or end.");
+        -:  525:		}
+    #####:  526:	      __push_char('-');
+    %%%%%:  526-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  527:	    }
+        -:  528:	  else
+        -:  529:	    {
+    #####:  530:	      if (_M_try_char())
+    %%%%%:  530-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  530-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  531:		{
+    #####:  532:		  __matcher._M_make_range(__last_char.second, _M_value[0]);
+    %%%%%:  532-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  532-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    #####:  533:		  __last_char.first = false;
+    %%%%%:  533-block  0
+        -:  534:		}
+    #####:  535:	      else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  535-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  535-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  536:		{
+    #####:  537:		  __matcher._M_make_range(__last_char.second, '-');
+    %%%%%:  537-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  538:		  __last_char.first = false;
+    %%%%%:  538-block  0
+        -:  539:		}
+        -:  540:	      else
+        -:  541:		{
+    #####:  542:		  if (_M_scanner._M_get_token()
+    %%%%%:  542-block  0
+call    0 never executed
+    #####:  543:		      != _ScannerT::_S_token_bracket_end)
+branch  0 never executed
+branch  1 never executed
+    #####:  544:		    __throw_regex_error(
+    %%%%%:  544-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  545:		      regex_constants::error_range,
+        -:  546:		      "Character is expected after a dash.");
+    #####:  547:		  __push_char('-');
+    %%%%%:  547-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  548:		}
+        -:  549:	    }
+        -:  550:	}
+    #####:  551:      else if (_M_match_token(_ScannerT::_S_token_quoted_class))
+    %%%%%:  551-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  551-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  552:	{
+    #####:  553:	  __flush();
+    %%%%%:  553-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  554:	  __matcher._M_add_character_class(_M_value,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  555:					   _M_ctype.is(_CtypeT::upper,
+    #####:  556:						       _M_value[0]));
+    %%%%%:  556-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  556-block  1
+call    3 never executed
+        -:  557:	}
+        -:  558:      else
+    #####:  559:	__throw_regex_error(regex_constants::error_brack,
+    %%%%%:  559-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  560:			    "Unexpected character in bracket expression.");
+        -:  561:
+    #####:  562:      return true;
+    %%%%%:  562-block  0
+        -:  563:    }
+------------------
+_ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE18_M_expression_termILb0ELb0EEEbRSt4pairIbcERNS_15_BracketMatcherIS3_XT_EXT0_EEE:
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE18_M_expression_termILb0ELb0EEEbRSt4pairIbcERNS_15_BracketMatcherIS3_XT_EXT0_EEE called 0 returned 0% blocks executed 0%
+    #####:  455:    _Compiler<_TraitsT>::
+        -:  456:    _M_expression_term(pair<bool, _CharT>& __last_char,
+        -:  457:		       _BracketMatcher<_TraitsT, __icase, __collate>& __matcher)
+        -:  458:    {
+    #####:  459:      if (_M_match_token(_ScannerT::_S_token_bracket_end))
+    %%%%%:  459-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  459-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  460:	return false;
+    %%%%%:  460-block  0
+        -:  461:
+    #####:  462:      const auto __push_char = [&](_CharT __ch)
+        -:  463:      {
+        -:  464:	if (__last_char.first)
+        -:  465:	  __matcher._M_add_char(__last_char.second);
+        -:  466:	else
+        -:  467:	  __last_char.first = true;
+        -:  468:	__last_char.second = __ch;
+        -:  469:      };
+    #####:  470:      const auto __flush = [&]
+        -:  471:      {
+        -:  472:	if (__last_char.first)
+        -:  473:	  {
+        -:  474:	    __matcher._M_add_char(__last_char.second);
+        -:  475:	    __last_char.first = false;
+        -:  476:	  }
+        -:  477:      };
+        -:  478:
+    #####:  479:      if (_M_match_token(_ScannerT::_S_token_collsymbol))
+    %%%%%:  479-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  479-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  480:	{
+    #####:  481:	  auto __symbol = __matcher._M_add_collate_element(_M_value);
+    %%%%%:  481-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  482:	  if (__symbol.size() == 1)
+    %%%%%:  482-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  483:	    __push_char(__symbol[0]);
+    %%%%%:  483-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  483-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+        -:  484:	  else
+    #####:  485:	    __flush();
+    %%%%%:  485-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  486:	}
+    %%%%%:  486-block  0
+call    0 never executed
+    $$$$$:  486-block  1
+call    1 never executed
+    #####:  487:      else if (_M_match_token(_ScannerT::_S_token_equiv_class_name))
+    %%%%%:  487-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  487-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  488:	{
+    #####:  489:	  __flush();
+    %%%%%:  489-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  490:	  __matcher._M_add_equivalence_class(_M_value);
+    %%%%%:  490-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  491:	}
+    #####:  492:      else if (_M_match_token(_ScannerT::_S_token_char_class_name))
+    %%%%%:  492-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  492-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  493:	{
+    #####:  494:	  __flush();
+    %%%%%:  494-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  495:	  __matcher._M_add_character_class(_M_value, false);
+    %%%%%:  495-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  496:	}
+    #####:  497:      else if (_M_try_char())
+    %%%%%:  497-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  497-block  1
+branch  3 never executed
+branch  4 never executed
+    #####:  498:	__push_char(_M_value[0]);
+    %%%%%:  498-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  498-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+        -:  499:      // POSIX doesn't allow '-' as a start-range char (say [a-z--0]),
+        -:  500:      // except when the '-' is the first or last character in the bracket
+        -:  501:      // expression ([--0]). ECMAScript treats all '-' after a range as a
+        -:  502:      // normal character. Also see above, where _M_expression_term gets called.
+        -:  503:      //
+        -:  504:      // As a result, POSIX rejects [-----], but ECMAScript doesn't.
+        -:  505:      // Boost (1.57.0) always uses POSIX style even in its ECMAScript syntax.
+        -:  506:      // Clang (3.5) always uses ECMAScript style even in its POSIX syntax.
+        -:  507:      //
+        -:  508:      // It turns out that no one reads BNFs ;)
+    #####:  509:      else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  509-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  509-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  510:	{
+    #####:  511:	  if (!__last_char.first)
+    %%%%%:  511-block  0
+branch  0 never executed
+branch  1 never executed
+        -:  512:	    {
+    #####:  513:	      if (!(_M_flags & regex_constants::ECMAScript))
+    %%%%%:  513-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  514:		{
+    #####:  515:		  if (_M_match_token(_ScannerT::_S_token_bracket_end))
+    %%%%%:  515-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  515-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  516:		    {
+    #####:  517:		      __push_char('-');
+    %%%%%:  517-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  518:		      return false;
+    %%%%%:  518-block  0
+        -:  519:		    }
+    #####:  520:		  __throw_regex_error(
+    %%%%%:  520-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  521:		    regex_constants::error_range,
+        -:  522:		    "Unexpected dash in bracket expression. For POSIX syntax, "
+        -:  523:		    "a dash is not treated literally only when it is at "
+        -:  524:		    "beginning or end.");
+        -:  525:		}
+    #####:  526:	      __push_char('-');
+    %%%%%:  526-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  527:	    }
+        -:  528:	  else
+        -:  529:	    {
+    #####:  530:	      if (_M_try_char())
+    %%%%%:  530-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  530-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  531:		{
+    #####:  532:		  __matcher._M_make_range(__last_char.second, _M_value[0]);
+    %%%%%:  532-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  532-block  1
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+    #####:  533:		  __last_char.first = false;
+    %%%%%:  533-block  0
+        -:  534:		}
+    #####:  535:	      else if (_M_match_token(_ScannerT::_S_token_bracket_dash))
+    %%%%%:  535-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  535-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  536:		{
+    #####:  537:		  __matcher._M_make_range(__last_char.second, '-');
+    %%%%%:  537-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  538:		  __last_char.first = false;
+    %%%%%:  538-block  0
+        -:  539:		}
+        -:  540:	      else
+        -:  541:		{
+    #####:  542:		  if (_M_scanner._M_get_token()
+    %%%%%:  542-block  0
+call    0 never executed
+    #####:  543:		      != _ScannerT::_S_token_bracket_end)
+branch  0 never executed
+branch  1 never executed
+    #####:  544:		    __throw_regex_error(
+    %%%%%:  544-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  545:		      regex_constants::error_range,
+        -:  546:		      "Character is expected after a dash.");
+    #####:  547:		  __push_char('-');
+    %%%%%:  547-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  548:		}
+        -:  549:	    }
+        -:  550:	}
+    #####:  551:      else if (_M_match_token(_ScannerT::_S_token_quoted_class))
+    %%%%%:  551-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  551-block  1
+branch  3 never executed
+branch  4 never executed
+        -:  552:	{
+    #####:  553:	  __flush();
+    %%%%%:  553-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  554:	  __matcher._M_add_character_class(_M_value,
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  555:					   _M_ctype.is(_CtypeT::upper,
+    #####:  556:						       _M_value[0]));
+    %%%%%:  556-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  556-block  1
+call    3 never executed
+        -:  557:	}
+        -:  558:      else
+    #####:  559:	__throw_regex_error(regex_constants::error_brack,
+    %%%%%:  559-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  560:			    "Unexpected character in bracket expression.");
+        -:  561:
+    #####:  562:      return true;
+    %%%%%:  562-block  0
+        -:  563:    }
+------------------
+        -:  564:
+        -:  565:  template<typename _TraitsT>
+        -:  566:    bool
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE11_M_try_charEv called 0 returned 0% blocks executed 0%
+    #####:  567:    _Compiler<_TraitsT>::
+        -:  568:    _M_try_char()
+        -:  569:    {
+    #####:  570:      bool __is_char = false;
+    #####:  571:      if (_M_match_token(_ScannerT::_S_token_oct_num))
+    %%%%%:  571-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  572:	{
+    #####:  573:	  __is_char = true;
+    #####:  574:	  _M_value.assign(1, _M_cur_int_value(8));
+    %%%%%:  574-block  0
+call    0 never executed
+call    1 never executed
+        -:  575:	}
+    #####:  576:      else if (_M_match_token(_ScannerT::_S_token_hex_num))
+    %%%%%:  576-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  577:	{
+    #####:  578:	  __is_char = true;
+    #####:  579:	  _M_value.assign(1, _M_cur_int_value(16));
+    %%%%%:  579-block  0
+call    0 never executed
+call    1 never executed
+        -:  580:	}
+    #####:  581:      else if (_M_match_token(_ScannerT::_S_token_ord_char))
+    %%%%%:  581-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  582:	__is_char = true;
+    %%%%%:  582-block  0
+    #####:  583:      return __is_char;
+    %%%%%:  583-block  0
+        -:  584:    }
+        -:  585:
+        -:  586:  template<typename _TraitsT>
+        -:  587:    bool
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE14_M_match_tokenENS_12_ScannerBase7_TokenTE called 0 returned 0% blocks executed 0%
+    #####:  588:    _Compiler<_TraitsT>::
+        -:  589:    _M_match_token(_TokenT token)
+        -:  590:    {
+    #####:  591:      if (token == _M_scanner._M_get_token())
+    %%%%%:  591-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+        -:  592:	{
+    #####:  593:	  _M_value = _M_scanner._M_get_value();
+    %%%%%:  593-block  0
+call    0 never executed
+call    1 never executed
+    #####:  594:	  _M_scanner._M_advance();
+call    0 never executed
+    #####:  595:	  return true;
+        -:  596:	}
+    #####:  597:      return false;
+    %%%%%:  597-block  0
+        -:  598:    }
+        -:  599:
+        -:  600:  template<typename _TraitsT>
+        -:  601:    int
+function _ZNSt8__detail9_CompilerINSt7__cxx1112regex_traitsIcEEE16_M_cur_int_valueEi called 0 returned 0% blocks executed 0%
+    #####:  602:    _Compiler<_TraitsT>::
+        -:  603:    _M_cur_int_value(int __radix)
+        -:  604:    {
+    #####:  605:      long __v = 0;
+    #####:  606:      for (typename _StringT::size_type __i = 0;
+    %%%%%:  606-block  0
+    #####:  607:	   __i < _M_value.length(); ++__i)
+    %%%%%:  607-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    #####:  608:	__v =__v * __radix + _M_traits.value(_M_value[__i], __radix);
+    %%%%%:  608-block  0
+call    0 never executed
+call    1 never executed
+    #####:  609:      return __v;
+    %%%%%:  609-block  0
+        -:  610:    }
+        -:  611:
+        -:  612:  template<typename _TraitsT, bool __icase, bool __collate>
+        -:  613:    bool
+    #####:  614:    _BracketMatcher<_TraitsT, __icase, __collate>::
+        -:  615:    _M_apply(_CharT __ch, false_type) const
+        -:  616:    {
+    #####:  617:      return [this, __ch]
+        -:  618:      {
+    #####:  619:	if (std::binary_search(_M_char_set.begin(), _M_char_set.end(),
+call    0 never executed
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+call    4 never executed
+call    5 never executed
+branch  6 never executed
+branch  7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+call   12 never executed
+call   13 never executed
+branch 14 never executed
+branch 15 never executed
+    #####:  620:			       _M_translator._M_translate(__ch)))
+    %%%%%:  620-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  620-block  1
+call    3 never executed
+    %%%%%:  620-block  2
+branch  4 never executed
+branch  5 never executed
+    $$$$$:  620-block  3
+    %%%%%:  620-block  4
+call    6 never executed
+call    7 never executed
+    %%%%%:  620-block  5
+branch  8 never executed
+branch  9 never executed
+    $$$$$:  620-block  6
+call   10 never executed
+    %%%%%:  620-block  7
+call   11 never executed
+branch 12 never executed
+branch 13 never executed
+    %%%%%:  620-block  8
+call   14 never executed
+    %%%%%:  620-block  9
+branch 15 never executed
+branch 16 never executed
+    $$$$$:  620-block 10
+    %%%%%:  620-block 11
+call   17 never executed
+call   18 never executed
+    %%%%%:  620-block 12
+branch 19 never executed
+branch 20 never executed
+    $$$$$:  620-block 13
+call   21 never executed
+    #####:  621:	  return true;
+    %%%%%:  621-block  0
+    %%%%%:  621-block  1
+    %%%%%:  621-block  2
+    %%%%%:  621-block  3
+    #####:  622:	auto __s = _M_translator._M_transform(__ch);
+    %%%%%:  622-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  622-block  1
+call    3 never executed
+    %%%%%:  622-block  2
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  622-block  3
+call    7 never executed
+    #####:  623:	for (auto& __it : _M_range_set)
+    %%%%%:  623-block  0
+call    0 never executed
+call    1 never executed
+    %%%%%:  623-block  1
+call    2 never executed
+    %%%%%:  623-block  2
+call    3 never executed
+    %%%%%:  623-block  3
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+call    7 never executed
+call    8 never executed
+    %%%%%:  623-block  4
+call    9 never executed
+    %%%%%:  623-block  5
+call   10 never executed
+    %%%%%:  623-block  6
+call   11 never executed
+branch 12 never executed
+branch 13 never executed
+    %%%%%:  623-block  7
+call   14 never executed
+call   15 never executed
+    %%%%%:  623-block  8
+call   16 never executed
+    %%%%%:  623-block  9
+call   17 never executed
+    %%%%%:  623-block 10
+call   18 never executed
+branch 19 never executed
+branch 20 never executed
+call   21 never executed
+call   22 never executed
+    %%%%%:  623-block 11
+call   23 never executed
+    %%%%%:  623-block 12
+call   24 never executed
+    %%%%%:  623-block 13
+call   25 never executed
+branch 26 never executed
+branch 27 never executed
+    #####:  624:	  if (_M_translator._M_match_range(__it.first, __it.second, __s))
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  624-block  0
+branch  3 never executed
+branch  4 never executed
+call    5 never executed
+branch  6 never executed
+branch  7 never executed
+    %%%%%:  624-block  1
+branch  8 never executed
+branch  9 never executed
+call   10 never executed
+branch 11 never executed
+branch 12 never executed
+call   13 never executed
+branch 14 never executed
+branch 15 never executed
+    #####:  625:	    return true;
+    %%%%%:  625-block  0
+    %%%%%:  625-block  1
+    %%%%%:  625-block  2
+    %%%%%:  625-block  3
+    #####:  626:	if (_M_traits.isctype(__ch, _M_class_set))
+    %%%%%:  626-block  0
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  626-block  1
+branch  3 never executed
+branch  4 never executed
+    %%%%%:  626-block  2
+call    5 never executed
+branch  6 never executed
+branch  7 never executed
+    %%%%%:  626-block  3
+call    8 never executed
+branch  9 never executed
+branch 10 never executed
+    %%%%%:  626-block  4
+branch 11 never executed
+branch 12 never executed
+    %%%%%:  626-block  5
+call   13 never executed
+branch 14 never executed
+branch 15 never executed
+    #####:  627:	  return true;
+    %%%%%:  627-block  0
+    %%%%%:  627-block  1
+    %%%%%:  627-block  2
+    %%%%%:  627-block  3
+    #####:  628:	if (std::find(_M_equiv_set.begin(), _M_equiv_set.end(),
+    %%%%%:  628-block  0
+call    0 never executed
+call    1 never executed
+call    2 never executed
+branch  3 never executed
+branch  4 never executed
+call    5 never executed
+    $$$$$:  628-block  1
+call    6 never executed
+    $$$$$:  628-block  2
+    %%%%%:  628-block  3
+call    7 never executed
+call    8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+call   12 never executed
+    $$$$$:  628-block  4
+call   13 never executed
+    $$$$$:  628-block  5
+    %%%%%:  628-block  6
+call   14 never executed
+call   15 never executed
+call   16 never executed
+branch 17 never executed
+branch 18 never executed
+call   19 never executed
+    $$$$$:  628-block  7
+call   20 never executed
+    $$$$$:  628-block  8
+    %%%%%:  628-block  9
+call   21 never executed
+call   22 never executed
+call   23 never executed
+branch 24 never executed
+branch 25 never executed
+call   26 never executed
+    $$$$$:  628-block 10
+call   27 never executed
+    $$$$$:  628-block 11
+    #####:  629:		      _M_traits.transform_primary(&__ch, &__ch+1))
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+call    3 never executed
+branch  4 never executed
+branch  5 never executed
+call    6 never executed
+branch  7 never executed
+branch  8 never executed
+call    9 never executed
+branch 10 never executed
+branch 11 never executed
+    #####:  630:	    != _M_equiv_set.end())
+    %%%%%:  630-block  0
+call    0 never executed
+    %%%%%:  630-block  1
+call    1 never executed
+branch  2 never executed
+branch  3 never executed
+    $$$$$:  630-block  2
+    %%%%%:  630-block  3
+call    4 never executed
+    %%%%%:  630-block  4
+call    5 never executed
+branch  6 never executed
+branch  7 never executed
+    $$$$$:  630-block  5
+call    8 never executed
+    %%%%%:  630-block  6
+call    9 never executed
+    %%%%%:  630-block  7
+call   10 never executed
+branch 11 never executed
+branch 12 never executed
+    $$$$$:  630-block  8
+    %%%%%:  630-block  9
+call   13 never executed
+    %%%%%:  630-block 10
+call   14 never executed
+branch 15 never executed
+branch 16 never executed
+    $$$$$:  630-block 11
+call   17 never executed
+    #####:  631:	  return true;
+    %%%%%:  631-block  0
+    %%%%%:  631-block  1
+    %%%%%:  631-block  2
+    %%%%%:  631-block  3
+    #####:  632:	for (auto& __it : _M_neg_class_set)
+    %%%%%:  632-block  0
+call    0 never executed
+call    1 never executed
+    %%%%%:  632-block  1
+call    2 never executed
+    %%%%%:  632-block  2
+call    3 never executed
+    %%%%%:  632-block  3
+call    4 never executed
+branch  5 never executed
+branch  6 never executed
+    %%%%%:  632-block  4
+call    7 never executed
+call    8 never executed
+    %%%%%:  632-block  5
+call    9 never executed
+    %%%%%:  632-block  6
+call   10 never executed
+    %%%%%:  632-block  7
+call   11 never executed
+branch 12 never executed
+branch 13 never executed
+    %%%%%:  632-block  8
+call   14 never executed
+call   15 never executed
+    %%%%%:  632-block  9
+call   16 never executed
+    %%%%%:  632-block 10
+call   17 never executed
+    %%%%%:  632-block 11
+call   18 never executed
+branch 19 never executed
+branch 20 never executed
+    %%%%%:  632-block 12
+call   21 never executed
+call   22 never executed
+    %%%%%:  632-block 13
+call   23 never executed
+    %%%%%:  632-block 14
+call   24 never executed
+    %%%%%:  632-block 15
+call   25 never executed
+branch 26 never executed
+branch 27 never executed
+    #####:  633:	  if (!_M_traits.isctype(__ch, __it))
+call    0 never executed
+branch  1 never executed
+branch  2 never executed
+    %%%%%:  633-block  0
+branch  3 never executed
+branch  4 never executed
+call    5 never executed
+branch  6 never executed
+branch  7 never executed
+    %%%%%:  633-block  1
+branch  8 never executed
+branch  9 never executed
+call   10 never executed
+branch 11 never executed
+branch 12 never executed
+    %%%%%:  633-block  2
+branch 13 never executed
+branch 14 never executed
+call   15 never executed
+branch 16 never executed
+branch 17 never executed
+    %%%%%:  633-block  3
+branch 18 never executed
+branch 19 never executed
+    #####:  634:	    return true;
+    %%%%%:  634-block  0
+    %%%%%:  634-block  1
+    %%%%%:  634-block  2
+    %%%%%:  634-block  3
+    #####:  635:	return false;
+    %%%%%:  635-block  0
+    %%%%%:  635-block  1
+    %%%%%:  635-block  2
+    %%%%%:  635-block  3
+    #####:  636:      }() ^ _M_is_non_matching;
+    %%%%%:  636-block  0
+call    0 never executed
+    $$$$$:  636-block  1
+call    1 never executed
+    %%%%%:  636-block  2
+call    2 never executed
+    $$$$$:  636-block  3
+call    3 never executed
+        -:  637:    }
+        -:  638:} // namespace __detail
+        -:  639:
+        -:  640:_GLIBCXX_END_NAMESPACE_VERSION
+        -:  641:} // namespace

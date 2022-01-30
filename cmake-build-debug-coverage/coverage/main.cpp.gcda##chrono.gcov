@@ -1,0 +1,3404 @@
+        -:    0:Source:C:/Users/aniru/AppData/Local/JetBrains/Toolbox/apps/CLion/ch-0/213.6461.75/bin/mingw/lib/gcc/x86_64-w64-mingw32/11.2.0/include/c++/chrono
+        -:    0:Graph:C:\Users\aniru\Desktop\code\src\private\cs6015\msdscript\cmake-build-debug-coverage\CMakeFiles\msdscript.dir\main.cpp.gcno
+        -:    0:Data:C:\Users\aniru\Desktop\code\src\private\cs6015\msdscript\cmake-build-debug-coverage\CMakeFiles\msdscript.dir\main.cpp.gcda
+        -:    0:Runs:1
+        -:    1:// <chrono> -*- C++ -*-
+        -:    2:
+        -:    3:// Copyright (C) 2008-2021 Free Software Foundation, Inc.
+        -:    4://
+        -:    5:// This file is part of the GNU ISO C++ Library.  This library is free
+        -:    6:// software; you can redistribute it and/or modify it under the
+        -:    7:// terms of the GNU General Public License as published by the
+        -:    8:// Free Software Foundation; either version 3, or (at your option)
+        -:    9:// any later version.
+        -:   10:
+        -:   11:// This library is distributed in the hope that it will be useful,
+        -:   12:// but WITHOUT ANY WARRANTY; without even the implied warranty of
+        -:   13:// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        -:   14:// GNU General Public License for more details.
+        -:   15:
+        -:   16:// Under Section 7 of GPL version 3, you are granted additional
+        -:   17:// permissions described in the GCC Runtime Library Exception, version
+        -:   18:// 3.1, as published by the Free Software Foundation.
+        -:   19:
+        -:   20:// You should have received a copy of the GNU General Public License and
+        -:   21:// a copy of the GCC Runtime Library Exception along with this program;
+        -:   22:// see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
+        -:   23:// <http://www.gnu.org/licenses/>.
+        -:   24:
+        -:   25:/** @file include/chrono
+        -:   26: *  This is a Standard C++ Library header.
+        -:   27: *  @ingroup chrono
+        -:   28: */
+        -:   29:
+        -:   30:#ifndef _GLIBCXX_CHRONO
+        -:   31:#define _GLIBCXX_CHRONO 1
+        -:   32:
+        -:   33:#pragma GCC system_header
+        -:   34:
+        -:   35:#if __cplusplus < 201103L
+        -:   36:# include <bits/c++0x_warning.h>
+        -:   37:#else
+        -:   38:
+        -:   39:#include <ratio>
+        -:   40:#include <type_traits>
+        -:   41:#include <limits>
+        -:   42:#include <ctime>
+        -:   43:#include <bits/parse_numbers.h> // for literals support.
+        -:   44:#if __cplusplus > 201703L
+        -:   45:# include <concepts>
+        -:   46:# include <compare>
+        -:   47:#endif
+        -:   48:
+        -:   49:namespace std _GLIBCXX_VISIBILITY(default)
+        -:   50:{
+        -:   51:_GLIBCXX_BEGIN_NAMESPACE_VERSION
+        -:   52:
+        -:   53:#if __cplusplus >= 201703L
+        -:   54:  namespace filesystem { struct __file_clock; };
+        -:   55:#endif
+        -:   56:
+        -:   57:  /**
+        -:   58:   * @defgroup chrono Time
+        -:   59:   * @ingroup utilities
+        -:   60:   *
+        -:   61:   * Classes and functions for time.
+        -:   62:   * @{
+        -:   63:   */
+        -:   64:
+        -:   65:  /** @namespace std::chrono
+        -:   66:   *  @brief ISO C++ 2011 namespace for date and time utilities
+        -:   67:   */
+        -:   68:  namespace chrono
+        -:   69:  {
+        -:   70:    template<typename _Rep, typename _Period = ratio<1>>
+        -:   71:      struct duration;
+        -:   72:
+        -:   73:    template<typename _Clock, typename _Dur = typename _Clock::duration>
+        -:   74:      struct time_point;
+        -:   75:  }
+        -:   76:
+        -:   77:  // 20.11.4.3 specialization of common_type (for duration, sfinae-friendly)
+        -:   78:
+        -:   79:  /// @cond undocumented
+        -:   80:
+        -:   81:  template<typename _CT, typename _Period1, typename _Period2, typename = void>
+        -:   82:    struct __duration_common_type
+        -:   83:    { };
+        -:   84:
+        -:   85:  template<typename _CT, typename _Period1, typename _Period2>
+        -:   86:    struct __duration_common_type<_CT, _Period1, _Period2,
+        -:   87:				  __void_t<typename _CT::type>>
+        -:   88:    {
+        -:   89:    private:
+        -:   90:      using __gcd_num = __static_gcd<_Period1::num, _Period2::num>;
+        -:   91:      using __gcd_den = __static_gcd<_Period1::den, _Period2::den>;
+        -:   92:      using __cr = typename _CT::type;
+        -:   93:      using __r = ratio<__gcd_num::value,
+        -:   94:			(_Period1::den / __gcd_den::value) * _Period2::den>;
+        -:   95:
+        -:   96:    public:
+        -:   97:      using type = chrono::duration<__cr, typename __r::type>;
+        -:   98:    };
+        -:   99:
+        -:  100:  /// @endcond
+        -:  101:
+        -:  102:  /// Specialization of common_type for chrono::duration types.
+        -:  103:  /// @relates duration
+        -:  104:  template<typename _Rep1, typename _Period1, typename _Rep2, typename _Period2>
+        -:  105:    struct common_type<chrono::duration<_Rep1, _Period1>,
+        -:  106:		       chrono::duration<_Rep2, _Period2>>
+        -:  107:    : __duration_common_type<common_type<_Rep1, _Rep2>,
+        -:  108:			     typename _Period1::type,
+        -:  109:			     typename _Period2::type>
+        -:  110:    { };
+        -:  111:
+        -:  112:  /// Specialization of common_type for two identical chrono::duration types.
+        -:  113:  /// @relates duration
+        -:  114:  template<typename _Rep, typename _Period>
+        -:  115:    struct common_type<chrono::duration<_Rep, _Period>,
+        -:  116:		       chrono::duration<_Rep, _Period>>
+        -:  117:    {
+        -:  118:      using type = chrono::duration<typename common_type<_Rep>::type,
+        -:  119:				    typename _Period::type>;
+        -:  120:    };
+        -:  121:
+        -:  122:  /// Specialization of common_type for one chrono::duration type.
+        -:  123:  /// @relates duration
+        -:  124:  template<typename _Rep, typename _Period>
+        -:  125:    struct common_type<chrono::duration<_Rep, _Period>>
+        -:  126:    {
+        -:  127:      using type = chrono::duration<typename common_type<_Rep>::type,
+        -:  128:				    typename _Period::type>;
+        -:  129:    };
+        -:  130:
+        -:  131:  // 20.11.4.3 specialization of common_type (for time_point, sfinae-friendly)
+        -:  132:
+        -:  133:  /// @cond undocumented
+        -:  134:
+        -:  135:  template<typename _CT, typename _Clock, typename = void>
+        -:  136:    struct __timepoint_common_type
+        -:  137:    { };
+        -:  138:
+        -:  139:  template<typename _CT, typename _Clock>
+        -:  140:    struct __timepoint_common_type<_CT, _Clock, __void_t<typename _CT::type>>
+        -:  141:    {
+        -:  142:      using type = chrono::time_point<_Clock, typename _CT::type>;
+        -:  143:    };
+        -:  144:
+        -:  145:  /// @endcond
+        -:  146:
+        -:  147:  /// Specialization of common_type for chrono::time_point types.
+        -:  148:  /// @relates time_point
+        -:  149:  template<typename _Clock, typename _Duration1, typename _Duration2>
+        -:  150:    struct common_type<chrono::time_point<_Clock, _Duration1>,
+        -:  151:		       chrono::time_point<_Clock, _Duration2>>
+        -:  152:    : __timepoint_common_type<common_type<_Duration1, _Duration2>, _Clock>
+        -:  153:    { };
+        -:  154:
+        -:  155:  /// Specialization of common_type for two identical chrono::time_point types.
+        -:  156:  /// @relates time_point
+        -:  157:  template<typename _Clock, typename _Duration>
+        -:  158:    struct common_type<chrono::time_point<_Clock, _Duration>,
+        -:  159:		       chrono::time_point<_Clock, _Duration>>
+        -:  160:    { using type = chrono::time_point<_Clock, _Duration>; };
+        -:  161:
+        -:  162:  /// Specialization of common_type for one chrono::time_point type.
+        -:  163:  /// @relates time_point
+        -:  164:  template<typename _Clock, typename _Duration>
+        -:  165:    struct common_type<chrono::time_point<_Clock, _Duration>>
+        -:  166:    { using type = chrono::time_point<_Clock, _Duration>; };
+        -:  167:
+        -:  168:  /// @} group chrono
+        -:  169:
+        -:  170:  namespace chrono
+        -:  171:  {
+        -:  172:    /// @addtogroup chrono
+        -:  173:    /// @{
+        -:  174:
+        -:  175:    /// @cond undocumented
+        -:  176:
+        -:  177:    // Primary template for duration_cast impl.
+        -:  178:    template<typename _ToDur, typename _CF, typename _CR,
+        -:  179:	     bool _NumIsOne = false, bool _DenIsOne = false>
+        -:  180:      struct __duration_cast_impl
+        -:  181:      {
+        -:  182:	template<typename _Rep, typename _Period>
+        -:  183:	  static constexpr _ToDur
+        -:  184:	  __cast(const duration<_Rep, _Period>& __d)
+        -:  185:	  {
+        -:  186:	    typedef typename _ToDur::rep			__to_rep;
+        -:  187:	    return _ToDur(static_cast<__to_rep>(static_cast<_CR>(__d.count())
+        -:  188:	      * static_cast<_CR>(_CF::num)
+        -:  189:	      / static_cast<_CR>(_CF::den)));
+        -:  190:	  }
+        -:  191:      };
+        -:  192:
+        -:  193:    template<typename _ToDur, typename _CF, typename _CR>
+        -:  194:      struct __duration_cast_impl<_ToDur, _CF, _CR, true, true>
+        -:  195:      {
+        -:  196:	template<typename _Rep, typename _Period>
+        -:  197:	  static constexpr _ToDur
+function _ZNSt6chrono20__duration_cast_implINS_8durationIxSt5ratioILx1ELx1000000000EEEES2_ILx1ELx1EExLb1ELb1EE6__castIxS3_EES4_RKNS1_IT_T0_EE called 2 returned 100% blocks executed 100%
+        2:  198:	  __cast(const duration<_Rep, _Period>& __d)
+        -:  199:	  {
+        -:  200:	    typedef typename _ToDur::rep			__to_rep;
+        2:  201:	    return _ToDur(static_cast<__to_rep>(__d.count()));
+        2:  201-block  0
+call    0 returned 2
+call    1 returned 2
+        -:  202:	  }
+        -:  203:      };
+        -:  204:
+        -:  205:    template<typename _ToDur, typename _CF, typename _CR>
+        -:  206:      struct __duration_cast_impl<_ToDur, _CF, _CR, true, false>
+        -:  207:      {
+        -:  208:	template<typename _Rep, typename _Period>
+        -:  209:	  static constexpr _ToDur
+        -:  210:	  __cast(const duration<_Rep, _Period>& __d)
+        -:  211:	  {
+        -:  212:	    typedef typename _ToDur::rep			__to_rep;
+        -:  213:	    return _ToDur(static_cast<__to_rep>(
+        -:  214:	      static_cast<_CR>(__d.count()) / static_cast<_CR>(_CF::den)));
+        -:  215:	  }
+        -:  216:      };
+        -:  217:
+        -:  218:    template<typename _ToDur, typename _CF, typename _CR>
+        -:  219:      struct __duration_cast_impl<_ToDur, _CF, _CR, false, true>
+        -:  220:      {
+        -:  221:	template<typename _Rep, typename _Period>
+        -:  222:	  static constexpr _ToDur
+        -:  223:	  __cast(const duration<_Rep, _Period>& __d)
+        -:  224:	  {
+        -:  225:	    typedef typename _ToDur::rep			__to_rep;
+        -:  226:	    return _ToDur(static_cast<__to_rep>(
+        -:  227:	      static_cast<_CR>(__d.count()) * static_cast<_CR>(_CF::num)));
+        -:  228:	  }
+        -:  229:      };
+        -:  230:
+        -:  231:    template<typename _Tp>
+        -:  232:      struct __is_duration
+        -:  233:      : std::false_type
+        -:  234:      { };
+        -:  235:
+        -:  236:    template<typename _Rep, typename _Period>
+        -:  237:      struct __is_duration<duration<_Rep, _Period>>
+        -:  238:      : std::true_type
+        -:  239:      { };
+        -:  240:
+        -:  241:    template<typename _Tp>
+        -:  242:      using __enable_if_is_duration
+        -:  243:	= typename enable_if<__is_duration<_Tp>::value, _Tp>::type;
+        -:  244:
+        -:  245:    template<typename _Tp>
+        -:  246:      using __disable_if_is_duration
+        -:  247:	= typename enable_if<!__is_duration<_Tp>::value, _Tp>::type;
+        -:  248:
+        -:  249:    /// @endcond
+        -:  250:
+        -:  251:    /// duration_cast
+        -:  252:    template<typename _ToDur, typename _Rep, typename _Period>
+        -:  253:      constexpr __enable_if_is_duration<_ToDur>
+function _ZNSt6chrono13duration_castINS_8durationIxSt5ratioILx1ELx1000000000EEEExS3_EENSt9enable_ifIXsrNS_13__is_durationIT_EE5valueES7_E4typeERKNS1_IT0_T1_EE called 2 returned 100% blocks executed 100%
+        2:  254:      duration_cast(const duration<_Rep, _Period>& __d)
+        -:  255:      {
+        -:  256:	typedef typename _ToDur::period				__to_period;
+        -:  257:	typedef typename _ToDur::rep				__to_rep;
+        -:  258:	typedef ratio_divide<_Period, __to_period> 		__cf;
+        -:  259:	typedef typename common_type<__to_rep, _Rep, intmax_t>::type
+        -:  260:	  							__cr;
+        -:  261:	typedef  __duration_cast_impl<_ToDur, __cf, __cr,
+        -:  262:				      __cf::num == 1, __cf::den == 1> __dc;
+        2:  263:	return __dc::__cast(__d);
+        2:  263-block  0
+call    0 returned 2
+        -:  264:      }
+        -:  265:
+        -:  266:    /// treat_as_floating_point
+        -:  267:    template<typename _Rep>
+        -:  268:      struct treat_as_floating_point
+        -:  269:      : is_floating_point<_Rep>
+        -:  270:      { };
+        -:  271:
+        -:  272:#if __cplusplus > 201402L
+        -:  273:    template <typename _Rep>
+        -:  274:      inline constexpr bool treat_as_floating_point_v =
+        -:  275:        treat_as_floating_point<_Rep>::value;
+        -:  276:#endif // C++17
+        -:  277:
+        -:  278:#if __cplusplus > 201703L
+        -:  279:    template<typename _Tp>
+        -:  280:      struct is_clock;
+        -:  281:
+        -:  282:    template<typename _Tp>
+        -:  283:      inline constexpr bool is_clock_v = is_clock<_Tp>::value;
+        -:  284:
+        -:  285:#if __cpp_lib_concepts
+        -:  286:    template<typename _Tp>
+        -:  287:      struct is_clock : false_type
+        -:  288:      { };
+        -:  289:
+        -:  290:    template<typename _Tp>
+        -:  291:      requires requires {
+        -:  292:	typename _Tp::rep;
+        -:  293:	typename _Tp::period;
+        -:  294:	typename _Tp::duration;
+        -:  295:	typename _Tp::time_point::clock;
+        -:  296:	typename _Tp::time_point::duration;
+        -:  297:	{ &_Tp::is_steady } -> same_as<const bool*>;
+        -:  298:	{ _Tp::now() } -> same_as<typename _Tp::time_point>;
+        -:  299:	requires same_as<typename _Tp::duration,
+        -:  300:			 duration<typename _Tp::rep, typename _Tp::period>>;
+        -:  301:	requires same_as<typename _Tp::time_point::duration,
+        -:  302:			 typename _Tp::duration>;
+        -:  303:      }
+        -:  304:      struct is_clock<_Tp> : true_type
+        -:  305:      { };
+        -:  306:#else
+        -:  307:    template<typename _Tp, typename = void>
+        -:  308:      struct __is_clock_impl : false_type
+        -:  309:      { };
+        -:  310:
+        -:  311:    template<typename _Tp>
+        -:  312:      struct __is_clock_impl<_Tp,
+        -:  313:			     void_t<typename _Tp::rep, typename _Tp::period,
+        -:  314:				    typename _Tp::duration,
+        -:  315:				    typename _Tp::time_point::duration,
+        -:  316:				    decltype(_Tp::is_steady),
+        -:  317:				    decltype(_Tp::now())>>
+        -:  318:      : __and_<is_same<typename _Tp::duration,
+        -:  319:		       duration<typename _Tp::rep, typename _Tp::period>>,
+        -:  320:	       is_same<typename _Tp::time_point::duration,
+        -:  321:		       typename _Tp::duration>,
+        -:  322:	       is_same<decltype(&_Tp::is_steady), const bool*>,
+        -:  323:	       is_same<decltype(_Tp::now()), typename _Tp::time_point>>::type
+        -:  324:      { };
+        -:  325:
+        -:  326:    template<typename _Tp>
+        -:  327:      struct is_clock : __is_clock_impl<_Tp>::type
+        -:  328:      { };
+        -:  329:#endif
+        -:  330:#endif // C++20
+        -:  331:
+        -:  332:#if __cplusplus >= 201703L
+        -:  333:# define __cpp_lib_chrono 201611
+        -:  334:
+        -:  335:    template<typename _ToDur, typename _Rep, typename _Period>
+        -:  336:      constexpr __enable_if_is_duration<_ToDur>
+        -:  337:      floor(const duration<_Rep, _Period>& __d)
+        -:  338:      {
+        -:  339:	auto __to = chrono::duration_cast<_ToDur>(__d);
+        -:  340:	if (__to > __d)
+        -:  341:	  return __to - _ToDur{1};
+        -:  342:	return __to;
+        -:  343:      }
+        -:  344:
+        -:  345:    template<typename _ToDur, typename _Rep, typename _Period>
+        -:  346:      constexpr __enable_if_is_duration<_ToDur>
+        -:  347:      ceil(const duration<_Rep, _Period>& __d)
+        -:  348:      {
+        -:  349:	auto __to = chrono::duration_cast<_ToDur>(__d);
+        -:  350:	if (__to < __d)
+        -:  351:	  return __to + _ToDur{1};
+        -:  352:	return __to;
+        -:  353:      }
+        -:  354:
+        -:  355:    template <typename _ToDur, typename _Rep, typename _Period>
+        -:  356:      constexpr enable_if_t<
+        -:  357:	__and_<__is_duration<_ToDur>,
+        -:  358:	       __not_<treat_as_floating_point<typename _ToDur::rep>>>::value,
+        -:  359:	_ToDur>
+        -:  360:      round(const duration<_Rep, _Period>& __d)
+        -:  361:      {
+        -:  362:	_ToDur __t0 = chrono::floor<_ToDur>(__d);
+        -:  363:	_ToDur __t1 = __t0 + _ToDur{1};
+        -:  364:	auto __diff0 = __d - __t0;
+        -:  365:	auto __diff1 = __t1 - __d;
+        -:  366:	if (__diff0 == __diff1)
+        -:  367:	{
+        -:  368:	    if (__t0.count() & 1)
+        -:  369:		return __t1;
+        -:  370:	    return __t0;
+        -:  371:	}
+        -:  372:	else if (__diff0 < __diff1)
+        -:  373:	    return __t0;
+        -:  374:	return __t1;
+        -:  375:      }
+        -:  376:
+        -:  377:    template<typename _Rep, typename _Period>
+        -:  378:      constexpr
+        -:  379:      enable_if_t<numeric_limits<_Rep>::is_signed, duration<_Rep, _Period>>
+        -:  380:      abs(duration<_Rep, _Period> __d)
+        -:  381:      {
+        -:  382:	if (__d >= __d.zero())
+        -:  383:	  return __d;
+        -:  384:	return -__d;
+        -:  385:      }
+        -:  386:
+        -:  387:    // Make chrono::ceil<D> also usable as chrono::__detail::ceil<D>.
+        -:  388:    namespace __detail { using chrono::ceil; }
+        -:  389:
+        -:  390:#else // ! C++17
+        -:  391:
+        -:  392:    // We want to use ceil even when compiling for earlier standards versions.
+        -:  393:    // C++11 only allows a single statement in a constexpr function, so we
+        -:  394:    // need to move the comparison into a separate function, __ceil_impl.
+        -:  395:    namespace __detail
+        -:  396:    {
+        -:  397:      template<typename _Tp, typename _Up>
+        -:  398:	constexpr _Tp
+        -:  399:	__ceil_impl(const _Tp& __t, const _Up& __u)
+        -:  400:	{
+        -:  401:	  return (__t < __u) ? (__t + _Tp{1}) : __t;
+        -:  402:	}
+        -:  403:
+        -:  404:      // C++11-friendly version of std::chrono::ceil<D> for internal use.
+        -:  405:      template<typename _ToDur, typename _Rep, typename _Period>
+        -:  406:	constexpr _ToDur
+        -:  407:	ceil(const duration<_Rep, _Period>& __d)
+        -:  408:	{
+        -:  409:	  return __detail::__ceil_impl(chrono::duration_cast<_ToDur>(__d), __d);
+        -:  410:	}
+        -:  411:    }
+        -:  412:#endif // C++17
+        -:  413:
+        -:  414:    /// duration_values
+        -:  415:    template<typename _Rep>
+        -:  416:      struct duration_values
+        -:  417:      {
+        -:  418:	static constexpr _Rep
+        -:  419:	zero() noexcept
+        -:  420:	{ return _Rep(0); }
+        -:  421:
+        -:  422:	static constexpr _Rep
+        -:  423:	max() noexcept
+        -:  424:	{ return numeric_limits<_Rep>::max(); }
+        -:  425:
+        -:  426:	static constexpr _Rep
+        -:  427:	min() noexcept
+        -:  428:	{ return numeric_limits<_Rep>::lowest(); }
+        -:  429:      };
+        -:  430:
+        -:  431:    /// @cond undocumented
+        -:  432:
+        -:  433:    template<typename _Tp>
+        -:  434:      struct __is_ratio
+        -:  435:      : std::false_type
+        -:  436:      { };
+        -:  437:
+        -:  438:    template<intmax_t _Num, intmax_t _Den>
+        -:  439:      struct __is_ratio<ratio<_Num, _Den>>
+        -:  440:      : std::true_type
+        -:  441:      { };
+        -:  442:
+        -:  443:    /// @endcond
+        -:  444:
+        -:  445:    /// duration
+        -:  446:    template<typename _Rep, typename _Period>
+        -:  447:      struct duration
+        -:  448:      {
+        -:  449:      private:
+        -:  450:	template<typename _Rep2>
+        -:  451:	  using __is_float = treat_as_floating_point<_Rep2>;
+        -:  452:
+        -:  453:	static constexpr intmax_t
+        -:  454:	_S_gcd(intmax_t __m, intmax_t __n) noexcept
+        -:  455:	{
+        -:  456:	  // Duration only allows positive periods so we don't need to
+        -:  457:	  // handle negative values here (unlike __static_gcd and std::gcd).
+        -:  458:#if __cplusplus >= 201402L
+        -:  459:	  do
+        -:  460:	    {
+        -:  461:	      intmax_t __rem = __m % __n;
+        -:  462:	      __m = __n;
+        -:  463:	      __n = __rem;
+        -:  464:	    }
+        -:  465:	  while (__n != 0);
+        -:  466:	  return __m;
+        -:  467:#else
+        -:  468:	  // C++11 doesn't allow loops in constexpr functions, but this
+        -:  469:	  // recursive version can be more expensive to evaluate.
+        -:  470:	  return (__n == 0) ? __m : _S_gcd(__n, __m % __n);
+        -:  471:#endif
+        -:  472:	}
+        -:  473:
+        -:  474:	// _GLIBCXX_RESOLVE_LIB_DEFECTS
+        -:  475:	// 2094. overflow shouldn't participate in overload resolution
+        -:  476:	// 3090. What is [2094] intended to mean?
+        -:  477:	// This only produces a valid type if no overflow occurs.
+        -:  478:	template<typename _R1, typename _R2,
+        -:  479:		 intmax_t __gcd1 = _S_gcd(_R1::num, _R2::num),
+        -:  480:		 intmax_t __gcd2 = _S_gcd(_R1::den, _R2::den)>
+        -:  481:	  using __divide = ratio<(_R1::num / __gcd1) * (_R2::den / __gcd2),
+        -:  482:				 (_R1::den / __gcd2) * (_R2::num / __gcd1)>;
+        -:  483:
+        -:  484:	// _Period2 is an exact multiple of _Period
+        -:  485:	template<typename _Period2>
+        -:  486:	  using __is_harmonic
+        -:  487:	    = __bool_constant<__divide<_Period2, _Period>::den == 1>;
+        -:  488:
+        -:  489:      public:
+        -:  490:
+        -:  491:	using rep = _Rep;
+        -:  492:	using period = typename _Period::type;
+        -:  493:
+        -:  494:	static_assert(!__is_duration<_Rep>::value, "rep cannot be a duration");
+        -:  495:	static_assert(__is_ratio<_Period>::value,
+        -:  496:		      "period must be a specialization of ratio");
+        -:  497:	static_assert(_Period::num > 0, "period must be positive");
+        -:  498:
+        -:  499:	// 20.11.5.1 construction / copy / destroy
+        -:  500:	constexpr duration() = default;
+        -:  501:
+        -:  502:	duration(const duration&) = default;
+        -:  503:
+        -:  504:	// _GLIBCXX_RESOLVE_LIB_DEFECTS
+        -:  505:	// 3050. Conversion specification problem in chrono::duration
+        -:  506:	template<typename _Rep2, typename = _Require<
+        -:  507:		 is_convertible<const _Rep2&, rep>,
+        -:  508:		 __or_<__is_float<rep>, __not_<__is_float<_Rep2>>>>>
+       2*:  509:	  constexpr explicit duration(const _Rep2& __rep)
+       2*:  510:	  : __r(static_cast<rep>(__rep)) { }
+------------------
+_ZNSt6chrono8durationIxSt5ratioILx1ELx1000EEEC1IxvEERKT_:
+function _ZNSt6chrono8durationIxSt5ratioILx1ELx1000EEEC1IxvEERKT_ called 0 returned 0% blocks executed 0%
+    #####:  509:	  constexpr explicit duration(const _Rep2& __rep)
+    #####:  510:	  : __r(static_cast<rep>(__rep)) { }
+------------------
+_ZNSt6chrono8durationIxSt5ratioILx1ELx1000000000EEEC1IxvEERKT_:
+function _ZNSt6chrono8durationIxSt5ratioILx1ELx1000000000EEEC1IxvEERKT_ called 2 returned 100% blocks executed 100%
+        2:  509:	  constexpr explicit duration(const _Rep2& __rep)
+        2:  510:	  : __r(static_cast<rep>(__rep)) { }
+------------------
+        -:  511:
+        -:  512:	template<typename _Rep2, typename _Period2, typename = _Require<
+        -:  513:		 is_convertible<const _Rep2&, rep>,
+        -:  514:		 __or_<__is_float<rep>,
+        -:  515:		       __and_<__is_harmonic<_Period2>,
+        -:  516:			      __not_<__is_float<_Rep2>>>>>>
+        -:  517:	  constexpr duration(const duration<_Rep2, _Period2>& __d)
+        -:  518:	  : __r(duration_cast<duration>(__d).count()) { }
+        -:  519:
+        -:  520:	~duration() = default;
+        -:  521:	duration& operator=(const duration&) = default;
+        -:  522:
+        -:  523:	// 20.11.5.2 observer
+        -:  524:	constexpr rep
+function _ZNKSt6chrono8durationIxSt5ratioILx1ELx1000000000EEE5countEv called 4 returned 100% blocks executed 100%
+        4:  525:	count() const
+        4:  526:	{ return __r; }
+        4:  526-block  0
+        -:  527:
+        -:  528:	// 20.11.5.3 arithmetic
+        -:  529:
+        -:  530:	constexpr duration<typename common_type<rep>::type, period>
+        -:  531:	operator+() const
+        -:  532:	{ return duration<typename common_type<rep>::type, period>(__r); }
+        -:  533:
+        -:  534:	constexpr duration<typename common_type<rep>::type, period>
+        -:  535:	operator-() const
+        -:  536:	{ return duration<typename common_type<rep>::type, period>(-__r); }
+        -:  537:
+        -:  538:	_GLIBCXX17_CONSTEXPR duration&
+        -:  539:	operator++()
+        -:  540:	{
+        -:  541:	  ++__r;
+        -:  542:	  return *this;
+        -:  543:	}
+        -:  544:
+        -:  545:	_GLIBCXX17_CONSTEXPR duration
+        -:  546:	operator++(int)
+        -:  547:	{ return duration(__r++); }
+        -:  548:
+        -:  549:	_GLIBCXX17_CONSTEXPR duration&
+        -:  550:	operator--()
+        -:  551:	{
+        -:  552:	  --__r;
+        -:  553:	  return *this;
+        -:  554:	}
+        -:  555:
+        -:  556:	_GLIBCXX17_CONSTEXPR duration
+        -:  557:	operator--(int)
+        -:  558:	{ return duration(__r--); }
+        -:  559:
+        -:  560:	_GLIBCXX17_CONSTEXPR duration&
+        -:  561:	operator+=(const duration& __d)
+        -:  562:	{
+        -:  563:	  __r += __d.count();
+        -:  564:	  return *this;
+        -:  565:	}
+        -:  566:
+        -:  567:	_GLIBCXX17_CONSTEXPR duration&
+        -:  568:	operator-=(const duration& __d)
+        -:  569:	{
+        -:  570:	  __r -= __d.count();
+        -:  571:	  return *this;
+        -:  572:	}
+        -:  573:
+        -:  574:	_GLIBCXX17_CONSTEXPR duration&
+        -:  575:	operator*=(const rep& __rhs)
+        -:  576:	{
+        -:  577:	  __r *= __rhs;
+        -:  578:	  return *this;
+        -:  579:	}
+        -:  580:
+        -:  581:	_GLIBCXX17_CONSTEXPR duration&
+        -:  582:	operator/=(const rep& __rhs)
+        -:  583:	{
+        -:  584:	  __r /= __rhs;
+        -:  585:	  return *this;
+        -:  586:	}
+        -:  587:
+        -:  588:	// DR 934.
+        -:  589:	template<typename _Rep2 = rep>
+        -:  590:	  _GLIBCXX17_CONSTEXPR
+        -:  591:	  typename enable_if<!treat_as_floating_point<_Rep2>::value,
+        -:  592:			     duration&>::type
+        -:  593:	  operator%=(const rep& __rhs)
+        -:  594:	  {
+        -:  595:	    __r %= __rhs;
+        -:  596:	    return *this;
+        -:  597:	  }
+        -:  598:
+        -:  599:	template<typename _Rep2 = rep>
+        -:  600:	  _GLIBCXX17_CONSTEXPR
+        -:  601:	  typename enable_if<!treat_as_floating_point<_Rep2>::value,
+        -:  602:			     duration&>::type
+        -:  603:	  operator%=(const duration& __d)
+        -:  604:	  {
+        -:  605:	    __r %= __d.count();
+        -:  606:	    return *this;
+        -:  607:	  }
+        -:  608:
+        -:  609:	// 20.11.5.4 special values
+        -:  610:	static constexpr duration
+        -:  611:	zero() noexcept
+        -:  612:	{ return duration(duration_values<rep>::zero()); }
+        -:  613:
+        -:  614:	static constexpr duration
+        -:  615:	min() noexcept
+        -:  616:	{ return duration(duration_values<rep>::min()); }
+        -:  617:
+        -:  618:	static constexpr duration
+        -:  619:	max() noexcept
+        -:  620:	{ return duration(duration_values<rep>::max()); }
+        -:  621:
+        -:  622:      private:
+        -:  623:	rep __r;
+        -:  624:      };
+        -:  625:
+        -:  626:    /// @relates duration @{
+        -:  627:
+        -:  628:    /// The sum of two durations.
+        -:  629:    template<typename _Rep1, typename _Period1,
+        -:  630:	     typename _Rep2, typename _Period2>
+        -:  631:      constexpr typename common_type<duration<_Rep1, _Period1>,
+        -:  632:				     duration<_Rep2, _Period2>>::type
+        -:  633:      operator+(const duration<_Rep1, _Period1>& __lhs,
+        -:  634:		const duration<_Rep2, _Period2>& __rhs)
+        -:  635:      {
+        -:  636:	typedef duration<_Rep1, _Period1>			__dur1;
+        -:  637:	typedef duration<_Rep2, _Period2>			__dur2;
+        -:  638:	typedef typename common_type<__dur1,__dur2>::type	__cd;
+        -:  639:	return __cd(__cd(__lhs).count() + __cd(__rhs).count());
+        -:  640:      }
+        -:  641:
+        -:  642:    /// The difference between two durations.
+        -:  643:    template<typename _Rep1, typename _Period1,
+        -:  644:	     typename _Rep2, typename _Period2>
+        -:  645:      constexpr typename common_type<duration<_Rep1, _Period1>,
+        -:  646:				     duration<_Rep2, _Period2>>::type
+        -:  647:      operator-(const duration<_Rep1, _Period1>& __lhs,
+        -:  648:		const duration<_Rep2, _Period2>& __rhs)
+        -:  649:      {
+        -:  650:	typedef duration<_Rep1, _Period1>			__dur1;
+        -:  651:	typedef duration<_Rep2, _Period2>			__dur2;
+        -:  652:	typedef typename common_type<__dur1,__dur2>::type	__cd;
+        -:  653:	return __cd(__cd(__lhs).count() - __cd(__rhs).count());
+        -:  654:      }
+        -:  655:
+        -:  656:    /// @}
+        -:  657:
+        -:  658:    /// @cond undocumented
+        -:  659:
+        -:  660:    // SFINAE helper to obtain common_type<_Rep1, _Rep2> only if _Rep2
+        -:  661:    // is implicitly convertible to it.
+        -:  662:    // _GLIBCXX_RESOLVE_LIB_DEFECTS
+        -:  663:    // 3050. Conversion specification problem in chrono::duration constructor
+        -:  664:    template<typename _Rep1, typename _Rep2,
+        -:  665:	     typename _CRep = typename common_type<_Rep1, _Rep2>::type>
+        -:  666:      using __common_rep_t = typename
+        -:  667:	enable_if<is_convertible<const _Rep2&, _CRep>::value, _CRep>::type;
+        -:  668:
+        -:  669:    /// @endcond
+        -:  670:
+        -:  671:    /// @relates duration @{
+        -:  672:
+        -:  673:    /// Multiply a duration by a scalar value.
+        -:  674:    template<typename _Rep1, typename _Period, typename _Rep2>
+        -:  675:      constexpr duration<__common_rep_t<_Rep1, _Rep2>, _Period>
+        -:  676:      operator*(const duration<_Rep1, _Period>& __d, const _Rep2& __s)
+        -:  677:      {
+        -:  678:	typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period>
+        -:  679:	  __cd;
+        -:  680:	return __cd(__cd(__d).count() * __s);
+        -:  681:      }
+        -:  682:
+        -:  683:    /// Multiply a duration by a scalar value.
+        -:  684:    template<typename _Rep1, typename _Rep2, typename _Period>
+        -:  685:      constexpr duration<__common_rep_t<_Rep2, _Rep1>, _Period>
+        -:  686:      operator*(const _Rep1& __s, const duration<_Rep2, _Period>& __d)
+        -:  687:      { return __d * __s; }
+        -:  688:
+        -:  689:    template<typename _Rep1, typename _Period, typename _Rep2>
+        -:  690:      constexpr
+        -:  691:      duration<__common_rep_t<_Rep1, __disable_if_is_duration<_Rep2>>, _Period>
+        -:  692:      operator/(const duration<_Rep1, _Period>& __d, const _Rep2& __s)
+        -:  693:      {
+        -:  694:	typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period>
+        -:  695:	  __cd;
+        -:  696:	return __cd(__cd(__d).count() / __s);
+        -:  697:      }
+        -:  698:
+        -:  699:    template<typename _Rep1, typename _Period1,
+        -:  700:	     typename _Rep2, typename _Period2>
+        -:  701:      constexpr typename common_type<_Rep1, _Rep2>::type
+        -:  702:      operator/(const duration<_Rep1, _Period1>& __lhs,
+        -:  703:		const duration<_Rep2, _Period2>& __rhs)
+        -:  704:      {
+        -:  705:	typedef duration<_Rep1, _Period1>			__dur1;
+        -:  706:	typedef duration<_Rep2, _Period2>			__dur2;
+        -:  707:	typedef typename common_type<__dur1,__dur2>::type	__cd;
+        -:  708:	return __cd(__lhs).count() / __cd(__rhs).count();
+        -:  709:      }
+        -:  710:
+        -:  711:    // DR 934.
+        -:  712:    template<typename _Rep1, typename _Period, typename _Rep2>
+        -:  713:      constexpr
+        -:  714:      duration<__common_rep_t<_Rep1, __disable_if_is_duration<_Rep2>>, _Period>
+        -:  715:      operator%(const duration<_Rep1, _Period>& __d, const _Rep2& __s)
+        -:  716:      {
+        -:  717:	typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period>
+        -:  718:	  __cd;
+        -:  719:	return __cd(__cd(__d).count() % __s);
+        -:  720:      }
+        -:  721:
+        -:  722:    template<typename _Rep1, typename _Period1,
+        -:  723:	     typename _Rep2, typename _Period2>
+        -:  724:      constexpr typename common_type<duration<_Rep1, _Period1>,
+        -:  725:				     duration<_Rep2, _Period2>>::type
+        -:  726:      operator%(const duration<_Rep1, _Period1>& __lhs,
+        -:  727:		const duration<_Rep2, _Period2>& __rhs)
+        -:  728:      {
+        -:  729:	typedef duration<_Rep1, _Period1>			__dur1;
+        -:  730:	typedef duration<_Rep2, _Period2>			__dur2;
+        -:  731:	typedef typename common_type<__dur1,__dur2>::type	__cd;
+        -:  732:	return __cd(__cd(__lhs).count() % __cd(__rhs).count());
+        -:  733:      }
+        -:  734:
+        -:  735:    // comparisons
+        -:  736:
+        -:  737:    template<typename _Rep1, typename _Period1,
+        -:  738:	     typename _Rep2, typename _Period2>
+        -:  739:      constexpr bool
+        -:  740:      operator==(const duration<_Rep1, _Period1>& __lhs,
+        -:  741:		 const duration<_Rep2, _Period2>& __rhs)
+        -:  742:      {
+        -:  743:	typedef duration<_Rep1, _Period1>			__dur1;
+        -:  744:	typedef duration<_Rep2, _Period2>			__dur2;
+        -:  745:	typedef typename common_type<__dur1,__dur2>::type	__ct;
+        -:  746:	return __ct(__lhs).count() == __ct(__rhs).count();
+        -:  747:      }
+        -:  748:
+        -:  749:    template<typename _Rep1, typename _Period1,
+        -:  750:	     typename _Rep2, typename _Period2>
+        -:  751:      constexpr bool
+        -:  752:      operator<(const duration<_Rep1, _Period1>& __lhs,
+        -:  753:		const duration<_Rep2, _Period2>& __rhs)
+        -:  754:      {
+        -:  755:	typedef duration<_Rep1, _Period1>			__dur1;
+        -:  756:	typedef duration<_Rep2, _Period2>			__dur2;
+        -:  757:	typedef typename common_type<__dur1,__dur2>::type	__ct;
+        -:  758:	return __ct(__lhs).count() < __ct(__rhs).count();
+        -:  759:      }
+        -:  760:
+        -:  761:#if __cpp_lib_three_way_comparison
+        -:  762:    template<typename _Rep1, typename _Period1,
+        -:  763:	     typename _Rep2, typename _Period2>
+        -:  764:      requires three_way_comparable<common_type_t<_Rep1, _Rep2>>
+        -:  765:      constexpr auto
+        -:  766:      operator<=>(const duration<_Rep1, _Period1>& __lhs,
+        -:  767:		  const duration<_Rep2, _Period2>& __rhs)
+        -:  768:      {
+        -:  769:	using __ct = common_type_t<duration<_Rep1, _Period1>,
+        -:  770:				   duration<_Rep2, _Period2>>;
+        -:  771:	return __ct(__lhs).count() <=> __ct(__rhs).count();
+        -:  772:      }
+        -:  773:#else
+        -:  774:    template<typename _Rep1, typename _Period1,
+        -:  775:	     typename _Rep2, typename _Period2>
+        -:  776:      constexpr bool
+        -:  777:      operator!=(const duration<_Rep1, _Period1>& __lhs,
+        -:  778:		 const duration<_Rep2, _Period2>& __rhs)
+        -:  779:      { return !(__lhs == __rhs); }
+        -:  780:#endif
+        -:  781:
+        -:  782:    template<typename _Rep1, typename _Period1,
+        -:  783:	     typename _Rep2, typename _Period2>
+        -:  784:      constexpr bool
+        -:  785:      operator<=(const duration<_Rep1, _Period1>& __lhs,
+        -:  786:		 const duration<_Rep2, _Period2>& __rhs)
+        -:  787:      { return !(__rhs < __lhs); }
+        -:  788:
+        -:  789:    template<typename _Rep1, typename _Period1,
+        -:  790:	     typename _Rep2, typename _Period2>
+        -:  791:      constexpr bool
+        -:  792:      operator>(const duration<_Rep1, _Period1>& __lhs,
+        -:  793:		const duration<_Rep2, _Period2>& __rhs)
+        -:  794:      { return __rhs < __lhs; }
+        -:  795:
+        -:  796:    template<typename _Rep1, typename _Period1,
+        -:  797:	     typename _Rep2, typename _Period2>
+        -:  798:      constexpr bool
+        -:  799:      operator>=(const duration<_Rep1, _Period1>& __lhs,
+        -:  800:		 const duration<_Rep2, _Period2>& __rhs)
+        -:  801:      { return !(__lhs < __rhs); }
+        -:  802:
+        -:  803:    /// @}
+        -:  804:
+        -:  805:#ifdef _GLIBCXX_USE_C99_STDINT_TR1
+        -:  806:# define _GLIBCXX_CHRONO_INT64_T int64_t
+        -:  807:#elif defined __INT64_TYPE__
+        -:  808:# define _GLIBCXX_CHRONO_INT64_T __INT64_TYPE__
+        -:  809:#else
+        -:  810:    static_assert(std::numeric_limits<unsigned long long>::digits >= 64,
+        -:  811:	"Representation type for nanoseconds must have at least 64 bits");
+        -:  812:# define _GLIBCXX_CHRONO_INT64_T long long
+        -:  813:#endif
+        -:  814:
+        -:  815:    /// nanoseconds
+        -:  816:    using nanoseconds	= duration<_GLIBCXX_CHRONO_INT64_T, nano>;
+        -:  817:
+        -:  818:    /// microseconds
+        -:  819:    using microseconds	= duration<_GLIBCXX_CHRONO_INT64_T, micro>;
+        -:  820:
+        -:  821:    /// milliseconds
+        -:  822:    using milliseconds	= duration<_GLIBCXX_CHRONO_INT64_T, milli>;
+        -:  823:
+        -:  824:    /// seconds
+        -:  825:    using seconds	= duration<_GLIBCXX_CHRONO_INT64_T>;
+        -:  826:
+        -:  827:    /// minutes
+        -:  828:    using minutes	= duration<_GLIBCXX_CHRONO_INT64_T, ratio< 60>>;
+        -:  829:
+        -:  830:    /// hours
+        -:  831:    using hours		= duration<_GLIBCXX_CHRONO_INT64_T, ratio<3600>>;
+        -:  832:
+        -:  833:#if __cplusplus > 201703L
+        -:  834:    /// days
+        -:  835:    using days		= duration<_GLIBCXX_CHRONO_INT64_T, ratio<86400>>;
+        -:  836:
+        -:  837:    /// weeks
+        -:  838:    using weeks		= duration<_GLIBCXX_CHRONO_INT64_T, ratio<604800>>;
+        -:  839:
+        -:  840:    /// years
+        -:  841:    using years		= duration<_GLIBCXX_CHRONO_INT64_T, ratio<31556952>>;
+        -:  842:
+        -:  843:    /// months
+        -:  844:    using months	= duration<_GLIBCXX_CHRONO_INT64_T, ratio<2629746>>;
+        -:  845:#endif // C++20
+        -:  846:
+        -:  847:#undef _GLIBCXX_CHRONO_INT64_T
+        -:  848:
+        -:  849:    /// time_point
+        -:  850:    template<typename _Clock, typename _Dur>
+        -:  851:      struct time_point
+        -:  852:      {
+        -:  853:	static_assert(__is_duration<_Dur>::value,
+        -:  854:	    "duration must be a specialization of std::chrono::duration");
+        -:  855:
+        -:  856:	typedef _Clock						clock;
+        -:  857:	typedef _Dur						duration;
+        -:  858:	typedef typename duration::rep				rep;
+        -:  859:	typedef typename duration::period			period;
+        -:  860:
+        -:  861:	constexpr time_point() : __d(duration::zero())
+        -:  862:	{ }
+        -:  863:
+        -:  864:	constexpr explicit time_point(const duration& __dur)
+        -:  865:	: __d(__dur)
+        -:  866:	{ }
+        -:  867:
+        -:  868:	// conversions
+        -:  869:	template<typename _Dur2,
+        -:  870:		 typename = _Require<is_convertible<_Dur2, _Dur>>>
+        -:  871:	  constexpr time_point(const time_point<clock, _Dur2>& __t)
+        -:  872:	  : __d(__t.time_since_epoch())
+        -:  873:	  { }
+        -:  874:
+        -:  875:	// observer
+        -:  876:	constexpr duration
+function _ZNKSt6chrono10time_pointINS_3_V212system_clockENS_8durationIxSt5ratioILx1ELx1000000000EEEEE16time_since_epochEv called 2 returned 100% blocks executed 100%
+        2:  877:	time_since_epoch() const
+        2:  878:	{ return __d; }
+        2:  878-block  0
+        -:  879:
+        -:  880:#if __cplusplus > 201703L
+        -:  881:	constexpr time_point&
+        -:  882:	operator++()
+        -:  883:	{
+        -:  884:	  ++__d;
+        -:  885:	  return *this;
+        -:  886:	}
+        -:  887:
+        -:  888:	constexpr time_point
+        -:  889:	operator++(int)
+        -:  890:	{ return time_point{__d++}; }
+        -:  891:
+        -:  892:	constexpr time_point&
+        -:  893:	operator--()
+        -:  894:	{
+        -:  895:	  --__d;
+        -:  896:	  return *this;
+        -:  897:	}
+        -:  898:
+        -:  899:	constexpr time_point
+        -:  900:	operator--(int)
+        -:  901:	{ return time_point{__d--}; }
+        -:  902:#endif
+        -:  903:
+        -:  904:	// arithmetic
+        -:  905:	_GLIBCXX17_CONSTEXPR time_point&
+        -:  906:	operator+=(const duration& __dur)
+        -:  907:	{
+        -:  908:	  __d += __dur;
+        -:  909:	  return *this;
+        -:  910:	}
+        -:  911:
+        -:  912:	_GLIBCXX17_CONSTEXPR time_point&
+        -:  913:	operator-=(const duration& __dur)
+        -:  914:	{
+        -:  915:	  __d -= __dur;
+        -:  916:	  return *this;
+        -:  917:	}
+        -:  918:
+        -:  919:	// special values
+        -:  920:	static constexpr time_point
+        -:  921:	min() noexcept
+        -:  922:	{ return time_point(duration::min()); }
+        -:  923:
+        -:  924:	static constexpr time_point
+        -:  925:	max() noexcept
+        -:  926:	{ return time_point(duration::max()); }
+        -:  927:
+        -:  928:      private:
+        -:  929:	duration __d;
+        -:  930:      };
+        -:  931:
+        -:  932:    /// time_point_cast
+        -:  933:    template<typename _ToDur, typename _Clock, typename _Dur>
+        -:  934:      constexpr typename enable_if<__is_duration<_ToDur>::value,
+        -:  935:				   time_point<_Clock, _ToDur>>::type
+        -:  936:      time_point_cast(const time_point<_Clock, _Dur>& __t)
+        -:  937:      {
+        -:  938:	typedef time_point<_Clock, _ToDur>			__time_point;
+        -:  939:	return __time_point(duration_cast<_ToDur>(__t.time_since_epoch()));
+        -:  940:      }
+        -:  941:
+        -:  942:#if __cplusplus > 201402L
+        -:  943:    template<typename _ToDur, typename _Clock, typename _Dur>
+        -:  944:      constexpr
+        -:  945:      enable_if_t<__is_duration<_ToDur>::value, time_point<_Clock, _ToDur>>
+        -:  946:      floor(const time_point<_Clock, _Dur>& __tp)
+        -:  947:      {
+        -:  948:	return time_point<_Clock, _ToDur>{
+        -:  949:	    chrono::floor<_ToDur>(__tp.time_since_epoch())};
+        -:  950:      }
+        -:  951:
+        -:  952:    template<typename _ToDur, typename _Clock, typename _Dur>
+        -:  953:      constexpr
+        -:  954:      enable_if_t<__is_duration<_ToDur>::value, time_point<_Clock, _ToDur>>
+        -:  955:      ceil(const time_point<_Clock, _Dur>& __tp)
+        -:  956:      {
+        -:  957:	return time_point<_Clock, _ToDur>{
+        -:  958:	    chrono::ceil<_ToDur>(__tp.time_since_epoch())};
+        -:  959:      }
+        -:  960:
+        -:  961:    template<typename _ToDur, typename _Clock, typename _Dur>
+        -:  962:      constexpr enable_if_t<
+        -:  963:	__and_<__is_duration<_ToDur>,
+        -:  964:	       __not_<treat_as_floating_point<typename _ToDur::rep>>>::value,
+        -:  965:	time_point<_Clock, _ToDur>>
+        -:  966:      round(const time_point<_Clock, _Dur>& __tp)
+        -:  967:      {
+        -:  968:	return time_point<_Clock, _ToDur>{
+        -:  969:	    chrono::round<_ToDur>(__tp.time_since_epoch())};
+        -:  970:      }
+        -:  971:#endif // C++17
+        -:  972:
+        -:  973:    /// @relates time_point @{
+        -:  974:
+        -:  975:    /// Adjust a time point forwards by the given duration.
+        -:  976:    template<typename _Clock, typename _Dur1,
+        -:  977:	     typename _Rep2, typename _Period2>
+        -:  978:      constexpr time_point<_Clock,
+        -:  979:	typename common_type<_Dur1, duration<_Rep2, _Period2>>::type>
+        -:  980:      operator+(const time_point<_Clock, _Dur1>& __lhs,
+        -:  981:		const duration<_Rep2, _Period2>& __rhs)
+        -:  982:      {
+        -:  983:	typedef duration<_Rep2, _Period2>			__dur2;
+        -:  984:	typedef typename common_type<_Dur1,__dur2>::type	__ct;
+        -:  985:	typedef time_point<_Clock, __ct>			__time_point;
+        -:  986:	return __time_point(__lhs.time_since_epoch() + __rhs);
+        -:  987:      }
+        -:  988:
+        -:  989:    /// Adjust a time point forwards by the given duration.
+        -:  990:    template<typename _Rep1, typename _Period1,
+        -:  991:	     typename _Clock, typename _Dur2>
+        -:  992:      constexpr time_point<_Clock,
+        -:  993:	typename common_type<duration<_Rep1, _Period1>, _Dur2>::type>
+        -:  994:      operator+(const duration<_Rep1, _Period1>& __lhs,
+        -:  995:		const time_point<_Clock, _Dur2>& __rhs)
+        -:  996:      {
+        -:  997:	typedef duration<_Rep1, _Period1>			__dur1;
+        -:  998:	typedef typename common_type<__dur1,_Dur2>::type	__ct;
+        -:  999:	typedef time_point<_Clock, __ct>			__time_point;
+        -: 1000:	return __time_point(__rhs.time_since_epoch() + __lhs);
+        -: 1001:      }
+        -: 1002:
+        -: 1003:    /// Adjust a time point backwards by the given duration.
+        -: 1004:    template<typename _Clock, typename _Dur1,
+        -: 1005:	     typename _Rep2, typename _Period2>
+        -: 1006:      constexpr time_point<_Clock,
+        -: 1007:	typename common_type<_Dur1, duration<_Rep2, _Period2>>::type>
+        -: 1008:      operator-(const time_point<_Clock, _Dur1>& __lhs,
+        -: 1009:		const duration<_Rep2, _Period2>& __rhs)
+        -: 1010:      {
+        -: 1011:	typedef duration<_Rep2, _Period2>			__dur2;
+        -: 1012:	typedef typename common_type<_Dur1,__dur2>::type	__ct;
+        -: 1013:	typedef time_point<_Clock, __ct>			__time_point;
+        -: 1014:	return __time_point(__lhs.time_since_epoch() -__rhs);
+        -: 1015:      }
+        -: 1016:
+        -: 1017:    /// @}
+        -: 1018:
+        -: 1019:    /// @relates time_point @{
+        -: 1020:
+        -: 1021:    /// The difference between two time points (as a duration)
+        -: 1022:    template<typename _Clock, typename _Dur1, typename _Dur2>
+        -: 1023:      constexpr typename common_type<_Dur1, _Dur2>::type
+        -: 1024:      operator-(const time_point<_Clock, _Dur1>& __lhs,
+        -: 1025:		const time_point<_Clock, _Dur2>& __rhs)
+        -: 1026:      { return __lhs.time_since_epoch() - __rhs.time_since_epoch(); }
+        -: 1027:
+        -: 1028:    template<typename _Clock, typename _Dur1, typename _Dur2>
+        -: 1029:      constexpr bool
+        -: 1030:      operator==(const time_point<_Clock, _Dur1>& __lhs,
+        -: 1031:		 const time_point<_Clock, _Dur2>& __rhs)
+        -: 1032:      { return __lhs.time_since_epoch() == __rhs.time_since_epoch(); }
+        -: 1033:
+        -: 1034:#if __cpp_lib_three_way_comparison
+        -: 1035:    template<typename _Clock, typename _Dur1,
+        -: 1036:	     three_way_comparable_with<_Dur1> _Dur2>
+        -: 1037:      constexpr auto
+        -: 1038:      operator<=>(const time_point<_Clock, _Dur1>& __lhs,
+        -: 1039:		  const time_point<_Clock, _Dur2>& __rhs)
+        -: 1040:      { return __lhs.time_since_epoch() <=> __rhs.time_since_epoch(); }
+        -: 1041:#else
+        -: 1042:    template<typename _Clock, typename _Dur1, typename _Dur2>
+        -: 1043:      constexpr bool
+        -: 1044:      operator!=(const time_point<_Clock, _Dur1>& __lhs,
+        -: 1045:		 const time_point<_Clock, _Dur2>& __rhs)
+        -: 1046:      { return !(__lhs == __rhs); }
+        -: 1047:#endif
+        -: 1048:
+        -: 1049:    template<typename _Clock, typename _Dur1, typename _Dur2>
+        -: 1050:      constexpr bool
+        -: 1051:      operator<(const time_point<_Clock, _Dur1>& __lhs,
+        -: 1052:		const time_point<_Clock, _Dur2>& __rhs)
+        -: 1053:      { return  __lhs.time_since_epoch() < __rhs.time_since_epoch(); }
+        -: 1054:
+        -: 1055:    template<typename _Clock, typename _Dur1, typename _Dur2>
+        -: 1056:      constexpr bool
+        -: 1057:      operator<=(const time_point<_Clock, _Dur1>& __lhs,
+        -: 1058:		 const time_point<_Clock, _Dur2>& __rhs)
+        -: 1059:      { return !(__rhs < __lhs); }
+        -: 1060:
+        -: 1061:    template<typename _Clock, typename _Dur1, typename _Dur2>
+        -: 1062:      constexpr bool
+        -: 1063:      operator>(const time_point<_Clock, _Dur1>& __lhs,
+        -: 1064:		const time_point<_Clock, _Dur2>& __rhs)
+        -: 1065:      { return __rhs < __lhs; }
+        -: 1066:
+        -: 1067:    template<typename _Clock, typename _Dur1, typename _Dur2>
+        -: 1068:      constexpr bool
+        -: 1069:      operator>=(const time_point<_Clock, _Dur1>& __lhs,
+        -: 1070:		 const time_point<_Clock, _Dur2>& __rhs)
+        -: 1071:      { return !(__lhs < __rhs); }
+        -: 1072:
+        -: 1073:    /// @}
+        -: 1074:
+        -: 1075:    // Clocks.
+        -: 1076:
+        -: 1077:    // Why nanosecond resolution as the default?
+        -: 1078:    // Why have std::system_clock always count in the highest
+        -: 1079:    // resolution (ie nanoseconds), even if on some OSes the low 3
+        -: 1080:    // or 9 decimal digits will be always zero? This allows later
+        -: 1081:    // implementations to change the system_clock::now()
+        -: 1082:    // implementation any time to provide better resolution without
+        -: 1083:    // changing function signature or units.
+        -: 1084:
+        -: 1085:    // To support the (forward) evolution of the library's defined
+        -: 1086:    // clocks, wrap inside inline namespace so that the current
+        -: 1087:    // defintions of system_clock, steady_clock, and
+        -: 1088:    // high_resolution_clock types are uniquely mangled. This way, new
+        -: 1089:    // code can use the latests clocks, while the library can contain
+        -: 1090:    // compatibility definitions for previous versions.  At some
+        -: 1091:    // point, when these clocks settle down, the inlined namespaces
+        -: 1092:    // can be removed.  XXX GLIBCXX_ABI Deprecated
+        -: 1093:    inline namespace _V2 {
+        -: 1094:
+        -: 1095:    /**
+        -: 1096:     *  @brief System clock.
+        -: 1097:     *
+        -: 1098:     *  Time returned represents wall time from the system-wide clock.
+        -: 1099:     *  @ingroup chrono
+        -: 1100:    */
+        -: 1101:    struct system_clock
+        -: 1102:    {
+        -: 1103:      typedef chrono::nanoseconds				duration;
+        -: 1104:      typedef duration::rep					rep;
+        -: 1105:      typedef duration::period					period;
+        -: 1106:      typedef chrono::time_point<system_clock, duration> 	time_point;
+        -: 1107:
+        -: 1108:      static_assert(system_clock::duration::min()
+        -: 1109:		    < system_clock::duration::zero(),
+        -: 1110:		    "a clock's minimum duration cannot be less than its epoch");
+        -: 1111:
+        -: 1112:      static constexpr bool is_steady = false;
+        -: 1113:
+        -: 1114:      static time_point
+        -: 1115:      now() noexcept;
+        -: 1116:
+        -: 1117:      // Map to C API
+        -: 1118:      static std::time_t
+        -: 1119:      to_time_t(const time_point& __t) noexcept
+        -: 1120:      {
+        -: 1121:	return std::time_t(duration_cast<chrono::seconds>
+        -: 1122:			   (__t.time_since_epoch()).count());
+        -: 1123:      }
+        -: 1124:
+        -: 1125:      static time_point
+        -: 1126:      from_time_t(std::time_t __t) noexcept
+        -: 1127:      {
+        -: 1128:	typedef chrono::time_point<system_clock, seconds>	__from;
+        -: 1129:	return time_point_cast<system_clock::duration>
+        -: 1130:	       (__from(chrono::seconds(__t)));
+        -: 1131:      }
+        -: 1132:    };
+        -: 1133:
+        -: 1134:
+        -: 1135:    /**
+        -: 1136:     *  @brief Monotonic clock
+        -: 1137:     *
+        -: 1138:     *  Time returned has the property of only increasing at a uniform rate.
+        -: 1139:     *  @ingroup chrono
+        -: 1140:    */
+        -: 1141:    struct steady_clock
+        -: 1142:    {
+        -: 1143:      typedef chrono::nanoseconds				duration;
+        -: 1144:      typedef duration::rep					rep;
+        -: 1145:      typedef duration::period					period;
+        -: 1146:      typedef chrono::time_point<steady_clock, duration>	time_point;
+        -: 1147:
+        -: 1148:      static constexpr bool is_steady = true;
+        -: 1149:
+        -: 1150:      static time_point
+        -: 1151:      now() noexcept;
+        -: 1152:    };
+        -: 1153:
+        -: 1154:
+        -: 1155:    /**
+        -: 1156:     *  @brief Highest-resolution clock
+        -: 1157:     *
+        -: 1158:     *  This is the clock "with the shortest tick period." Alias to
+        -: 1159:     *  std::system_clock until higher-than-nanosecond definitions
+        -: 1160:     *  become feasible.
+        -: 1161:     *  @ingroup chrono
+        -: 1162:    */
+        -: 1163:    using high_resolution_clock = system_clock;
+        -: 1164:
+        -: 1165:    } // end inline namespace _V2
+        -: 1166:
+        -: 1167:#if __cplusplus > 201703L
+        -: 1168:    template<typename _Duration>
+        -: 1169:      using sys_time = time_point<system_clock, _Duration>;
+        -: 1170:    using sys_seconds = sys_time<seconds>;
+        -: 1171:    using sys_days = sys_time<days>;
+        -: 1172:
+        -: 1173:    using file_clock = ::std::filesystem::__file_clock;
+        -: 1174:
+        -: 1175:    template<typename _Duration>
+        -: 1176:      using file_time = time_point<file_clock, _Duration>;
+        -: 1177:
+        -: 1178:    template<> struct is_clock<system_clock> : true_type { };
+        -: 1179:    template<> struct is_clock<steady_clock> : true_type { };
+        -: 1180:    template<> struct is_clock<file_clock> : true_type { };
+        -: 1181:
+        -: 1182:    template<> inline constexpr bool is_clock_v<system_clock> = true;
+        -: 1183:    template<> inline constexpr bool is_clock_v<steady_clock> = true;
+        -: 1184:    template<> inline constexpr bool is_clock_v<file_clock> = true;
+        -: 1185:
+        -: 1186:    struct local_t { };
+        -: 1187:    template<typename _Duration>
+        -: 1188:      using local_time = time_point<local_t, _Duration>;
+        -: 1189:    using local_seconds = local_time<seconds>;
+        -: 1190:    using local_days = local_time<days>;
+        -: 1191:
+        -: 1192:    class utc_clock;
+        -: 1193:    class tai_clock;
+        -: 1194:    class gps_clock;
+        -: 1195:
+        -: 1196:    template<typename _Duration>
+        -: 1197:      using utc_time = time_point<utc_clock, _Duration>;
+        -: 1198:    using utc_seconds = utc_time<seconds>;
+        -: 1199:
+        -: 1200:    template<typename _Duration>
+        -: 1201:      using tai_time = time_point<tai_clock, _Duration>;
+        -: 1202:    using tai_seconds = tai_time<seconds>;
+        -: 1203:
+        -: 1204:    template<typename _Duration>
+        -: 1205:      using gps_time = time_point<gps_clock, _Duration>;
+        -: 1206:    using gps_seconds = gps_time<seconds>;
+        -: 1207:
+        -: 1208:    template<> struct is_clock<utc_clock> : true_type { };
+        -: 1209:    template<> struct is_clock<tai_clock> : true_type { };
+        -: 1210:    template<> struct is_clock<gps_clock> : true_type { };
+        -: 1211:
+        -: 1212:    template<> inline constexpr bool is_clock_v<utc_clock> = true;
+        -: 1213:    template<> inline constexpr bool is_clock_v<tai_clock> = true;
+        -: 1214:    template<> inline constexpr bool is_clock_v<gps_clock> = true;
+        -: 1215:
+        -: 1216:    struct leap_second_info
+        -: 1217:    {
+        -: 1218:      bool is_leap_second;
+        -: 1219:      seconds elapsed;
+        -: 1220:    };
+        -: 1221:
+        -: 1222:    // CALENDRICAL TYPES
+        -: 1223:
+        -: 1224:    // CLASS DECLARATIONS
+        -: 1225:    class day;
+        -: 1226:    class month;
+        -: 1227:    class year;
+        -: 1228:    class weekday;
+        -: 1229:    class weekday_indexed;
+        -: 1230:    class weekday_last;
+        -: 1231:    class month_day;
+        -: 1232:    class month_day_last;
+        -: 1233:    class month_weekday;
+        -: 1234:    class month_weekday_last;
+        -: 1235:    class year_month;
+        -: 1236:    class year_month_day;
+        -: 1237:    class year_month_day_last;
+        -: 1238:    class year_month_weekday;
+        -: 1239:    class year_month_weekday_last;
+        -: 1240:
+        -: 1241:    struct last_spec
+        -: 1242:    {
+        -: 1243:      explicit last_spec() = default;
+        -: 1244:
+        -: 1245:      friend constexpr month_day_last
+        -: 1246:      operator/(int __m, last_spec) noexcept;
+        -: 1247:
+        -: 1248:      friend constexpr month_day_last
+        -: 1249:      operator/(last_spec, int __m) noexcept;
+        -: 1250:    };
+        -: 1251:
+        -: 1252:    inline constexpr last_spec last{};
+        -: 1253:
+        -: 1254:    namespace __detail
+        -: 1255:    {
+        -: 1256:      // Compute the remainder of the Euclidean division of __n divided by __d.
+        -: 1257:      // Euclidean division truncates toward negative infinity and always
+        -: 1258:      // produces a remainder in the range of [0,__d-1] (whereas standard
+        -: 1259:      // division truncates toward zero and yields a nonpositive remainder
+        -: 1260:      // for negative __n).
+        -: 1261:      constexpr unsigned
+        -: 1262:      __modulo(long long __n, unsigned __d)
+        -: 1263:      {
+        -: 1264:	if (__n >= 0)
+        -: 1265:	  return __n % __d;
+        -: 1266:	else
+        -: 1267:	  return (__d + (__n % __d)) % __d;
+        -: 1268:      }
+        -: 1269:
+        -: 1270:      inline constexpr unsigned __days_per_month[12]
+        -: 1271:	= { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        -: 1272:    }
+        -: 1273:
+        -: 1274:    // DAY
+        -: 1275:
+        -: 1276:    class day
+        -: 1277:    {
+        -: 1278:    private:
+        -: 1279:      unsigned char _M_d;
+        -: 1280:
+        -: 1281:    public:
+        -: 1282:      day() = default;
+        -: 1283:
+        -: 1284:      explicit constexpr
+        -: 1285:      day(unsigned __d) noexcept
+        -: 1286:      : _M_d(__d)
+        -: 1287:      { }
+        -: 1288:
+        -: 1289:      constexpr day&
+        -: 1290:      operator++() noexcept
+        -: 1291:      {
+        -: 1292:	++_M_d;
+        -: 1293:	return *this;
+        -: 1294:      }
+        -: 1295:
+        -: 1296:      constexpr day
+        -: 1297:      operator++(int) noexcept
+        -: 1298:      {
+        -: 1299:	auto __ret = *this;
+        -: 1300:	++(*this);
+        -: 1301:	return __ret;
+        -: 1302:      }
+        -: 1303:
+        -: 1304:      constexpr day&
+        -: 1305:      operator--() noexcept
+        -: 1306:      {
+        -: 1307:	--_M_d;
+        -: 1308:	return *this;
+        -: 1309:      }
+        -: 1310:
+        -: 1311:      constexpr day
+        -: 1312:      operator--(int) noexcept
+        -: 1313:      {
+        -: 1314:	auto __ret = *this;
+        -: 1315:	--(*this);
+        -: 1316:	return __ret;
+        -: 1317:      }
+        -: 1318:
+        -: 1319:      constexpr day&
+        -: 1320:      operator+=(const days& __d) noexcept
+        -: 1321:      {
+        -: 1322:	*this = *this + __d;
+        -: 1323:	return *this;
+        -: 1324:      }
+        -: 1325:
+        -: 1326:      constexpr day&
+        -: 1327:      operator-=(const days& __d) noexcept
+        -: 1328:      {
+        -: 1329:	*this = *this - __d;
+        -: 1330:	return *this;
+        -: 1331:      }
+        -: 1332:
+        -: 1333:      constexpr explicit
+        -: 1334:      operator unsigned() const noexcept
+        -: 1335:      { return _M_d; }
+        -: 1336:
+        -: 1337:      constexpr bool
+        -: 1338:      ok() const noexcept
+        -: 1339:      { return 1 <= _M_d && _M_d <= 31; }
+        -: 1340:
+        -: 1341:      friend constexpr bool
+        -: 1342:      operator==(const day& __x, const day& __y) noexcept
+        -: 1343:      { return unsigned{__x} == unsigned{__y}; }
+        -: 1344:
+        -: 1345:      friend constexpr strong_ordering
+        -: 1346:      operator<=>(const day& __x, const day& __y) noexcept
+        -: 1347:      { return unsigned{__x} <=> unsigned{__y}; }
+        -: 1348:
+        -: 1349:      friend constexpr day
+        -: 1350:      operator+(const day& __x, const days& __y) noexcept
+        -: 1351:      { return day(unsigned{__x} + __y.count()); }
+        -: 1352:
+        -: 1353:      friend constexpr day
+        -: 1354:      operator+(const days& __x, const day& __y) noexcept
+        -: 1355:      { return __y + __x; }
+        -: 1356:
+        -: 1357:      friend constexpr day
+        -: 1358:      operator-(const day& __x, const days& __y) noexcept
+        -: 1359:      { return __x + -__y; }
+        -: 1360:
+        -: 1361:      friend constexpr days
+        -: 1362:      operator-(const day& __x, const day& __y) noexcept
+        -: 1363:      { return days{int(unsigned{__x}) - int(unsigned{__y})}; }
+        -: 1364:
+        -: 1365:      friend constexpr month_day
+        -: 1366:      operator/(const month& __m, const day& __d) noexcept;
+        -: 1367:
+        -: 1368:      friend constexpr month_day
+        -: 1369:      operator/(int __m, const day& __d) noexcept;
+        -: 1370:
+        -: 1371:      friend constexpr month_day
+        -: 1372:      operator/(const day& __d, const month& __m) noexcept;
+        -: 1373:
+        -: 1374:      friend constexpr month_day
+        -: 1375:      operator/(const day& __d, int __m) noexcept;
+        -: 1376:
+        -: 1377:      friend constexpr year_month_day
+        -: 1378:      operator/(const year_month& __ym, const day& __d) noexcept;
+        -: 1379:
+        -: 1380:      // TODO: Implement operator<<, to_stream, from_stream.
+        -: 1381:    };
+        -: 1382:
+        -: 1383:    // MONTH
+        -: 1384:
+        -: 1385:    class month
+        -: 1386:    {
+        -: 1387:    private:
+        -: 1388:      unsigned char _M_m;
+        -: 1389:
+        -: 1390:    public:
+        -: 1391:      month() = default;
+        -: 1392:
+        -: 1393:      explicit constexpr
+        -: 1394:      month(unsigned __m) noexcept
+        -: 1395:      : _M_m(__m)
+        -: 1396:      { }
+        -: 1397:
+        -: 1398:      constexpr month&
+        -: 1399:      operator++() noexcept
+        -: 1400:      {
+        -: 1401:	*this += months{1};
+        -: 1402:	return *this;
+        -: 1403:      }
+        -: 1404:
+        -: 1405:      constexpr month
+        -: 1406:      operator++(int) noexcept
+        -: 1407:      {
+        -: 1408:	auto __ret = *this;
+        -: 1409:	++(*this);
+        -: 1410:	return __ret;
+        -: 1411:      }
+        -: 1412:
+        -: 1413:      constexpr month&
+        -: 1414:      operator--() noexcept
+        -: 1415:      {
+        -: 1416:	*this -= months{1};
+        -: 1417:	return *this;
+        -: 1418:      }
+        -: 1419:
+        -: 1420:      constexpr month
+        -: 1421:      operator--(int) noexcept
+        -: 1422:      {
+        -: 1423:	auto __ret = *this;
+        -: 1424:	--(*this);
+        -: 1425:	return __ret;
+        -: 1426:      }
+        -: 1427:
+        -: 1428:      constexpr month&
+        -: 1429:      operator+=(const months& __m) noexcept
+        -: 1430:      {
+        -: 1431:	*this = *this + __m;
+        -: 1432:	return *this;
+        -: 1433:      }
+        -: 1434:
+        -: 1435:      constexpr month&
+        -: 1436:      operator-=(const months& __m) noexcept
+        -: 1437:      {
+        -: 1438:	*this = *this - __m;
+        -: 1439:	return *this;
+        -: 1440:      }
+        -: 1441:
+        -: 1442:      explicit constexpr
+        -: 1443:      operator unsigned() const noexcept
+        -: 1444:      { return _M_m; }
+        -: 1445:
+        -: 1446:      constexpr bool
+        -: 1447:      ok() const noexcept
+        -: 1448:      { return 1 <= _M_m && _M_m <= 12; }
+        -: 1449:
+        -: 1450:      friend constexpr bool
+        -: 1451:      operator==(const month& __x, const month& __y) noexcept
+        -: 1452:      { return unsigned{__x} == unsigned{__y}; }
+        -: 1453:
+        -: 1454:      friend constexpr strong_ordering
+        -: 1455:      operator<=>(const month& __x, const month& __y) noexcept
+        -: 1456:      { return unsigned{__x} <=> unsigned{__y}; }
+        -: 1457:
+        -: 1458:      friend constexpr month
+        -: 1459:      operator+(const month& __x, const months& __y) noexcept
+        -: 1460:      {
+        -: 1461:	auto __n = static_cast<long long>(unsigned{__x}) + (__y.count() - 1);
+        -: 1462:	return month{__detail::__modulo(__n, 12) + 1};
+        -: 1463:      }
+        -: 1464:
+        -: 1465:      friend constexpr month
+        -: 1466:      operator+(const months& __x,  const month& __y) noexcept
+        -: 1467:      { return __y + __x; }
+        -: 1468:
+        -: 1469:      friend constexpr month
+        -: 1470:      operator-(const month& __x, const months& __y) noexcept
+        -: 1471:      { return __x + -__y; }
+        -: 1472:
+        -: 1473:      friend constexpr months
+        -: 1474:      operator-(const month& __x,  const month& __y) noexcept
+        -: 1475:      {
+        -: 1476:	const auto __dm = int(unsigned(__x)) - int(unsigned(__y));
+        -: 1477:	return months{__dm < 0 ? 12 + __dm : __dm};
+        -: 1478:      }
+        -: 1479:
+        -: 1480:      friend constexpr year_month
+        -: 1481:      operator/(const year& __y, const month& __m) noexcept;
+        -: 1482:
+        -: 1483:      friend constexpr month_day
+        -: 1484:      operator/(const month& __m, int __d) noexcept;
+        -: 1485:
+        -: 1486:      friend constexpr month_day_last
+        -: 1487:      operator/(const month& __m, last_spec) noexcept;
+        -: 1488:
+        -: 1489:      friend constexpr month_day_last
+        -: 1490:      operator/(last_spec, const month& __m) noexcept;
+        -: 1491:
+        -: 1492:      friend constexpr month_weekday
+        -: 1493:      operator/(const month& __m, const weekday_indexed& __wdi) noexcept;
+        -: 1494:
+        -: 1495:      friend constexpr month_weekday
+        -: 1496:      operator/(const weekday_indexed& __wdi, const month& __m) noexcept;
+        -: 1497:
+        -: 1498:      friend constexpr month_weekday_last
+        -: 1499:      operator/(const month& __m, const weekday_last& __wdl) noexcept;
+        -: 1500:
+        -: 1501:      friend constexpr month_weekday_last
+        -: 1502:      operator/(const weekday_last& __wdl, const month& __m) noexcept;
+        -: 1503:
+        -: 1504:      // TODO: Implement operator<<, to_stream, from_stream.
+        -: 1505:    };
+        -: 1506:
+        -: 1507:    inline constexpr month January{1};
+        -: 1508:    inline constexpr month February{2};
+        -: 1509:    inline constexpr month March{3};
+        -: 1510:    inline constexpr month April{4};
+        -: 1511:    inline constexpr month May{5};
+        -: 1512:    inline constexpr month June{6};
+        -: 1513:    inline constexpr month July{7};
+        -: 1514:    inline constexpr month August{8};
+        -: 1515:    inline constexpr month September{9};
+        -: 1516:    inline constexpr month October{10};
+        -: 1517:    inline constexpr month November{11};
+        -: 1518:    inline constexpr month December{12};
+        -: 1519:
+        -: 1520:    // YEAR
+        -: 1521:
+        -: 1522:    class year
+        -: 1523:    {
+        -: 1524:    private:
+        -: 1525:      short _M_y;
+        -: 1526:
+        -: 1527:    public:
+        -: 1528:      year() = default;
+        -: 1529:
+        -: 1530:      explicit constexpr
+        -: 1531:      year(int __y) noexcept
+        -: 1532:      : _M_y{static_cast<short>(__y)}
+        -: 1533:      { }
+        -: 1534:
+        -: 1535:      static constexpr year
+        -: 1536:      min() noexcept
+        -: 1537:      { return year{-32767}; }
+        -: 1538:
+        -: 1539:      static constexpr year
+        -: 1540:      max() noexcept
+        -: 1541:      { return year{32767}; }
+        -: 1542:
+        -: 1543:      constexpr year&
+        -: 1544:      operator++() noexcept
+        -: 1545:      {
+        -: 1546:	++_M_y;
+        -: 1547:	return *this;
+        -: 1548:      }
+        -: 1549:
+        -: 1550:      constexpr year
+        -: 1551:      operator++(int) noexcept
+        -: 1552:      {
+        -: 1553:	auto __ret = *this;
+        -: 1554:	++(*this);
+        -: 1555:	return __ret;
+        -: 1556:      }
+        -: 1557:
+        -: 1558:      constexpr year&
+        -: 1559:      operator--() noexcept
+        -: 1560:      {
+        -: 1561:	--_M_y;
+        -: 1562:	return *this;
+        -: 1563:      }
+        -: 1564:
+        -: 1565:      constexpr year
+        -: 1566:      operator--(int) noexcept
+        -: 1567:      {
+        -: 1568:	auto __ret = *this;
+        -: 1569:	--(*this);
+        -: 1570:	return __ret;
+        -: 1571:      }
+        -: 1572:
+        -: 1573:      constexpr year&
+        -: 1574:      operator+=(const years& __y) noexcept
+        -: 1575:      {
+        -: 1576:	*this = *this + __y;
+        -: 1577:	return *this;
+        -: 1578:      }
+        -: 1579:
+        -: 1580:      constexpr year&
+        -: 1581:      operator-=(const years& __y) noexcept
+        -: 1582:      {
+        -: 1583:	*this = *this - __y;
+        -: 1584:	return *this;
+        -: 1585:      }
+        -: 1586:
+        -: 1587:      constexpr year
+        -: 1588:      operator+() const noexcept
+        -: 1589:      { return *this; }
+        -: 1590:
+        -: 1591:      constexpr year
+        -: 1592:      operator-() const noexcept
+        -: 1593:      { return year{-_M_y}; }
+        -: 1594:
+        -: 1595:      constexpr bool
+        -: 1596:      is_leap() const noexcept
+        -: 1597:      {
+        -: 1598:	// Testing divisibility by 100 first gives better performance, that is,
+        -: 1599:	// return (_M_y % 100 != 0 || _M_y % 400 == 0) && _M_y % 4 == 0;
+        -: 1600:
+        -: 1601:	// It gets even faster if _M_y is in [-536870800, 536870999]
+        -: 1602:	// (which is the case here) and _M_y % 100 is replaced by
+        -: 1603:	// __is_multiple_of_100 below.
+        -: 1604:
+        -: 1605:	// References:
+        -: 1606:	// [1] https://github.com/cassioneri/calendar
+        -: 1607:	// [2] https://accu.org/journals/overload/28/155/overload155.pdf#page=16
+        -: 1608:
+        -: 1609:	constexpr uint32_t __multiplier   = 42949673;
+        -: 1610:	constexpr uint32_t __bound        = 42949669;
+        -: 1611:	constexpr uint32_t __max_dividend = 1073741799;
+        -: 1612:	constexpr uint32_t __offset       = __max_dividend / 2 / 100 * 100;
+        -: 1613:	const bool __is_multiple_of_100
+        -: 1614:	  = __multiplier * (_M_y + __offset) < __bound;
+        -: 1615:	return (!__is_multiple_of_100 || _M_y % 400 == 0) && _M_y % 4 == 0;
+        -: 1616:      }
+        -: 1617:
+        -: 1618:      explicit constexpr
+        -: 1619:      operator int() const noexcept
+        -: 1620:      { return _M_y; }
+        -: 1621:
+        -: 1622:      constexpr bool
+        -: 1623:      ok() const noexcept
+        -: 1624:      { return min()._M_y <= _M_y && _M_y <= max()._M_y; }
+        -: 1625:
+        -: 1626:      friend constexpr bool
+        -: 1627:      operator==(const year& __x, const year& __y) noexcept
+        -: 1628:      { return int{__x} == int{__y}; }
+        -: 1629:
+        -: 1630:      friend constexpr strong_ordering
+        -: 1631:      operator<=>(const year& __x, const year& __y) noexcept
+        -: 1632:      { return int{__x} <=> int{__y}; }
+        -: 1633:
+        -: 1634:      friend constexpr year
+        -: 1635:      operator+(const year& __x, const years& __y) noexcept
+        -: 1636:      { return year{int{__x} + static_cast<int>(__y.count())}; }
+        -: 1637:
+        -: 1638:      friend constexpr year
+        -: 1639:      operator+(const years& __x, const year& __y) noexcept
+        -: 1640:      { return __y + __x; }
+        -: 1641:
+        -: 1642:      friend constexpr year
+        -: 1643:      operator-(const year& __x, const years& __y) noexcept
+        -: 1644:      { return __x + -__y; }
+        -: 1645:
+        -: 1646:      friend constexpr years
+        -: 1647:      operator-(const year& __x, const year& __y) noexcept
+        -: 1648:      { return years{int{__x} - int{__y}}; }
+        -: 1649:
+        -: 1650:      friend constexpr year_month
+        -: 1651:      operator/(const year& __y, int __m) noexcept;
+        -: 1652:
+        -: 1653:      friend constexpr year_month_day
+        -: 1654:      operator/(const year& __y, const month_day& __md) noexcept;
+        -: 1655:
+        -: 1656:      friend constexpr year_month_day
+        -: 1657:      operator/(const month_day& __md, const year& __y) noexcept;
+        -: 1658:
+        -: 1659:      friend constexpr year_month_day_last
+        -: 1660:      operator/(const year& __y, const month_day_last& __mdl) noexcept;
+        -: 1661:
+        -: 1662:      friend constexpr year_month_day_last
+        -: 1663:      operator/(const month_day_last& __mdl, const year& __y) noexcept;
+        -: 1664:
+        -: 1665:      friend constexpr year_month_weekday
+        -: 1666:      operator/(const year& __y, const month_weekday& __mwd) noexcept;
+        -: 1667:
+        -: 1668:      friend constexpr year_month_weekday
+        -: 1669:      operator/(const month_weekday& __mwd, const year& __y) noexcept;
+        -: 1670:
+        -: 1671:      friend constexpr year_month_weekday_last
+        -: 1672:      operator/(const year& __y, const month_weekday_last& __mwdl) noexcept;
+        -: 1673:
+        -: 1674:      friend constexpr year_month_weekday_last
+        -: 1675:      operator/(const month_weekday_last& __mwdl, const year& __y) noexcept;
+        -: 1676:
+        -: 1677:      // TODO: Implement operator<<, to_stream, from_stream.
+        -: 1678:    };
+        -: 1679:
+        -: 1680:    // WEEKDAY
+        -: 1681:
+        -: 1682:    class weekday
+        -: 1683:    {
+        -: 1684:    private:
+        -: 1685:      unsigned char _M_wd;
+        -: 1686:
+        -: 1687:      static constexpr weekday
+        -: 1688:      _S_from_days(const days& __d)
+        -: 1689:      {
+        -: 1690:	auto __n = __d.count();
+        -: 1691:	return weekday(__n >= -4 ? (__n + 4) % 7 : (__n + 5) % 7 + 6);
+        -: 1692:      }
+        -: 1693:
+        -: 1694:    public:
+        -: 1695:      weekday() = default;
+        -: 1696:
+        -: 1697:      explicit constexpr
+        -: 1698:      weekday(unsigned __wd) noexcept
+        -: 1699:      : _M_wd(__wd == 7 ? 0 : __wd) // __wd % 7 ?
+        -: 1700:      { }
+        -: 1701:
+        -: 1702:      constexpr
+        -: 1703:      weekday(const sys_days& __dp) noexcept
+        -: 1704:      : weekday{_S_from_days(__dp.time_since_epoch())}
+        -: 1705:      { }
+        -: 1706:
+        -: 1707:      explicit constexpr
+        -: 1708:      weekday(const local_days& __dp) noexcept
+        -: 1709:      : weekday{sys_days{__dp.time_since_epoch()}}
+        -: 1710:      { }
+        -: 1711:
+        -: 1712:      constexpr weekday&
+        -: 1713:      operator++() noexcept
+        -: 1714:      {
+        -: 1715:	*this += days{1};
+        -: 1716:	return *this;
+        -: 1717:      }
+        -: 1718:
+        -: 1719:      constexpr weekday
+        -: 1720:      operator++(int) noexcept
+        -: 1721:      {
+        -: 1722:	auto __ret = *this;
+        -: 1723:	++(*this);
+        -: 1724:	return __ret;
+        -: 1725:      }
+        -: 1726:
+        -: 1727:      constexpr weekday&
+        -: 1728:      operator--() noexcept
+        -: 1729:      {
+        -: 1730:	*this -= days{1};
+        -: 1731:	return *this;
+        -: 1732:      }
+        -: 1733:
+        -: 1734:      constexpr weekday
+        -: 1735:      operator--(int) noexcept
+        -: 1736:      {
+        -: 1737:	auto __ret = *this;
+        -: 1738:	--(*this);
+        -: 1739:	return __ret;
+        -: 1740:      }
+        -: 1741:
+        -: 1742:      constexpr weekday&
+        -: 1743:      operator+=(const days& __d) noexcept
+        -: 1744:      {
+        -: 1745:	*this = *this + __d;
+        -: 1746:	return *this;
+        -: 1747:      }
+        -: 1748:
+        -: 1749:      constexpr weekday&
+        -: 1750:      operator-=(const days& __d) noexcept
+        -: 1751:      {
+        -: 1752:	*this = *this - __d;
+        -: 1753:	return *this;
+        -: 1754:      }
+        -: 1755:
+        -: 1756:      constexpr unsigned
+        -: 1757:      c_encoding() const noexcept
+        -: 1758:      { return _M_wd; }
+        -: 1759:
+        -: 1760:      constexpr unsigned
+        -: 1761:      iso_encoding() const noexcept
+        -: 1762:      { return _M_wd == 0u ? 7u : _M_wd; }
+        -: 1763:
+        -: 1764:      constexpr bool
+        -: 1765:      ok() const noexcept
+        -: 1766:      { return _M_wd <= 6; }
+        -: 1767:
+        -: 1768:      constexpr weekday_indexed
+        -: 1769:      operator[](unsigned __index) const noexcept;
+        -: 1770:
+        -: 1771:      constexpr weekday_last
+        -: 1772:      operator[](last_spec) const noexcept;
+        -: 1773:
+        -: 1774:      friend constexpr bool
+        -: 1775:      operator==(const weekday& __x, const weekday& __y) noexcept
+        -: 1776:      { return __x._M_wd == __y._M_wd; }
+        -: 1777:
+        -: 1778:      friend constexpr weekday
+        -: 1779:      operator+(const weekday& __x, const days& __y) noexcept
+        -: 1780:      {
+        -: 1781:	auto __n = static_cast<long long>(__x._M_wd) + __y.count();
+        -: 1782:	return weekday{__detail::__modulo(__n, 7)};
+        -: 1783:      }
+        -: 1784:
+        -: 1785:      friend constexpr weekday
+        -: 1786:      operator+(const days& __x, const weekday& __y) noexcept
+        -: 1787:      { return __y + __x; }
+        -: 1788:
+        -: 1789:      friend constexpr weekday
+        -: 1790:      operator-(const weekday& __x, const days& __y) noexcept
+        -: 1791:      { return __x + -__y; }
+        -: 1792:
+        -: 1793:      friend constexpr days
+        -: 1794:      operator-(const weekday& __x, const weekday& __y) noexcept
+        -: 1795:      {
+        -: 1796:	auto __n = static_cast<long long>(__x._M_wd) - __y._M_wd;
+        -: 1797:	return days{__detail::__modulo(__n, 7)};
+        -: 1798:      }
+        -: 1799:
+        -: 1800:      // TODO: operator<<, from_stream.
+        -: 1801:    };
+        -: 1802:
+        -: 1803:    inline constexpr weekday Sunday{0};
+        -: 1804:    inline constexpr weekday Monday{1};
+        -: 1805:    inline constexpr weekday Tuesday{2};
+        -: 1806:    inline constexpr weekday Wednesday{3};
+        -: 1807:    inline constexpr weekday Thursday{4};
+        -: 1808:    inline constexpr weekday Friday{5};
+        -: 1809:    inline constexpr weekday Saturday{6};
+        -: 1810:
+        -: 1811:    // WEEKDAY_INDEXED
+        -: 1812:
+        -: 1813:    class weekday_indexed
+        -: 1814:    {
+        -: 1815:    private:
+        -: 1816:      chrono::weekday _M_wd;
+        -: 1817:      unsigned char _M_index;
+        -: 1818:
+        -: 1819:    public:
+        -: 1820:      weekday_indexed() = default;
+        -: 1821:
+        -: 1822:      constexpr
+        -: 1823:      weekday_indexed(const chrono::weekday& __wd, unsigned __index) noexcept
+        -: 1824:      : _M_wd(__wd), _M_index(__index)
+        -: 1825:      { }
+        -: 1826:
+        -: 1827:      constexpr chrono::weekday
+        -: 1828:      weekday() const noexcept
+        -: 1829:      { return _M_wd; }
+        -: 1830:
+        -: 1831:      constexpr unsigned
+        -: 1832:      index() const noexcept
+        -: 1833:      { return _M_index; };
+        -: 1834:
+        -: 1835:      constexpr bool
+        -: 1836:      ok() const noexcept
+        -: 1837:      { return _M_wd.ok() && 1 <= _M_index && _M_index <= 5; }
+        -: 1838:
+        -: 1839:      friend constexpr bool
+        -: 1840:      operator==(const weekday_indexed& __x, const weekday_indexed& __y) noexcept
+        -: 1841:      { return __x.weekday() == __y.weekday() && __x.index() == __y.index(); }
+        -: 1842:
+        -: 1843:      friend constexpr month_weekday
+        -: 1844:      operator/(const month& __m, const weekday_indexed& __wdi) noexcept;
+        -: 1845:
+        -: 1846:      friend constexpr month_weekday
+        -: 1847:      operator/(int __m, const weekday_indexed& __wdi) noexcept;
+        -: 1848:
+        -: 1849:      friend constexpr month_weekday
+        -: 1850:      operator/(const weekday_indexed& __wdi, const month& __m) noexcept;
+        -: 1851:
+        -: 1852:      friend constexpr month_weekday
+        -: 1853:      operator/(const weekday_indexed& __wdi, int __m) noexcept;
+        -: 1854:
+        -: 1855:      friend constexpr year_month_weekday
+        -: 1856:      operator/(const year_month& __ym, const weekday_indexed& __wdi) noexcept;
+        -: 1857:
+        -: 1858:      // TODO: Implement operator<<.
+        -: 1859:    };
+        -: 1860:
+        -: 1861:    constexpr weekday_indexed
+        -: 1862:    weekday::operator[](unsigned __index) const noexcept
+        -: 1863:    { return {*this, __index}; }
+        -: 1864:
+        -: 1865:    // WEEKDAY_LAST
+        -: 1866:
+        -: 1867:    class weekday_last
+        -: 1868:    {
+        -: 1869:    private:
+        -: 1870:      chrono::weekday _M_wd;
+        -: 1871:
+        -: 1872:    public:
+        -: 1873:      explicit constexpr
+        -: 1874:      weekday_last(const chrono::weekday& __wd) noexcept
+        -: 1875:      : _M_wd{__wd}
+        -: 1876:      { }
+        -: 1877:
+        -: 1878:      constexpr chrono::weekday
+        -: 1879:      weekday() const noexcept
+        -: 1880:      { return _M_wd; }
+        -: 1881:
+        -: 1882:      constexpr bool
+        -: 1883:      ok() const noexcept
+        -: 1884:      { return _M_wd.ok(); }
+        -: 1885:
+        -: 1886:      friend constexpr bool
+        -: 1887:      operator==(const weekday_last& __x, const weekday_last& __y) noexcept
+        -: 1888:      { return __x.weekday() == __y.weekday(); }
+        -: 1889:
+        -: 1890:      friend constexpr month_weekday_last
+        -: 1891:      operator/(int __m, const weekday_last& __wdl) noexcept;
+        -: 1892:
+        -: 1893:      friend constexpr month_weekday_last
+        -: 1894:      operator/(const weekday_last& __wdl, int __m) noexcept;
+        -: 1895:
+        -: 1896:      friend constexpr year_month_weekday_last
+        -: 1897:      operator/(const year_month& __ym, const weekday_last& __wdl) noexcept;
+        -: 1898:
+        -: 1899:      // TODO: Implement operator<<.
+        -: 1900:    };
+        -: 1901:
+        -: 1902:    constexpr weekday_last
+        -: 1903:    weekday::operator[](last_spec) const noexcept
+        -: 1904:    { return weekday_last{*this}; }
+        -: 1905:
+        -: 1906:    // MONTH_DAY
+        -: 1907:
+        -: 1908:    class month_day
+        -: 1909:    {
+        -: 1910:    private:
+        -: 1911:      chrono::month _M_m;
+        -: 1912:      chrono::day _M_d;
+        -: 1913:
+        -: 1914:    public:
+        -: 1915:      month_day() = default;
+        -: 1916:
+        -: 1917:      constexpr
+        -: 1918:      month_day(const chrono::month& __m, const chrono::day& __d) noexcept
+        -: 1919:      : _M_m{__m}, _M_d{__d}
+        -: 1920:      { }
+        -: 1921:
+        -: 1922:      constexpr chrono::month
+        -: 1923:      month() const noexcept
+        -: 1924:      { return _M_m; }
+        -: 1925:
+        -: 1926:      constexpr chrono::day
+        -: 1927:      day() const noexcept
+        -: 1928:      { return _M_d; }
+        -: 1929:
+        -: 1930:      constexpr bool
+        -: 1931:      ok() const noexcept
+        -: 1932:      {
+        -: 1933:	return _M_m.ok()
+        -: 1934:	  && 1u <= unsigned(_M_d)
+        -: 1935:	  && unsigned(_M_d) <= __detail::__days_per_month[unsigned(_M_m) - 1];
+        -: 1936:      }
+        -: 1937:
+        -: 1938:      friend constexpr bool
+        -: 1939:      operator==(const month_day& __x, const month_day& __y) noexcept
+        -: 1940:      { return __x.month() == __y.month() && __x.day() == __y.day(); }
+        -: 1941:
+        -: 1942:      friend constexpr strong_ordering
+        -: 1943:      operator<=>(const month_day& __x, const month_day& __y) noexcept
+        -: 1944:	= default;
+        -: 1945:
+        -: 1946:      friend constexpr month_day
+        -: 1947:      operator/(const chrono::month& __m, const chrono::day& __d) noexcept
+        -: 1948:      { return {__m, __d}; }
+        -: 1949:
+        -: 1950:      friend constexpr month_day
+        -: 1951:      operator/(const chrono::month& __m, int __d) noexcept
+        -: 1952:      { return {__m, chrono::day(unsigned(__d))}; }
+        -: 1953:
+        -: 1954:      friend constexpr month_day
+        -: 1955:      operator/(int __m, const chrono::day& __d) noexcept
+        -: 1956:      { return {chrono::month(unsigned(__m)), __d}; }
+        -: 1957:
+        -: 1958:      friend constexpr month_day
+        -: 1959:      operator/(const chrono::day& __d, const chrono::month& __m) noexcept
+        -: 1960:      { return {__m, __d}; }
+        -: 1961:
+        -: 1962:      friend constexpr month_day
+        -: 1963:      operator/(const chrono::day& __d, int __m) noexcept
+        -: 1964:      { return {chrono::month(unsigned(__m)), __d}; }
+        -: 1965:
+        -: 1966:      friend constexpr year_month_day
+        -: 1967:      operator/(int __y, const month_day& __md) noexcept;
+        -: 1968:
+        -: 1969:      friend constexpr year_month_day
+        -: 1970:      operator/(const month_day& __md, int __y) noexcept;
+        -: 1971:
+        -: 1972:      // TODO: Implement operator<<, from_stream.
+        -: 1973:    };
+        -: 1974:
+        -: 1975:    // MONTH_DAY_LAST
+        -: 1976:
+        -: 1977:    class month_day_last
+        -: 1978:    {
+        -: 1979:    private:
+        -: 1980:      chrono::month _M_m;
+        -: 1981:
+        -: 1982:    public:
+        -: 1983:      explicit constexpr
+        -: 1984:      month_day_last(const chrono::month& __m) noexcept
+        -: 1985:      : _M_m{__m}
+        -: 1986:      { }
+        -: 1987:
+        -: 1988:      constexpr chrono::month
+        -: 1989:      month() const noexcept
+        -: 1990:      { return _M_m; }
+        -: 1991:
+        -: 1992:      constexpr bool
+        -: 1993:      ok() const noexcept
+        -: 1994:      { return _M_m.ok(); }
+        -: 1995:
+        -: 1996:      friend constexpr bool
+        -: 1997:      operator==(const month_day_last& __x, const month_day_last& __y) noexcept
+        -: 1998:      { return __x.month() == __y.month(); }
+        -: 1999:
+        -: 2000:      friend constexpr strong_ordering
+        -: 2001:      operator<=>(const month_day_last& __x, const month_day_last& __y) noexcept
+        -: 2002:	= default;
+        -: 2003:
+        -: 2004:      friend constexpr month_day_last
+        -: 2005:      operator/(const chrono::month& __m, last_spec) noexcept
+        -: 2006:      { return month_day_last{__m}; }
+        -: 2007:
+        -: 2008:      friend constexpr month_day_last
+        -: 2009:      operator/(int __m, last_spec) noexcept
+        -: 2010:      { return chrono::month(unsigned(__m)) / last; }
+        -: 2011:
+        -: 2012:      friend constexpr month_day_last
+        -: 2013:      operator/(last_spec, const chrono::month& __m) noexcept
+        -: 2014:      { return __m / last; }
+        -: 2015:
+        -: 2016:      friend constexpr month_day_last
+        -: 2017:      operator/(last_spec, int __m) noexcept
+        -: 2018:      { return __m / last; }
+        -: 2019:
+        -: 2020:      friend constexpr year_month_day_last
+        -: 2021:      operator/(int __y, const month_day_last& __mdl) noexcept;
+        -: 2022:
+        -: 2023:      friend constexpr year_month_day_last
+        -: 2024:      operator/(const month_day_last& __mdl, int __y) noexcept;
+        -: 2025:
+        -: 2026:      // TODO: Implement operator<<.
+        -: 2027:    };
+        -: 2028:
+        -: 2029:    // MONTH_WEEKDAY
+        -: 2030:
+        -: 2031:    class month_weekday
+        -: 2032:    {
+        -: 2033:    private:
+        -: 2034:      chrono::month _M_m;
+        -: 2035:      chrono::weekday_indexed _M_wdi;
+        -: 2036:
+        -: 2037:    public:
+        -: 2038:      constexpr
+        -: 2039:      month_weekday(const chrono::month& __m,
+        -: 2040:		    const chrono::weekday_indexed& __wdi) noexcept
+        -: 2041:      : _M_m{__m}, _M_wdi{__wdi}
+        -: 2042:      { }
+        -: 2043:
+        -: 2044:      constexpr chrono::month
+        -: 2045:      month() const noexcept
+        -: 2046:      { return _M_m; }
+        -: 2047:
+        -: 2048:      constexpr chrono::weekday_indexed
+        -: 2049:      weekday_indexed() const noexcept
+        -: 2050:      { return _M_wdi; }
+        -: 2051:
+        -: 2052:      constexpr bool
+        -: 2053:      ok() const noexcept
+        -: 2054:      { return _M_m.ok() && _M_wdi.ok(); }
+        -: 2055:
+        -: 2056:      friend constexpr bool
+        -: 2057:      operator==(const month_weekday& __x, const month_weekday& __y) noexcept
+        -: 2058:      {
+        -: 2059:	return __x.month() == __y.month()
+        -: 2060:	  && __x.weekday_indexed() == __y.weekday_indexed();
+        -: 2061:      }
+        -: 2062:
+        -: 2063:      friend constexpr month_weekday
+        -: 2064:      operator/(const chrono::month& __m,
+        -: 2065:		const chrono::weekday_indexed& __wdi) noexcept
+        -: 2066:      { return {__m, __wdi}; }
+        -: 2067:
+        -: 2068:      friend constexpr month_weekday
+        -: 2069:      operator/(int __m, const chrono::weekday_indexed& __wdi) noexcept
+        -: 2070:      { return chrono::month(unsigned(__m)) / __wdi; }
+        -: 2071:
+        -: 2072:      friend constexpr month_weekday
+        -: 2073:      operator/(const chrono::weekday_indexed& __wdi,
+        -: 2074:		const chrono::month& __m) noexcept
+        -: 2075:      { return __m / __wdi; }
+        -: 2076:
+        -: 2077:      friend constexpr month_weekday
+        -: 2078:      operator/(const chrono::weekday_indexed& __wdi, int __m) noexcept
+        -: 2079:      { return __m / __wdi; }
+        -: 2080:
+        -: 2081:      friend constexpr year_month_weekday
+        -: 2082:      operator/(int __y, const month_weekday& __mwd) noexcept;
+        -: 2083:
+        -: 2084:      friend constexpr year_month_weekday
+        -: 2085:      operator/(const month_weekday& __mwd, int __y) noexcept;
+        -: 2086:
+        -: 2087:      // TODO: Implement operator<<.
+        -: 2088:    };
+        -: 2089:
+        -: 2090:    // MONTH_WEEKDAY_LAST
+        -: 2091:
+        -: 2092:    class month_weekday_last
+        -: 2093:    {
+        -: 2094:    private:
+        -: 2095:      chrono::month _M_m;
+        -: 2096:      chrono::weekday_last _M_wdl;
+        -: 2097:
+        -: 2098:    public:
+        -: 2099:      constexpr
+        -: 2100:      month_weekday_last(const chrono::month& __m,
+        -: 2101:			 const chrono::weekday_last& __wdl) noexcept
+        -: 2102:      :_M_m{__m}, _M_wdl{__wdl}
+        -: 2103:      { }
+        -: 2104:
+        -: 2105:      constexpr chrono::month
+        -: 2106:      month() const noexcept
+        -: 2107:      { return _M_m; }
+        -: 2108:
+        -: 2109:      constexpr chrono::weekday_last
+        -: 2110:      weekday_last() const noexcept
+        -: 2111:      { return _M_wdl; }
+        -: 2112:
+        -: 2113:      constexpr bool
+        -: 2114:      ok() const noexcept
+        -: 2115:      { return _M_m.ok() && _M_wdl.ok(); }
+        -: 2116:
+        -: 2117:      friend constexpr bool
+        -: 2118:      operator==(const month_weekday_last& __x,
+        -: 2119:		 const month_weekday_last& __y) noexcept
+        -: 2120:      {
+        -: 2121:	return __x.month() == __y.month()
+        -: 2122:	  && __x.weekday_last() == __y.weekday_last();
+        -: 2123:      }
+        -: 2124:
+        -: 2125:      friend constexpr month_weekday_last
+        -: 2126:      operator/(const chrono::month& __m,
+        -: 2127:		const chrono::weekday_last& __wdl) noexcept
+        -: 2128:      { return {__m, __wdl}; }
+        -: 2129:
+        -: 2130:      friend constexpr month_weekday_last
+        -: 2131:      operator/(int __m, const chrono::weekday_last& __wdl) noexcept
+        -: 2132:      { return chrono::month(unsigned(__m)) / __wdl; }
+        -: 2133:
+        -: 2134:      friend constexpr month_weekday_last
+        -: 2135:      operator/(const chrono::weekday_last& __wdl,
+        -: 2136:		const chrono::month& __m) noexcept
+        -: 2137:      { return __m / __wdl; }
+        -: 2138:
+        -: 2139:      friend constexpr month_weekday_last
+        -: 2140:      operator/(const chrono::weekday_last& __wdl, int __m) noexcept
+        -: 2141:      { return chrono::month(unsigned(__m)) / __wdl; }
+        -: 2142:
+        -: 2143:      friend constexpr year_month_weekday_last
+        -: 2144:      operator/(int __y, const month_weekday_last& __mwdl) noexcept;
+        -: 2145:
+        -: 2146:      friend constexpr year_month_weekday_last
+        -: 2147:      operator/(const month_weekday_last& __mwdl, int __y) noexcept;
+        -: 2148:
+        -: 2149:      // TODO: Implement operator<<.
+        -: 2150:    };
+        -: 2151:
+        -: 2152:    // YEAR_MONTH
+        -: 2153:
+        -: 2154:    namespace __detail
+        -: 2155:    {
+        -: 2156:      // [time.cal.ym], [time.cal.ymd], etc constrain the 'months'-based
+        -: 2157:      // addition/subtraction operator overloads like so:
+        -: 2158:      //
+        -: 2159:      //   Constraints: if the argument supplied by the caller for the months
+        -: 2160:      //   parameter is convertible to years, its implicit conversion sequence
+        -: 2161:      //   to years is worse than its implicit conversion sequence to months.
+        -: 2162:      //
+        -: 2163:      // We realize this constraint by templatizing the 'months'-based
+        -: 2164:      // overloads (using a dummy defaulted template parameter), so that
+        -: 2165:      // overload resolution doesn't select the 'months'-based overload unless
+        -: 2166:      // the implicit conversion sequence to 'months' is better than that to
+        -: 2167:      // 'years'.
+        -: 2168:      using __months_years_conversion_disambiguator = void;
+        -: 2169:    }
+        -: 2170:
+        -: 2171:    class year_month
+        -: 2172:    {
+        -: 2173:    private:
+        -: 2174:      chrono::year _M_y;
+        -: 2175:      chrono::month _M_m;
+        -: 2176:
+        -: 2177:    public:
+        -: 2178:      year_month() = default;
+        -: 2179:
+        -: 2180:      constexpr
+        -: 2181:      year_month(const chrono::year& __y, const chrono::month& __m) noexcept
+        -: 2182:      : _M_y{__y}, _M_m{__m}
+        -: 2183:      { }
+        -: 2184:
+        -: 2185:      constexpr chrono::year
+        -: 2186:      year() const noexcept
+        -: 2187:      { return _M_y; }
+        -: 2188:
+        -: 2189:      constexpr chrono::month
+        -: 2190:      month() const noexcept
+        -: 2191:      { return _M_m; }
+        -: 2192:
+        -: 2193:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2194:	constexpr year_month&
+        -: 2195:	operator+=(const months& __dm) noexcept
+        -: 2196:	{
+        -: 2197:	  *this = *this + __dm;
+        -: 2198:	  return *this;
+        -: 2199:	}
+        -: 2200:
+        -: 2201:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2202:	constexpr year_month&
+        -: 2203:	operator-=(const months& __dm) noexcept
+        -: 2204:	{
+        -: 2205:	  *this = *this - __dm;
+        -: 2206:	  return *this;
+        -: 2207:	}
+        -: 2208:
+        -: 2209:      constexpr year_month&
+        -: 2210:      operator+=(const years& __dy)  noexcept
+        -: 2211:      {
+        -: 2212:	*this = *this + __dy;
+        -: 2213:	return *this;
+        -: 2214:      }
+        -: 2215:
+        -: 2216:      constexpr year_month&
+        -: 2217:      operator-=(const years& __dy)  noexcept
+        -: 2218:      {
+        -: 2219:	*this = *this - __dy;
+        -: 2220:	return *this;
+        -: 2221:      }
+        -: 2222:
+        -: 2223:      constexpr bool
+        -: 2224:      ok() const noexcept
+        -: 2225:      { return _M_y.ok() && _M_m.ok(); }
+        -: 2226:
+        -: 2227:      friend constexpr bool
+        -: 2228:      operator==(const year_month& __x, const year_month& __y) noexcept
+        -: 2229:      { return __x.year() == __y.year() && __x.month() == __y.month(); }
+        -: 2230:
+        -: 2231:      friend constexpr strong_ordering
+        -: 2232:      operator<=>(const year_month& __x, const year_month& __y) noexcept
+        -: 2233:	= default;
+        -: 2234:
+        -: 2235:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2236:	friend constexpr year_month
+        -: 2237:	operator+(const year_month& __ym, const months& __dm) noexcept
+        -: 2238:	{
+        -: 2239:	  // TODO: Optimize?
+        -: 2240:	  auto __m = __ym.month() + __dm;
+        -: 2241:	  auto __i = int(unsigned(__ym.month())) - 1 + __dm.count();
+        -: 2242:	  auto __y = (__i < 0
+        -: 2243:		      ? __ym.year() + years{(__i - 11) / 12}
+        -: 2244:		      : __ym.year() + years{__i / 12});
+        -: 2245:	  return __y / __m;
+        -: 2246:	}
+        -: 2247:
+        -: 2248:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2249:	friend constexpr year_month
+        -: 2250:	operator+(const months& __dm, const year_month& __ym) noexcept
+        -: 2251:	{ return __ym + __dm; }
+        -: 2252:
+        -: 2253:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2254:	friend constexpr year_month
+        -: 2255:	operator-(const year_month& __ym, const months& __dm) noexcept
+        -: 2256:	{ return __ym + -__dm; }
+        -: 2257:
+        -: 2258:      friend constexpr months
+        -: 2259:      operator-(const year_month& __x, const year_month& __y) noexcept
+        -: 2260:      {
+        -: 2261:	return (__x.year() - __y.year()
+        -: 2262:		+ months{static_cast<int>(unsigned{__x.month()})
+        -: 2263:			 - static_cast<int>(unsigned{__y.month()})});
+        -: 2264:      }
+        -: 2265:
+        -: 2266:      friend constexpr year_month
+        -: 2267:      operator+(const year_month& __ym, const years& __dy) noexcept
+        -: 2268:      { return (__ym.year() + __dy) / __ym.month(); }
+        -: 2269:
+        -: 2270:      friend constexpr year_month
+        -: 2271:      operator+(const years& __dy, const year_month& __ym) noexcept
+        -: 2272:      { return __ym + __dy; }
+        -: 2273:
+        -: 2274:      friend constexpr year_month
+        -: 2275:      operator-(const year_month& __ym, const years& __dy) noexcept
+        -: 2276:      { return __ym + -__dy; }
+        -: 2277:
+        -: 2278:      friend constexpr year_month
+        -: 2279:      operator/(const chrono::year& __y, const chrono::month& __m) noexcept
+        -: 2280:      { return {__y, __m}; }
+        -: 2281:
+        -: 2282:      friend constexpr year_month
+        -: 2283:      operator/(const chrono::year& __y, int __m) noexcept
+        -: 2284:      { return {__y, chrono::month(unsigned(__m))}; }
+        -: 2285:
+        -: 2286:      friend constexpr year_month_day
+        -: 2287:      operator/(const year_month& __ym, int __d) noexcept;
+        -: 2288:
+        -: 2289:      friend constexpr year_month_day_last
+        -: 2290:      operator/(const year_month& __ym, last_spec) noexcept;
+        -: 2291:
+        -: 2292:      // TODO: Implement operator<<, from_stream.
+        -: 2293:    };
+        -: 2294:
+        -: 2295:    // YEAR_MONTH_DAY
+        -: 2296:
+        -: 2297:    class year_month_day
+        -: 2298:    {
+        -: 2299:    private:
+        -: 2300:      chrono::year _M_y;
+        -: 2301:      chrono::month _M_m;
+        -: 2302:      chrono::day _M_d;
+        -: 2303:
+        -: 2304:      static constexpr year_month_day _S_from_days(const days& __dp) noexcept;
+        -: 2305:
+        -: 2306:      constexpr days _M_days_since_epoch() const noexcept;
+        -: 2307:
+        -: 2308:    public:
+        -: 2309:      year_month_day() = default;
+        -: 2310:
+        -: 2311:      constexpr
+        -: 2312:      year_month_day(const chrono::year& __y, const chrono::month& __m,
+        -: 2313:		     const chrono::day& __d) noexcept
+        -: 2314:      : _M_y{__y}, _M_m{__m}, _M_d{__d}
+        -: 2315:      { }
+        -: 2316:
+        -: 2317:      constexpr
+        -: 2318:      year_month_day(const year_month_day_last& __ymdl) noexcept;
+        -: 2319:
+        -: 2320:      constexpr
+        -: 2321:      year_month_day(const sys_days& __dp) noexcept
+        -: 2322:      : year_month_day(_S_from_days(__dp.time_since_epoch()))
+        -: 2323:      { }
+        -: 2324:
+        -: 2325:      explicit constexpr
+        -: 2326:      year_month_day(const local_days& __dp) noexcept
+        -: 2327:      : year_month_day(sys_days{__dp.time_since_epoch()})
+        -: 2328:      { }
+        -: 2329:
+        -: 2330:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2331:	constexpr year_month_day&
+        -: 2332:	operator+=(const months& __m) noexcept
+        -: 2333:	{
+        -: 2334:	  *this = *this + __m;
+        -: 2335:	  return *this;
+        -: 2336:	}
+        -: 2337:
+        -: 2338:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2339:	constexpr year_month_day&
+        -: 2340:	operator-=(const months& __m) noexcept
+        -: 2341:	{
+        -: 2342:	  *this = *this - __m;
+        -: 2343:	  return *this;
+        -: 2344:	}
+        -: 2345:
+        -: 2346:      constexpr year_month_day&
+        -: 2347:      operator+=(const years& __y) noexcept
+        -: 2348:      {
+        -: 2349:	*this = *this + __y;
+        -: 2350:	return *this;
+        -: 2351:      }
+        -: 2352:
+        -: 2353:      constexpr year_month_day&
+        -: 2354:      operator-=(const years& __y) noexcept
+        -: 2355:      {
+        -: 2356:	*this = *this - __y;
+        -: 2357:	return *this;
+        -: 2358:      }
+        -: 2359:
+        -: 2360:      constexpr chrono::year
+        -: 2361:      year() const noexcept
+        -: 2362:      { return _M_y; }
+        -: 2363:
+        -: 2364:      constexpr chrono::month
+        -: 2365:      month() const noexcept
+        -: 2366:      { return _M_m; }
+        -: 2367:
+        -: 2368:      constexpr chrono::day
+        -: 2369:      day() const noexcept
+        -: 2370:      { return _M_d; }
+        -: 2371:
+        -: 2372:      constexpr
+        -: 2373:      operator sys_days() const noexcept
+        -: 2374:      { return sys_days{_M_days_since_epoch()}; }
+        -: 2375:
+        -: 2376:      explicit constexpr
+        -: 2377:      operator local_days() const noexcept
+        -: 2378:      { return local_days{sys_days{*this}.time_since_epoch()}; }
+        -: 2379:
+        -: 2380:      constexpr bool ok() const noexcept;
+        -: 2381:
+        -: 2382:      friend constexpr bool
+        -: 2383:      operator==(const year_month_day& __x, const year_month_day& __y) noexcept
+        -: 2384:      {
+        -: 2385:	return __x.year() == __y.year()
+        -: 2386:	  && __x.month() == __y.month()
+        -: 2387:	  && __x.day() == __y.day();
+        -: 2388:      }
+        -: 2389:
+        -: 2390:      friend constexpr strong_ordering
+        -: 2391:      operator<=>(const year_month_day& __x, const year_month_day& __y) noexcept
+        -: 2392:	= default;
+        -: 2393:
+        -: 2394:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2395:	friend constexpr year_month_day
+        -: 2396:	operator+(const year_month_day& __ymd, const months& __dm) noexcept
+        -: 2397:	{ return (__ymd.year() / __ymd.month() + __dm) / __ymd.day(); }
+        -: 2398:
+        -: 2399:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2400:	friend constexpr year_month_day
+        -: 2401:	operator+(const months& __dm, const year_month_day& __ymd) noexcept
+        -: 2402:	{ return __ymd + __dm; }
+        -: 2403:
+        -: 2404:      friend constexpr year_month_day
+        -: 2405:      operator+(const year_month_day& __ymd, const years& __dy) noexcept
+        -: 2406:      { return (__ymd.year() + __dy) / __ymd.month() / __ymd.day(); }
+        -: 2407:
+        -: 2408:      friend constexpr year_month_day
+        -: 2409:      operator+(const years& __dy, const year_month_day& __ymd) noexcept
+        -: 2410:      { return __ymd + __dy; }
+        -: 2411:
+        -: 2412:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2413:	friend constexpr year_month_day
+        -: 2414:	operator-(const year_month_day& __ymd, const months& __dm) noexcept
+        -: 2415:	{ return __ymd + -__dm; }
+        -: 2416:
+        -: 2417:      friend constexpr year_month_day
+        -: 2418:      operator-(const year_month_day& __ymd, const years& __dy) noexcept
+        -: 2419:      { return __ymd + -__dy; }
+        -: 2420:
+        -: 2421:      friend constexpr year_month_day
+        -: 2422:      operator/(const year_month& __ym, const chrono::day& __d) noexcept
+        -: 2423:      { return {__ym.year(), __ym.month(), __d}; }
+        -: 2424:
+        -: 2425:      friend constexpr year_month_day
+        -: 2426:      operator/(const year_month& __ym, int __d) noexcept
+        -: 2427:      { return __ym / chrono::day{unsigned(__d)}; }
+        -: 2428:
+        -: 2429:      friend constexpr year_month_day
+        -: 2430:      operator/(const chrono::year& __y, const month_day& __md) noexcept
+        -: 2431:      { return __y / __md.month() / __md.day(); }
+        -: 2432:
+        -: 2433:      friend constexpr year_month_day
+        -: 2434:      operator/(int __y, const month_day& __md) noexcept
+        -: 2435:      { return chrono::year{__y} / __md; }
+        -: 2436:
+        -: 2437:      friend constexpr year_month_day
+        -: 2438:      operator/(const month_day& __md, const chrono::year& __y) noexcept
+        -: 2439:      { return __y / __md; }
+        -: 2440:
+        -: 2441:      friend constexpr year_month_day
+        -: 2442:      operator/(const month_day& __md, int __y) noexcept
+        -: 2443:      { return chrono::year(__y) / __md; }
+        -: 2444:
+        -: 2445:      // TODO: Implement operator<<, from_stream.
+        -: 2446:    };
+        -: 2447:
+        -: 2448:    // Construct from days since 1970/01/01.
+        -: 2449:    // Proposition 6.3 of Neri and Schneider,
+        -: 2450:    // "Euclidean Affine Functions and Applications to Calendar Algorithms".
+        -: 2451:    // https://arxiv.org/abs/2102.06959
+        -: 2452:    constexpr year_month_day
+        -: 2453:    year_month_day::_S_from_days(const days& __dp) noexcept
+        -: 2454:    {
+        -: 2455:      constexpr auto __z2    = static_cast<uint32_t>(-1468000);
+        -: 2456:      constexpr auto __r2_e3 = static_cast<uint32_t>(536895458);
+        -: 2457:
+        -: 2458:      const auto __r0 = static_cast<uint32_t>(__dp.count()) + __r2_e3;
+        -: 2459:
+        -: 2460:      const auto __n1 = 4 * __r0 + 3;
+        -: 2461:      const auto __q1 = __n1 / 146097;
+        -: 2462:      const auto __r1 = __n1 % 146097 / 4;
+        -: 2463:
+        -: 2464:      constexpr auto __p32 = static_cast<uint64_t>(1) << 32;
+        -: 2465:      const auto __n2 = 4 * __r1 + 3;
+        -: 2466:      const auto __u2 = static_cast<uint64_t>(2939745) * __n2;
+        -: 2467:      const auto __q2 = static_cast<uint32_t>(__u2 / __p32);
+        -: 2468:      const auto __r2 = static_cast<uint32_t>(__u2 % __p32) / 2939745 / 4;
+        -: 2469:
+        -: 2470:      constexpr auto __p16 = static_cast<uint32_t>(1) << 16;
+        -: 2471:      const auto __n3 = 2141 * __r2 + 197913;
+        -: 2472:      const auto __q3 = __n3 / __p16;
+        -: 2473:      const auto __r3 = __n3 % __p16 / 2141;
+        -: 2474:
+        -: 2475:      const auto __y0 = 100 * __q1 + __q2;
+        -: 2476:      const auto __m0 = __q3;
+        -: 2477:      const auto __d0 = __r3;
+        -: 2478:
+        -: 2479:      const auto __j  = __r2 >= 306;
+        -: 2480:      const auto __y1 = __y0 + __j;
+        -: 2481:      const auto __m1 = __j ? __m0 - 12 : __m0;
+        -: 2482:      const auto __d1 = __d0 + 1;
+        -: 2483:
+        -: 2484:      return year_month_day{chrono::year{static_cast<int>(__y1 + __z2)},
+        -: 2485:			    chrono::month{__m1}, chrono::day{__d1}};
+        -: 2486:    }
+        -: 2487:
+        -: 2488:    // Days since 1970/01/01.
+        -: 2489:    // Proposition 6.2 of Neri and Schneider,
+        -: 2490:    // "Euclidean Affine Functions and Applications to Calendar Algorithms".
+        -: 2491:    // https://arxiv.org/abs/2102.06959
+        -: 2492:    constexpr days
+        -: 2493:    year_month_day::_M_days_since_epoch() const noexcept
+        -: 2494:    {
+        -: 2495:      auto constexpr __z2    = static_cast<uint32_t>(-1468000);
+        -: 2496:      auto constexpr __r2_e3 = static_cast<uint32_t>(536895458);
+        -: 2497:
+        -: 2498:      const auto __y1 = static_cast<uint32_t>(static_cast<int>(_M_y)) - __z2;
+        -: 2499:      const auto __m1 = static_cast<uint32_t>(static_cast<unsigned>(_M_m));
+        -: 2500:      const auto __d1 = static_cast<uint32_t>(static_cast<unsigned>(_M_d));
+        -: 2501:
+        -: 2502:      const auto __j  = static_cast<uint32_t>(__m1 < 3);
+        -: 2503:      const auto __y0 = __y1 - __j;
+        -: 2504:      const auto __m0 = __j ? __m1 + 12 : __m1;
+        -: 2505:      const auto __d0 = __d1 - 1;
+        -: 2506:
+        -: 2507:      const auto __q1 = __y0 / 100;
+        -: 2508:      const auto __yc = 1461 * __y0 / 4 - __q1 + __q1 / 4;
+        -: 2509:      const auto __mc = (979 *__m0 - 2919) / 32;
+        -: 2510:      const auto __dc = __d0;
+        -: 2511:
+        -: 2512:      return days{static_cast<int32_t>(__yc + __mc + __dc - __r2_e3)};
+        -: 2513:    }
+        -: 2514:
+        -: 2515:    // YEAR_MONTH_DAY_LAST
+        -: 2516:
+        -: 2517:    class year_month_day_last
+        -: 2518:    {
+        -: 2519:    private:
+        -: 2520:      chrono::year _M_y;
+        -: 2521:      chrono::month_day_last _M_mdl;
+        -: 2522:
+        -: 2523:    public:
+        -: 2524:      constexpr
+        -: 2525:      year_month_day_last(const chrono::year& __y,
+        -: 2526:			  const chrono::month_day_last& __mdl) noexcept
+        -: 2527:      : _M_y{__y}, _M_mdl{__mdl}
+        -: 2528:      { }
+        -: 2529:
+        -: 2530:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2531:	constexpr year_month_day_last&
+        -: 2532:	operator+=(const months& __m) noexcept
+        -: 2533:	{
+        -: 2534:	  *this = *this + __m;
+        -: 2535:	  return *this;
+        -: 2536:	}
+        -: 2537:
+        -: 2538:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2539:	constexpr year_month_day_last&
+        -: 2540:	operator-=(const months& __m) noexcept
+        -: 2541:	{
+        -: 2542:	  *this = *this - __m;
+        -: 2543:	  return *this;
+        -: 2544:	}
+        -: 2545:
+        -: 2546:      constexpr year_month_day_last&
+        -: 2547:      operator+=(const years& __y)  noexcept
+        -: 2548:      {
+        -: 2549:	*this = *this + __y;
+        -: 2550:	return *this;
+        -: 2551:      }
+        -: 2552:
+        -: 2553:      constexpr year_month_day_last&
+        -: 2554:      operator-=(const years& __y)  noexcept
+        -: 2555:      {
+        -: 2556:	*this = *this - __y;
+        -: 2557:	return *this;
+        -: 2558:      }
+        -: 2559:
+        -: 2560:      constexpr chrono::year
+        -: 2561:      year() const noexcept
+        -: 2562:      { return _M_y; }
+        -: 2563:
+        -: 2564:      constexpr chrono::month
+        -: 2565:      month() const noexcept
+        -: 2566:      { return _M_mdl.month(); }
+        -: 2567:
+        -: 2568:      constexpr chrono::month_day_last
+        -: 2569:      month_day_last() const noexcept
+        -: 2570:      { return _M_mdl; }
+        -: 2571:
+        -: 2572:      // Return A day representing the last day of this year, month pair.
+        -: 2573:      constexpr chrono::day
+        -: 2574:      day() const noexcept
+        -: 2575:      {
+        -: 2576:	const auto __m = static_cast<unsigned>(month());
+        -: 2577:
+        -: 2578:	// Excluding February, the last day of month __m is either 30 or 31 or,
+        -: 2579:	// in another words, it is 30 + b = 30 | b, where b is in {0, 1}.
+        -: 2580:
+        -: 2581:	// If __m in {1, 3, 4, 5, 6, 7}, then b is 1 if, and only if __m is odd.
+        -: 2582:	// Hence, b = __m & 1 = (__m ^ 0) & 1.
+        -: 2583:
+        -: 2584:	// If __m in {8, 9, 10, 11, 12}, then b is 1 if, and only if __m is even.
+        -: 2585:	// Hence, b = (__m ^ 1) & 1.
+        -: 2586:
+        -: 2587:	// Therefore, b = (__m ^ c) & 1, where c = 0, if __m < 8, or c = 1 if
+        -: 2588:	// __m >= 8, that is, c = __m >> 3.
+        -: 2589:
+        -: 2590:	// The above mathematically justifies this implementation whose
+        -: 2591:	// performance does not depend on look-up tables being on the L1 cache.
+        -: 2592:	return chrono::day{__m != 2 ? ((__m ^ (__m >> 3)) & 1) | 30
+        -: 2593:				    : _M_y.is_leap() ? 29 : 28};
+        -: 2594:      }
+        -: 2595:
+        -: 2596:      constexpr
+        -: 2597:      operator sys_days() const noexcept
+        -: 2598:      { return sys_days{year() / month() / day()}; }
+        -: 2599:
+        -: 2600:      explicit constexpr
+        -: 2601:      operator local_days() const noexcept
+        -: 2602:      { return local_days{sys_days{*this}.time_since_epoch()}; }
+        -: 2603:
+        -: 2604:      constexpr bool
+        -: 2605:      ok() const noexcept
+        -: 2606:      { return _M_y.ok() && _M_mdl.ok(); }
+        -: 2607:
+        -: 2608:      friend constexpr bool
+        -: 2609:      operator==(const year_month_day_last& __x,
+        -: 2610:		 const year_month_day_last& __y) noexcept
+        -: 2611:      {
+        -: 2612:	return __x.year() == __y.year()
+        -: 2613:	  && __x.month_day_last() == __y.month_day_last();
+        -: 2614:      }
+        -: 2615:
+        -: 2616:      friend constexpr strong_ordering
+        -: 2617:      operator<=>(const year_month_day_last& __x,
+        -: 2618:		  const year_month_day_last& __y) noexcept
+        -: 2619:	= default;
+        -: 2620:
+        -: 2621:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2622:	friend constexpr year_month_day_last
+        -: 2623:	operator+(const year_month_day_last& __ymdl,
+        -: 2624:		  const months& __dm) noexcept
+        -: 2625:	{ return (__ymdl.year() / __ymdl.month() + __dm) / last; }
+        -: 2626:
+        -: 2627:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2628:	friend constexpr year_month_day_last
+        -: 2629:	operator+(const months& __dm,
+        -: 2630:		  const year_month_day_last& __ymdl) noexcept
+        -: 2631:	{ return __ymdl + __dm; }
+        -: 2632:
+        -: 2633:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2634:	friend constexpr year_month_day_last
+        -: 2635:	operator-(const year_month_day_last& __ymdl,
+        -: 2636:		  const months& __dm) noexcept
+        -: 2637:	{ return __ymdl + -__dm; }
+        -: 2638:
+        -: 2639:      friend constexpr year_month_day_last
+        -: 2640:      operator+(const year_month_day_last& __ymdl,
+        -: 2641:		const years& __dy) noexcept
+        -: 2642:      { return {__ymdl.year() + __dy, __ymdl.month_day_last()}; }
+        -: 2643:
+        -: 2644:      friend constexpr year_month_day_last
+        -: 2645:      operator+(const years& __dy,
+        -: 2646:		const year_month_day_last& __ymdl) noexcept
+        -: 2647:      { return __ymdl + __dy; }
+        -: 2648:
+        -: 2649:      friend constexpr year_month_day_last
+        -: 2650:      operator-(const year_month_day_last& __ymdl,
+        -: 2651:		const years& __dy) noexcept
+        -: 2652:      { return __ymdl + -__dy; }
+        -: 2653:
+        -: 2654:      friend constexpr year_month_day_last
+        -: 2655:      operator/(const year_month& __ym, last_spec) noexcept
+        -: 2656:      { return {__ym.year(), chrono::month_day_last{__ym.month()}}; }
+        -: 2657:
+        -: 2658:      friend constexpr year_month_day_last
+        -: 2659:      operator/(const chrono::year& __y,
+        -: 2660:		const chrono::month_day_last& __mdl) noexcept
+        -: 2661:      { return {__y, __mdl}; }
+        -: 2662:
+        -: 2663:      friend constexpr year_month_day_last
+        -: 2664:      operator/(int __y, const chrono::month_day_last& __mdl) noexcept
+        -: 2665:      { return chrono::year(__y) / __mdl; }
+        -: 2666:
+        -: 2667:      friend constexpr year_month_day_last
+        -: 2668:      operator/(const chrono::month_day_last& __mdl,
+        -: 2669:		const chrono::year& __y) noexcept
+        -: 2670:      { return __y / __mdl; }
+        -: 2671:
+        -: 2672:      friend constexpr year_month_day_last
+        -: 2673:      operator/(const chrono::month_day_last& __mdl, int __y) noexcept
+        -: 2674:      { return chrono::year(__y) / __mdl; }
+        -: 2675:
+        -: 2676:      // TODO: Implement operator<<.
+        -: 2677:    };
+        -: 2678:
+        -: 2679:    // year_month_day ctor from year_month_day_last
+        -: 2680:    constexpr
+        -: 2681:    year_month_day::year_month_day(const year_month_day_last& __ymdl) noexcept
+        -: 2682:    : _M_y{__ymdl.year()}, _M_m{__ymdl.month()}, _M_d{__ymdl.day()}
+        -: 2683:    { }
+        -: 2684:
+        -: 2685:    constexpr bool
+        -: 2686:    year_month_day::ok() const noexcept
+        -: 2687:    {
+        -: 2688:      if (!_M_y.ok() || !_M_m.ok())
+        -: 2689:	return false;
+        -: 2690:      return chrono::day{1} <= _M_d && _M_d <= (_M_y / _M_m / last).day();
+        -: 2691:    }
+        -: 2692:
+        -: 2693:    // YEAR_MONTH_WEEKDAY
+        -: 2694:
+        -: 2695:    class year_month_weekday
+        -: 2696:    {
+        -: 2697:    private:
+        -: 2698:      chrono::year _M_y;
+        -: 2699:      chrono::month _M_m;
+        -: 2700:      chrono::weekday_indexed _M_wdi;
+        -: 2701:
+        -: 2702:      static constexpr year_month_weekday
+        -: 2703:      _S_from_sys_days(const sys_days& __dp)
+        -: 2704:      {
+        -: 2705:	year_month_day __ymd{__dp};
+        -: 2706:	chrono::weekday __wd{__dp};
+        -: 2707:	auto __index = __wd[(unsigned{__ymd.day()} - 1) / 7 + 1];
+        -: 2708:	return {__ymd.year(), __ymd.month(), __index};
+        -: 2709:      }
+        -: 2710:
+        -: 2711:    public:
+        -: 2712:      year_month_weekday() = default;
+        -: 2713:
+        -: 2714:      constexpr
+        -: 2715:      year_month_weekday(const chrono::year& __y, const chrono::month& __m,
+        -: 2716:			 const chrono::weekday_indexed& __wdi) noexcept
+        -: 2717:      : _M_y{__y}, _M_m{__m}, _M_wdi{__wdi}
+        -: 2718:      { }
+        -: 2719:
+        -: 2720:      constexpr
+        -: 2721:      year_month_weekday(const sys_days& __dp) noexcept
+        -: 2722:      : year_month_weekday{_S_from_sys_days(__dp)}
+        -: 2723:      { }
+        -: 2724:
+        -: 2725:      explicit constexpr
+        -: 2726:      year_month_weekday(const local_days& __dp) noexcept
+        -: 2727:      : year_month_weekday{sys_days{__dp.time_since_epoch()}}
+        -: 2728:      { }
+        -: 2729:
+        -: 2730:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2731:	constexpr year_month_weekday&
+        -: 2732:	operator+=(const months& __m) noexcept
+        -: 2733:	{
+        -: 2734:	  *this = *this + __m;
+        -: 2735:	  return *this;
+        -: 2736:	}
+        -: 2737:
+        -: 2738:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2739:	constexpr year_month_weekday&
+        -: 2740:	operator-=(const months& __m) noexcept
+        -: 2741:	{
+        -: 2742:	  *this = *this - __m;
+        -: 2743:	  return *this;
+        -: 2744:	}
+        -: 2745:
+        -: 2746:      constexpr year_month_weekday&
+        -: 2747:      operator+=(const years& __y) noexcept
+        -: 2748:      {
+        -: 2749:	*this = *this + __y;
+        -: 2750:	return *this;
+        -: 2751:      }
+        -: 2752:
+        -: 2753:      constexpr year_month_weekday&
+        -: 2754:      operator-=(const years& __y) noexcept
+        -: 2755:      {
+        -: 2756:	*this = *this - __y;
+        -: 2757:	return *this;
+        -: 2758:      }
+        -: 2759:
+        -: 2760:      constexpr chrono::year
+        -: 2761:      year() const noexcept
+        -: 2762:      { return _M_y; }
+        -: 2763:
+        -: 2764:      constexpr chrono::month
+        -: 2765:      month() const noexcept
+        -: 2766:      { return _M_m; }
+        -: 2767:
+        -: 2768:      constexpr chrono::weekday
+        -: 2769:      weekday() const noexcept
+        -: 2770:      { return _M_wdi.weekday(); }
+        -: 2771:
+        -: 2772:      constexpr unsigned
+        -: 2773:      index() const noexcept
+        -: 2774:      { return _M_wdi.index(); }
+        -: 2775:
+        -: 2776:      constexpr chrono::weekday_indexed
+        -: 2777:      weekday_indexed() const noexcept
+        -: 2778:      { return _M_wdi; }
+        -: 2779:
+        -: 2780:      constexpr
+        -: 2781:      operator sys_days() const noexcept
+        -: 2782:      {
+        -: 2783:	auto __d = sys_days{year() / month() / 1};
+        -: 2784:	return __d + (weekday() - chrono::weekday(__d)
+        -: 2785:		      + days{(static_cast<int>(index())-1)*7});
+        -: 2786:      }
+        -: 2787:
+        -: 2788:      explicit constexpr
+        -: 2789:      operator local_days() const noexcept
+        -: 2790:      { return local_days{sys_days{*this}.time_since_epoch()}; }
+        -: 2791:
+        -: 2792:      constexpr bool
+        -: 2793:      ok() const noexcept
+        -: 2794:      {
+        -: 2795:	if (!_M_y.ok() || !_M_m.ok() || !_M_wdi.ok())
+        -: 2796:	  return false;
+        -: 2797:	if (_M_wdi.index() <= 4)
+        -: 2798:	  return true;
+        -: 2799:	days __d = (_M_wdi.weekday()
+        -: 2800:		    - chrono::weekday{sys_days{_M_y / _M_m / 1}}
+        -: 2801:		    + days((_M_wdi.index()-1)*7 + 1));
+        -: 2802:	__glibcxx_assert(__d.count() >= 1);
+        -: 2803:	return __d.count() <= unsigned{(_M_y / _M_m / last).day()};
+        -: 2804:      }
+        -: 2805:
+        -: 2806:      friend constexpr bool
+        -: 2807:      operator==(const year_month_weekday& __x,
+        -: 2808:		 const year_month_weekday& __y) noexcept
+        -: 2809:      {
+        -: 2810:	return __x.year() == __y.year()
+        -: 2811:	  && __x.month() == __y.month()
+        -: 2812:	  && __x.weekday_indexed() == __y.weekday_indexed();
+        -: 2813:      }
+        -: 2814:
+        -: 2815:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2816:	friend constexpr year_month_weekday
+        -: 2817:	operator+(const year_month_weekday& __ymwd, const months& __dm) noexcept
+        -: 2818:	{
+        -: 2819:	  return ((__ymwd.year() / __ymwd.month() + __dm)
+        -: 2820:		  / __ymwd.weekday_indexed());
+        -: 2821:	}
+        -: 2822:
+        -: 2823:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2824:	friend constexpr year_month_weekday
+        -: 2825:	operator+(const months& __dm, const year_month_weekday& __ymwd) noexcept
+        -: 2826:	{ return __ymwd + __dm; }
+        -: 2827:
+        -: 2828:      friend constexpr year_month_weekday
+        -: 2829:      operator+(const year_month_weekday& __ymwd, const years& __dy) noexcept
+        -: 2830:      { return {__ymwd.year() + __dy, __ymwd.month(), __ymwd.weekday_indexed()}; }
+        -: 2831:
+        -: 2832:      friend constexpr year_month_weekday
+        -: 2833:      operator+(const years& __dy, const year_month_weekday& __ymwd) noexcept
+        -: 2834:      { return __ymwd + __dy; }
+        -: 2835:
+        -: 2836:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2837:	friend constexpr year_month_weekday
+        -: 2838:	operator-(const year_month_weekday& __ymwd, const months& __dm) noexcept
+        -: 2839:	{ return __ymwd + -__dm; }
+        -: 2840:
+        -: 2841:      friend constexpr year_month_weekday
+        -: 2842:      operator-(const year_month_weekday& __ymwd, const years& __dy) noexcept
+        -: 2843:      { return __ymwd + -__dy; }
+        -: 2844:
+        -: 2845:      friend constexpr year_month_weekday
+        -: 2846:      operator/(const year_month& __ym,
+        -: 2847:		const chrono::weekday_indexed& __wdi) noexcept
+        -: 2848:      { return {__ym.year(), __ym.month(), __wdi}; }
+        -: 2849:
+        -: 2850:      friend constexpr year_month_weekday
+        -: 2851:      operator/(const chrono::year& __y, const month_weekday& __mwd) noexcept
+        -: 2852:      { return {__y, __mwd.month(), __mwd.weekday_indexed()}; }
+        -: 2853:
+        -: 2854:      friend constexpr year_month_weekday
+        -: 2855:      operator/(int __y, const month_weekday& __mwd) noexcept
+        -: 2856:      { return chrono::year(__y) / __mwd; }
+        -: 2857:
+        -: 2858:      friend constexpr year_month_weekday
+        -: 2859:      operator/(const month_weekday& __mwd, const chrono::year& __y) noexcept
+        -: 2860:      { return __y / __mwd; }
+        -: 2861:
+        -: 2862:      friend constexpr year_month_weekday
+        -: 2863:      operator/(const month_weekday& __mwd, int __y) noexcept
+        -: 2864:      { return chrono::year(__y) / __mwd; }
+        -: 2865:
+        -: 2866:      // TODO: Implement operator<<.
+        -: 2867:    };
+        -: 2868:
+        -: 2869:    // YEAR_MONTH_WEEKDAY_LAST
+        -: 2870:
+        -: 2871:    class year_month_weekday_last
+        -: 2872:    {
+        -: 2873:    private:
+        -: 2874:      chrono::year _M_y;
+        -: 2875:      chrono::month _M_m;
+        -: 2876:      chrono::weekday_last _M_wdl;
+        -: 2877:
+        -: 2878:    public:
+        -: 2879:      constexpr
+        -: 2880:      year_month_weekday_last(const chrono::year& __y, const chrono::month& __m,
+        -: 2881:			      const chrono::weekday_last& __wdl) noexcept
+        -: 2882:      : _M_y{__y}, _M_m{__m}, _M_wdl{__wdl}
+        -: 2883:      { }
+        -: 2884:
+        -: 2885:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2886:	constexpr year_month_weekday_last&
+        -: 2887:	operator+=(const months& __m) noexcept
+        -: 2888:	{
+        -: 2889:	  *this = *this + __m;
+        -: 2890:	  return *this;
+        -: 2891:	}
+        -: 2892:
+        -: 2893:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2894:	constexpr year_month_weekday_last&
+        -: 2895:	operator-=(const months& __m) noexcept
+        -: 2896:	{
+        -: 2897:	  *this = *this - __m;
+        -: 2898:	  return *this;
+        -: 2899:	}
+        -: 2900:
+        -: 2901:      constexpr year_month_weekday_last&
+        -: 2902:      operator+=(const years& __y)  noexcept
+        -: 2903:      {
+        -: 2904:	*this = *this + __y;
+        -: 2905:	return *this;
+        -: 2906:      }
+        -: 2907:
+        -: 2908:      constexpr year_month_weekday_last&
+        -: 2909:      operator-=(const years& __y)  noexcept
+        -: 2910:      {
+        -: 2911:	*this = *this - __y;
+        -: 2912:	return *this;
+        -: 2913:      }
+        -: 2914:
+        -: 2915:      constexpr chrono::year
+        -: 2916:      year() const noexcept
+        -: 2917:      { return _M_y; }
+        -: 2918:
+        -: 2919:      constexpr chrono::month
+        -: 2920:      month() const noexcept
+        -: 2921:      { return _M_m; }
+        -: 2922:
+        -: 2923:      constexpr chrono::weekday
+        -: 2924:      weekday() const noexcept
+        -: 2925:      { return _M_wdl.weekday(); }
+        -: 2926:
+        -: 2927:      constexpr chrono::weekday_last
+        -: 2928:      weekday_last() const noexcept
+        -: 2929:      { return _M_wdl; }
+        -: 2930:
+        -: 2931:      constexpr
+        -: 2932:      operator sys_days() const noexcept
+        -: 2933:      {
+        -: 2934:	const auto __d = sys_days{_M_y / _M_m / last};
+        -: 2935:	return sys_days{(__d - (chrono::weekday{__d}
+        -: 2936:				- _M_wdl.weekday())).time_since_epoch()};
+        -: 2937:      }
+        -: 2938:
+        -: 2939:      explicit constexpr
+        -: 2940:      operator local_days() const noexcept
+        -: 2941:      { return local_days{sys_days{*this}.time_since_epoch()}; }
+        -: 2942:
+        -: 2943:      constexpr bool
+        -: 2944:      ok() const noexcept
+        -: 2945:      { return _M_y.ok() && _M_m.ok() && _M_wdl.ok(); }
+        -: 2946:
+        -: 2947:      friend constexpr bool
+        -: 2948:      operator==(const year_month_weekday_last& __x,
+        -: 2949:		 const year_month_weekday_last& __y) noexcept
+        -: 2950:      {
+        -: 2951:	return __x.year() == __y.year()
+        -: 2952:	  && __x.month() == __y.month()
+        -: 2953:	  && __x.weekday_last() == __y.weekday_last();
+        -: 2954:      }
+        -: 2955:
+        -: 2956:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2957:	friend constexpr year_month_weekday_last
+        -: 2958:	operator+(const year_month_weekday_last& __ymwdl,
+        -: 2959:		  const months& __dm) noexcept
+        -: 2960:	{
+        -: 2961:	  return ((__ymwdl.year() / __ymwdl.month() + __dm)
+        -: 2962:		  / __ymwdl.weekday_last());
+        -: 2963:	}
+        -: 2964:
+        -: 2965:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2966:	friend constexpr year_month_weekday_last
+        -: 2967:	operator+(const months& __dm,
+        -: 2968:		  const year_month_weekday_last& __ymwdl) noexcept
+        -: 2969:	{ return __ymwdl + __dm; }
+        -: 2970:
+        -: 2971:      friend constexpr year_month_weekday_last
+        -: 2972:      operator+(const year_month_weekday_last& __ymwdl,
+        -: 2973:		const years& __dy) noexcept
+        -: 2974:      { return {__ymwdl.year() + __dy, __ymwdl.month(), __ymwdl.weekday_last()}; }
+        -: 2975:
+        -: 2976:      friend constexpr year_month_weekday_last
+        -: 2977:      operator+(const years& __dy,
+        -: 2978:		const year_month_weekday_last& __ymwdl) noexcept
+        -: 2979:      { return __ymwdl + __dy; }
+        -: 2980:
+        -: 2981:      template<typename = __detail::__months_years_conversion_disambiguator>
+        -: 2982:	friend constexpr year_month_weekday_last
+        -: 2983:	operator-(const year_month_weekday_last& __ymwdl,
+        -: 2984:		  const months& __dm) noexcept
+        -: 2985:	{ return __ymwdl + -__dm; }
+        -: 2986:
+        -: 2987:      friend constexpr year_month_weekday_last
+        -: 2988:      operator-(const year_month_weekday_last& __ymwdl,
+        -: 2989:		const years& __dy) noexcept
+        -: 2990:      { return __ymwdl + -__dy; }
+        -: 2991:
+        -: 2992:      friend constexpr year_month_weekday_last
+        -: 2993:      operator/(const year_month& __ym,
+        -: 2994:		const chrono::weekday_last& __wdl) noexcept
+        -: 2995:      { return {__ym.year(), __ym.month(), __wdl}; }
+        -: 2996:
+        -: 2997:      friend constexpr year_month_weekday_last
+        -: 2998:      operator/(const chrono::year& __y,
+        -: 2999:		const chrono::month_weekday_last& __mwdl) noexcept
+        -: 3000:      { return {__y, __mwdl.month(), __mwdl.weekday_last()}; }
+        -: 3001:
+        -: 3002:      friend constexpr year_month_weekday_last
+        -: 3003:      operator/(int __y, const chrono::month_weekday_last& __mwdl) noexcept
+        -: 3004:      { return chrono::year(__y) / __mwdl; }
+        -: 3005:
+        -: 3006:      friend constexpr year_month_weekday_last
+        -: 3007:      operator/(const chrono::month_weekday_last& __mwdl,
+        -: 3008:		const chrono::year& __y) noexcept
+        -: 3009:      { return __y / __mwdl; }
+        -: 3010:
+        -: 3011:      friend constexpr year_month_weekday_last
+        -: 3012:      operator/(const chrono::month_weekday_last& __mwdl, int __y) noexcept
+        -: 3013:      { return chrono::year(__y) / __mwdl; }
+        -: 3014:
+        -: 3015:      // TODO: Implement operator<<.
+        -: 3016:    };
+        -: 3017:
+        -: 3018:    // HH_MM_SS
+        -: 3019:
+        -: 3020:    namespace __detail
+        -: 3021:    {
+        -: 3022:      consteval long long
+        -: 3023:      __pow10(unsigned __n)
+        -: 3024:      {
+        -: 3025:	long long __r = 1;
+        -: 3026:	while (__n-- > 0)
+        -: 3027:	  __r *= 10;
+        -: 3028:	return __r;
+        -: 3029:      }
+        -: 3030:    }
+        -: 3031:
+        -: 3032:    template<typename _Duration>
+        -: 3033:      class hh_mm_ss
+        -: 3034:      {
+        -: 3035:      private:
+        -: 3036:	static constexpr int
+        -: 3037:	_S_fractional_width()
+        -: 3038:	{
+        -: 3039:	  int __multiplicity_2 = 0;
+        -: 3040:	  int __multiplicity_5 = 0;
+        -: 3041:	  auto __den = _Duration::period::den;
+        -: 3042:	  while ((__den % 2) == 0)
+        -: 3043:	    {
+        -: 3044:	      ++__multiplicity_2;
+        -: 3045:	      __den /= 2;
+        -: 3046:	    }
+        -: 3047:	  while ((__den % 5) == 0)
+        -: 3048:	    {
+        -: 3049:	      ++__multiplicity_5;
+        -: 3050:	      __den /= 5;
+        -: 3051:	    }
+        -: 3052:	  if (__den != 1)
+        -: 3053:	    return 6;
+        -: 3054:
+        -: 3055:	  int __width = (__multiplicity_2 > __multiplicity_5
+        -: 3056:			 ? __multiplicity_2 : __multiplicity_5);
+        -: 3057:	  if (__width > 18)
+        -: 3058:	    __width = 18;
+        -: 3059:	  return __width;
+        -: 3060:	}
+        -: 3061:
+        -: 3062:      public:
+        -: 3063:	static constexpr unsigned fractional_width = {_S_fractional_width()};
+        -: 3064:
+        -: 3065:	using precision
+        -: 3066:	  = duration<common_type_t<typename _Duration::rep,
+        -: 3067:				   chrono::seconds::rep>,
+        -: 3068:		     ratio<1, __detail::__pow10(fractional_width)>>;
+        -: 3069:
+        -: 3070:	constexpr
+        -: 3071:	hh_mm_ss() noexcept
+        -: 3072:	: hh_mm_ss{_Duration::zero()}
+        -: 3073:	{ }
+        -: 3074:
+        -: 3075:	constexpr explicit
+        -: 3076:	hh_mm_ss(_Duration __d) noexcept
+        -: 3077:	: _M_is_neg (__d < _Duration::zero()),
+        -: 3078:	  _M_h (duration_cast<chrono::hours>(abs(__d))),
+        -: 3079:	  _M_m (duration_cast<chrono::minutes>(abs(__d) - hours())),
+        -: 3080:	  _M_s (duration_cast<chrono::seconds>(abs(__d) - hours() - minutes()))
+        -: 3081:	{
+        -: 3082:	  if constexpr (treat_as_floating_point_v<typename precision::rep>)
+        -: 3083:	    _M_ss = abs(__d) - hours() - minutes() - seconds();
+        -: 3084:	  else
+        -: 3085:	    _M_ss = duration_cast<precision>(abs(__d) - hours()
+        -: 3086:					     - minutes() - seconds());
+        -: 3087:	}
+        -: 3088:
+        -: 3089:	constexpr bool
+        -: 3090:	is_negative() const noexcept
+        -: 3091:	{ return _M_is_neg; }
+        -: 3092:
+        -: 3093:	constexpr chrono::hours
+        -: 3094:	hours() const noexcept
+        -: 3095:	{ return _M_h; }
+        -: 3096:
+        -: 3097:	constexpr chrono::minutes
+        -: 3098:	minutes() const noexcept
+        -: 3099:	{ return _M_m; }
+        -: 3100:
+        -: 3101:	constexpr chrono::seconds
+        -: 3102:	seconds() const noexcept
+        -: 3103:	{ return _M_s; }
+        -: 3104:
+        -: 3105:	constexpr precision
+        -: 3106:	subseconds() const noexcept
+        -: 3107:	{ return _M_ss; }
+        -: 3108:
+        -: 3109:	constexpr explicit
+        -: 3110:	operator precision() const noexcept
+        -: 3111:	{ return to_duration(); }
+        -: 3112:
+        -: 3113:	constexpr precision
+        -: 3114:	to_duration() const noexcept
+        -: 3115:	{
+        -: 3116:	  if (_M_is_neg)
+        -: 3117:	    return -(_M_h + _M_m + _M_s + _M_ss);
+        -: 3118:	  else
+        -: 3119:	    return _M_h + _M_m + _M_s + _M_ss;
+        -: 3120:	}
+        -: 3121:
+        -: 3122:	// TODO: Implement operator<<.
+        -: 3123:
+        -: 3124:      private:
+        -: 3125:	bool _M_is_neg;
+        -: 3126:	chrono::hours _M_h;
+        -: 3127:	chrono::minutes _M_m;
+        -: 3128:	chrono::seconds _M_s;
+        -: 3129:	precision _M_ss;
+        -: 3130:      };
+        -: 3131:#endif // C++20
+        -: 3132:
+        -: 3133:    /// @}
+        -: 3134:  } // namespace chrono
+        -: 3135:
+        -: 3136:#if __cplusplus > 201103L
+        -: 3137:
+        -: 3138:#define __cpp_lib_chrono_udls 201304
+        -: 3139:
+        -: 3140:  inline namespace literals
+        -: 3141:  {
+        -: 3142:  /** ISO C++ 2014  namespace for suffixes for duration literals.
+        -: 3143:   *
+        -: 3144:   * These suffixes can be used to create `chrono::duration` values with
+        -: 3145:   * tick periods of hours, minutes, seconds, milliseconds, microseconds
+        -: 3146:   * or nanoseconds. For example, `std::chrono::seconds(5)` can be written
+        -: 3147:   * as `5s` after making the suffix visible in the current scope.
+        -: 3148:   * The suffixes can be made visible by a using-directive or
+        -: 3149:   * using-declaration such as:
+        -: 3150:   *  - `using namespace std::chrono_literals;`
+        -: 3151:   *  - `using namespace std::literals;`
+        -: 3152:   *  - `using namespace std::chrono;`
+        -: 3153:   *  - `using namespace std;`
+        -: 3154:   *  - `using std::chrono_literals::operator""s;`
+        -: 3155:   *
+        -: 3156:   * The result of these suffixes on an integer literal is one of the
+        -: 3157:   * standard typedefs such as `std::chrono::hours`.
+        -: 3158:   * The result on a floating-point literal is a duration type with the
+        -: 3159:   * specified tick period and an unspecified floating-point representation,
+        -: 3160:   * for example `1.5e2ms` might be equivalent to
+        -: 3161:   * `chrono::duration<long double, chrono::milli>(1.5e2)`.
+        -: 3162:   *
+        -: 3163:   * @ingroup chrono
+        -: 3164:   */
+        -: 3165:  inline namespace chrono_literals
+        -: 3166:  {
+        -: 3167:#pragma GCC diagnostic push
+        -: 3168:#pragma GCC diagnostic ignored "-Wliteral-suffix"
+        -: 3169:    /// @cond undocumented
+        -: 3170:    template<typename _Dur, char... _Digits>
+        -: 3171:      constexpr _Dur __check_overflow()
+        -: 3172:      {
+        -: 3173:	using _Val = __parse_int::_Parse_int<_Digits...>;
+        -: 3174:	constexpr typename _Dur::rep __repval = _Val::value;
+        -: 3175:	static_assert(__repval >= 0 && __repval == _Val::value,
+        -: 3176:		      "literal value cannot be represented by duration type");
+        -: 3177:	return _Dur(__repval);
+        -: 3178:      }
+        -: 3179:    /// @endcond
+        -: 3180:
+        -: 3181:    /// Literal suffix for durations representing non-integer hours
+        -: 3182:    constexpr chrono::duration<long double, ratio<3600,1>>
+        -: 3183:    operator""h(long double __hours)
+        -: 3184:    { return chrono::duration<long double, ratio<3600,1>>{__hours}; }
+        -: 3185:
+        -: 3186:    /// Literal suffix for durations of type `std::chrono::hours`
+        -: 3187:    template <char... _Digits>
+        -: 3188:      constexpr chrono::hours
+        -: 3189:      operator""h()
+        -: 3190:      { return __check_overflow<chrono::hours, _Digits...>(); }
+        -: 3191:
+        -: 3192:    /// Literal suffix for durations representing non-integer minutes
+        -: 3193:    constexpr chrono::duration<long double, ratio<60,1>>
+        -: 3194:    operator""min(long double __mins)
+        -: 3195:    { return chrono::duration<long double, ratio<60,1>>{__mins}; }
+        -: 3196:
+        -: 3197:    /// Literal suffix for durations of type `std::chrono::minutes`
+        -: 3198:    template <char... _Digits>
+        -: 3199:      constexpr chrono::minutes
+        -: 3200:      operator""min()
+        -: 3201:      { return __check_overflow<chrono::minutes, _Digits...>(); }
+        -: 3202:
+        -: 3203:    /// Literal suffix for durations representing non-integer seconds
+        -: 3204:    constexpr chrono::duration<long double>
+        -: 3205:    operator""s(long double __secs)
+        -: 3206:    { return chrono::duration<long double>{__secs}; }
+        -: 3207:
+        -: 3208:    /// Literal suffix for durations of type `std::chrono::seconds`
+        -: 3209:    template <char... _Digits>
+        -: 3210:      constexpr chrono::seconds
+        -: 3211:      operator""s()
+        -: 3212:      { return __check_overflow<chrono::seconds, _Digits...>(); }
+        -: 3213:
+        -: 3214:    /// Literal suffix for durations representing non-integer milliseconds
+        -: 3215:    constexpr chrono::duration<long double, milli>
+        -: 3216:    operator""ms(long double __msecs)
+        -: 3217:    { return chrono::duration<long double, milli>{__msecs}; }
+        -: 3218:
+        -: 3219:    /// Literal suffix for durations of type `std::chrono::milliseconds`
+        -: 3220:    template <char... _Digits>
+        -: 3221:      constexpr chrono::milliseconds
+        -: 3222:      operator""ms()
+        -: 3223:      { return __check_overflow<chrono::milliseconds, _Digits...>(); }
+        -: 3224:
+        -: 3225:    /// Literal suffix for durations representing non-integer microseconds
+        -: 3226:    constexpr chrono::duration<long double, micro>
+        -: 3227:    operator""us(long double __usecs)
+        -: 3228:    { return chrono::duration<long double, micro>{__usecs}; }
+        -: 3229:
+        -: 3230:    /// Literal suffix for durations of type `std::chrono::microseconds`
+        -: 3231:    template <char... _Digits>
+        -: 3232:      constexpr chrono::microseconds
+        -: 3233:      operator""us()
+        -: 3234:      { return __check_overflow<chrono::microseconds, _Digits...>(); }
+        -: 3235:
+        -: 3236:    /// Literal suffix for durations representing non-integer nanoseconds
+        -: 3237:    constexpr chrono::duration<long double, nano>
+        -: 3238:    operator""ns(long double __nsecs)
+        -: 3239:    { return chrono::duration<long double, nano>{__nsecs}; }
+        -: 3240:
+        -: 3241:    /// Literal suffix for durations of type `std::chrono::nanoseconds`
+        -: 3242:    template <char... _Digits>
+        -: 3243:      constexpr chrono::nanoseconds
+        -: 3244:      operator""ns()
+        -: 3245:      { return __check_overflow<chrono::nanoseconds, _Digits...>(); }
+        -: 3246:
+        -: 3247:#if __cplusplus > 201703L
+        -: 3248:    constexpr chrono::day
+        -: 3249:    operator""d(unsigned long long __d) noexcept
+        -: 3250:    { return chrono::day{static_cast<unsigned>(__d)}; }
+        -: 3251:
+        -: 3252:    constexpr chrono::year
+        -: 3253:    operator""y(unsigned long long __y) noexcept
+        -: 3254:    { return chrono::year{static_cast<int>(__y)}; }
+        -: 3255:#endif // C++20
+        -: 3256:
+        -: 3257:#pragma GCC diagnostic pop
+        -: 3258:  } // inline namespace chrono_literals
+        -: 3259:  } // inline namespace literals
+        -: 3260:
+        -: 3261:  namespace chrono
+        -: 3262:  {
+        -: 3263:    using namespace literals::chrono_literals;
+        -: 3264:  } // namespace chrono
+        -: 3265:
+        -: 3266:#if __cplusplus > 201703L
+        -: 3267:  namespace chrono
+        -: 3268:  {
+        -: 3269:    // 12/24 HOURS FUNCTIONS
+        -: 3270:
+        -: 3271:    constexpr bool
+        -: 3272:    is_am(const hours& __h) noexcept
+        -: 3273:    { return 0h <= __h && __h <= 11h; }
+        -: 3274:
+        -: 3275:    constexpr bool
+        -: 3276:    is_pm(const hours& __h) noexcept
+        -: 3277:    { return 12h <= __h && __h <= 23h; }
+        -: 3278:
+        -: 3279:    constexpr hours
+        -: 3280:    make12(const hours& __h) noexcept
+        -: 3281:    {
+        -: 3282:      if (__h == 0h)
+        -: 3283:	return 12h;
+        -: 3284:      else if (__h > 12h)
+        -: 3285:	return __h - 12h;
+        -: 3286:      return __h;
+        -: 3287:    }
+        -: 3288:
+        -: 3289:    constexpr hours
+        -: 3290:    make24(const hours& __h, bool __is_pm) noexcept
+        -: 3291:    {
+        -: 3292:      if (!__is_pm)
+        -: 3293:	{
+        -: 3294:	  if (__h == 12h)
+        -: 3295:	    return 0h;
+        -: 3296:	  else
+        -: 3297:	    return __h;
+        -: 3298:	}
+        -: 3299:      else
+        -: 3300:	{
+        -: 3301:	  if (__h == 12h)
+        -: 3302:	    return __h;
+        -: 3303:	  else
+        -: 3304:	    return __h + 12h;
+        -: 3305:	}
+        -: 3306:    }
+        -: 3307:  }
+        -: 3308:#endif
+        -: 3309:
+        -: 3310:#if __cplusplus >= 201703L
+        -: 3311:  namespace filesystem
+        -: 3312:  {
+        -: 3313:    struct __file_clock
+        -: 3314:    {
+        -: 3315:      using duration                  = chrono::nanoseconds;
+        -: 3316:      using rep                       = duration::rep;
+        -: 3317:      using period                    = duration::period;
+        -: 3318:      using time_point                = chrono::time_point<__file_clock>;
+        -: 3319:      static constexpr bool is_steady = false;
+        -: 3320:
+        -: 3321:      static time_point
+        -: 3322:      now() noexcept
+        -: 3323:      { return _S_from_sys(chrono::system_clock::now()); }
+        -: 3324:
+        -: 3325:#if __cplusplus > 201703L
+        -: 3326:      template<typename _Dur>
+        -: 3327:	static
+        -: 3328:	chrono::file_time<_Dur>
+        -: 3329:	from_sys(const chrono::sys_time<_Dur>& __t) noexcept
+        -: 3330:	{ return _S_from_sys(__t); }
+        -: 3331:
+        -: 3332:      // For internal use only
+        -: 3333:      template<typename _Dur>
+        -: 3334:	static
+        -: 3335:	chrono::sys_time<_Dur>
+        -: 3336:	to_sys(const chrono::file_time<_Dur>& __t) noexcept
+        -: 3337:	{ return _S_to_sys(__t); }
+        -: 3338:#endif // C++20
+        -: 3339:
+        -: 3340:    private:
+        -: 3341:      using __sys_clock = chrono::system_clock;
+        -: 3342:
+        -: 3343:      // This clock's (unspecified) epoch is 2174-01-01 00:00:00 UTC.
+        -: 3344:      // A signed 64-bit duration with nanosecond resolution gives roughly
+        -: 3345:      // +/- 292 years, which covers the 1901-2446 date range for ext4.
+        -: 3346:      static constexpr chrono::seconds _S_epoch_diff{6437664000};
+        -: 3347:
+        -: 3348:    protected:
+        -: 3349:      // For internal use only
+        -: 3350:      template<typename _Dur>
+        -: 3351:	static
+        -: 3352:	chrono::time_point<__file_clock, _Dur>
+        -: 3353:	_S_from_sys(const chrono::time_point<__sys_clock, _Dur>& __t) noexcept
+        -: 3354:	{
+        -: 3355:	  using __file_time = chrono::time_point<__file_clock, _Dur>;
+        -: 3356:	  return __file_time{__t.time_since_epoch()} - _S_epoch_diff;
+        -: 3357:	}
+        -: 3358:
+        -: 3359:      // For internal use only
+        -: 3360:      template<typename _Dur>
+        -: 3361:	static
+        -: 3362:	chrono::time_point<__sys_clock, _Dur>
+        -: 3363:	_S_to_sys(const chrono::time_point<__file_clock, _Dur>& __t) noexcept
+        -: 3364:	{
+        -: 3365:	  using __sys_time = chrono::time_point<__sys_clock, _Dur>;
+        -: 3366:	  return __sys_time{__t.time_since_epoch()} + _S_epoch_diff;
+        -: 3367:	}
+        -: 3368:    };
+        -: 3369:  } // namespace filesystem
+        -: 3370:#endif // C++17
+        -: 3371:#endif // C++14
+        -: 3372:
+        -: 3373:_GLIBCXX_END_NAMESPACE_VERSION
+        -: 3374:} // namespace std
+        -: 3375:
+        -: 3376:#endif // C++11
+        -: 3377:
+        -: 3378:#endif //_GLIBCXX_CHRONO
