@@ -12,11 +12,12 @@
 class Expr {
 public:
     bool has_variable();
-    std::string to_string();
+    std::string to_string(bool isPretty);
 
 
     virtual Expr* subst(std::string var, Expr* e) = 0;
     virtual void print(std::ostream &out) = 0;
+    virtual void pretty_print(std::ostream &out, int precedence) = 0;
     virtual bool equals(Expr *e) = 0;
     virtual int interp() = 0;
 };
@@ -31,6 +32,8 @@ public:
     int interp();
     Expr* subst(std::string var, Expr* e);
     void print(std::ostream &out);
+    void pretty_print(std::ostream &out, int precedence);
+
 };
 
 class Add : public Expr {
@@ -44,6 +47,7 @@ public:
     int interp();
     Expr* subst(std::string var, Expr* e);
     void print(std::ostream &out);
+    void pretty_print(std::ostream &out, int precedence);
 };
 
 class Mult : public Expr {
@@ -57,6 +61,7 @@ public:
     int interp();
     Expr* subst(std::string var, Expr* e);
     void print(std::ostream &out);
+    void pretty_print(std::ostream &out, int precedence);
 };
 
 class Var : public Expr {
@@ -69,6 +74,7 @@ public:
     int interp();
     Expr* subst(std::string var, Expr* e);
     void print(std::ostream &out);
+    void pretty_print(std::ostream &out, int precedence);
 };
 
 #endif //ASSIGNMENT02_EXPR_H
