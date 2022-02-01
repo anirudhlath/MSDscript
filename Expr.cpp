@@ -22,8 +22,8 @@ Mult::Mult(Expr *lhs, Expr *rhs) {
 }
 
 bool Num::equals(Expr *e) {
-    Num *num = dynamic_cast<Num*>(e);
-    if(num == nullptr) {
+    Num *num = dynamic_cast<Num *>(e);
+    if (num == nullptr) {
         return false;
     } else {
         return this->val == num->val;
@@ -31,8 +31,8 @@ bool Num::equals(Expr *e) {
 }
 
 bool Mult::equals(Expr *e) {
-    Mult *mult = dynamic_cast<Mult*>(e);
-    if(mult == nullptr) {
+    Mult *mult = dynamic_cast<Mult *>(e);
+    if (mult == nullptr) {
         return false;
     } else {
         return (this->lhs->equals(mult->lhs) && this->rhs->equals(mult->rhs));
@@ -40,8 +40,8 @@ bool Mult::equals(Expr *e) {
 }
 
 bool Add::equals(Expr *e) {
-    Add *add = dynamic_cast<Add*>(e);
-    if(add == nullptr) {
+    Add *add = dynamic_cast<Add *>(e);
+    if (add == nullptr) {
         return false;
     } else {
         return (this->lhs->equals(add->lhs) && this->rhs->equals(add->rhs));
@@ -53,8 +53,8 @@ Var::Var(std::string val) {
 }
 
 bool Var::equals(Expr *e) {
-    Var *var = dynamic_cast<Var*>(e);
-    if(var == nullptr) {
+    Var *var = dynamic_cast<Var *>(e);
+    if (var == nullptr) {
         return false;
     } else {
         return this->val == var->val;
@@ -81,26 +81,26 @@ bool Expr::has_variable() {
     bool result = false;
     try {
         this->interp();
-    } catch(std::runtime_error) {
+    } catch (std::runtime_error) {
         result = true;
     }
     return result;
 }
 
-Expr* Num::subst(std::string var, Expr* e) {
+Expr *Num::subst(std::string var, Expr *e) {
     return this;
 }
 
-Expr* Add::subst(std::string var, Expr* e) {
+Expr *Add::subst(std::string var, Expr *e) {
     return new Add(lhs->subst(var, e), rhs->subst(var, e));
 }
 
-Expr* Mult::subst(std::string var, Expr* e) {
+Expr *Mult::subst(std::string var, Expr *e) {
     return new Mult(lhs->subst(var, e), rhs->subst(var, e));
 }
 
-Expr* Var::subst(std::string var, Expr* e) {
-    if(this->val == var)
+Expr *Var::subst(std::string var, Expr *e) {
+    if (this->val == var)
         return e;
     return this;
 }
@@ -173,7 +173,7 @@ std::string Expr::to_string(bool isPretty) {
     return out.str();
 }
 
-TEST_CASE( "equals" ) {
+TEST_CASE("equals") {
     // Num
     Expr *two = new Num(2);
     Expr *twod = new Num(2);
@@ -195,7 +195,7 @@ TEST_CASE( "equals" ) {
     CHECK(var1->equals(var1) == true);
     CHECK(var1->equals(var1d) == true);
     CHECK(var1->equals(var2) == false);
-    CHECK_THROWS_WITH( (new Var("x"))->interp(), "Error occurred, a variable cannot be interpreted." );
+    CHECK_THROWS_WITH((new Var("x"))->interp(), "Error occurred, a variable cannot be interpreted.");
     CHECK(var1->has_variable() == true);
     CHECK(var1->subst("hello", var2)->equals(var2));
     CHECK(var1->subst("hell", var2)->equals(var1));
@@ -228,25 +228,27 @@ TEST_CASE( "equals" ) {
     CHECK(add1->interp() == 5);
     CHECK(add1->has_variable() == false);
     CHECK(add1->subst("x", add3)->equals(add1));
-
+    
     // Expr
     Expr *e1 = new Mult(add1, mult1);
     Expr *e2 = new Mult(add1, mult1);
     Expr *e3 = new Mult(two, mult1);
     Expr *e5 = new Mult(new Add(add1, mult1), mult1);
     Expr *e4 = new Mult(new Var("x"), mult1);
-    Expr *e6 = new Mult(new Mult(new Mult(two, two),new Add(var1, three)), new Mult(new Add(two, two),new Mult(two, three)));
+    Expr *e6 = new Mult(new Mult(new Mult(two, two), new Add(var1, three)),
+                        new Mult(new Add(two, two), new Mult(two, three)));
     Expr *e7 = new Mult(new Mult(two, three), three);
     Expr *e8 = new Mult(three, new Mult(two, three));
     Expr *e9 = new Mult(new Add(two, new Add(three, two)), two);
+
     CHECK(e1->equals(e1) == true);
     CHECK(e1->equals(e2) == true);
     CHECK(e1->equals(e3) == false);
     CHECK(e1->has_variable() == false);
     CHECK(e4->has_variable() == true);
-    CHECK( (new Add(new Var("x"), new Num(7)))
-                   ->subst("x", new Var("y"))
-                   ->equals(new Add(new Var("y"), new Num(7))) );
+    CHECK((new Add(new Var("x"), new Num(7)))
+                  ->subst("x", new Var("y"))
+                  ->equals(new Add(new Var("y"), new Num(7))));
     CHECK(e1->to_string(false) == "((3+2)*(2*3))");
     CHECK(e1->to_string(true) == "(3 + 2) * 2 * 3");
     CHECK(e5->to_string(false) == "(((3+2)+(2*3))*(2*3))");
@@ -263,10 +265,6 @@ TEST_CASE( "equals" ) {
     CHECK(mult1->equals(add3) == false);
     CHECK(add1->equals(mult1) == false);
     CHECK(var1->equals(mult1) == false);
-
-
-
-
 
 
 }
