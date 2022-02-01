@@ -126,9 +126,9 @@ void Mult::pretty_print(std::ostream &out, int precedence) {
     if (precedence >= 2) {
         out << '(';
     }
-    lhs->pretty_print(out, precedence+1);
+    lhs->pretty_print(out, 2);
     out << " * ";
-    rhs->pretty_print(out, precedence+1);
+    rhs->pretty_print(out, 1);
     if (precedence >= 2) {
         out << ')';
     }
@@ -146,13 +146,12 @@ void Add::pretty_print(std::ostream &out, int precedence) {
     if (precedence >= 1) {
         out << '(';
     }
-    lhs->pretty_print(out, precedence+1);
+    lhs->pretty_print(out, 1);
     out << " + ";
-    rhs->pretty_print(out, precedence+1);
+    rhs->pretty_print(out, 0);
     if (precedence >= 1) {
         out << ')';
     }
-
 }
 
 void Var::print(std::ostream &out) {
@@ -237,6 +236,9 @@ TEST_CASE( "equals" ) {
     Expr *e5 = new Mult(new Add(add1, mult1), mult1);
     Expr *e4 = new Mult(new Var("x"), mult1);
     Expr *e6 = new Mult(new Mult(new Mult(two, two),new Add(var1, three)), new Mult(new Add(two, two),new Mult(two, three)));
+    Expr *e7 = new Mult(new Mult(two, three), three);
+    Expr *e8 = new Mult(three, new Mult(two, three));
+    Expr *e9 = new Mult(new Add(two, new Add(three, two)), two);
     CHECK(e1->equals(e1) == true);
     CHECK(e1->equals(e2) == true);
     CHECK(e1->equals(e3) == false);
@@ -248,7 +250,10 @@ TEST_CASE( "equals" ) {
     CHECK(e1->to_string(false) == "((3+2)*(2*3))");
     CHECK(e1->to_string(true) == "(3 + 2) * 2 * 3");
     CHECK(e5->to_string(false) == "(((3+2)+(2*3))*(2*3))");
-    CHECK(e6->to_string(true) == "(2 * 2) * (hello + 3) * (2 + 2) * (2 * 3)");
+    CHECK(e6->to_string(true) == "((2 * 2) * (hello + 3)) * (2 + 2) * 2 * 3");
+    CHECK(e7->to_string(true) == "(2 * 3) * 3");
+    CHECK(e8->to_string(true) == "3 * 2 * 3");
+    CHECK(e9->to_string(true) == "(2 + 3 + 2) * 2");
     CHECK((new Add(new Num(1), new Mult(new Num(2), new Num(3))))->to_string(true) == "1 + 2 * 3");
     CHECK((new Mult(new Num(1), new Mult(new Num(2), new Num(3))))->to_string(true) == "1 * 2 * 3");
     CHECK((new Mult(new Num(1), new Add(new Num(2), new Num(3))))->to_string(true) == "1 * (2 + 3)");
