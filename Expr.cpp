@@ -329,6 +329,12 @@ void Let::print(std::ostream &out) {
 }
 
 void Let::pretty_print(std::ostream &out, int precedence) {
+
+    /* TODO:
+     * 1. Implement the let and in alignment properly.
+     * 2. Implement parenthesis system properly.
+     */
+
     if (precedence > 0) {
         out << '(';
     }
