@@ -5,6 +5,7 @@
 #define CATCH_CONFIG_RUNNER
 
 #include "catch.hpp"
+#include "Parser.h"
 #include <iostream>
 
 int main(int argc, char **argv) {
@@ -13,6 +14,7 @@ int main(int argc, char **argv) {
         if (argv[1] == TEST)
             if (Catch::Session().run() != 0)
                 exit(1);
+    
 
     std::cout << "The program has successfully compiled!" << std::endl;
     return 0;

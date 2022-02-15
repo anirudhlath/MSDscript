@@ -2,19 +2,6 @@
 // Created by aniru on 2/14/2022.
 //
 
-/* NOTES:
-* 〈expr〉               =   〈addend〉
-                    |   〈addend〉 + 〈expr〉
-
-* 〈addend〉             =   〈multicand〉
-                    |   〈multicand〉 * 〈addend〉
-
-* 〈multicand〉          =   〈number〉
-                    |   ( 〈expr〉 )
-                    |   〈variable〉
-                    |   _let 〈variable〉 = 〈expr〉 _in 〈expr〉
-*/
-
 #include "Expr.h"
 
 #ifndef MSDSCRIPT_PARSER_H

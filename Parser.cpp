@@ -94,14 +94,28 @@ Expr *parse_num(std::istream &in) {
 Expr *parse_var(std::istream &in) {
     std::string str = "";
     char c = in.peek();
-    if (isalpha(c)) {
+    while (1) {
+        c = in.peek();
+        if (isalpha(c)) {
+            consume(in, c);
+            str += c;
+        } else {
+            break;
+        }
+    }
+    /*if (isalpha(c)) {
         consume(in, c);
         str += c;
-        while (!isspace(c)) {
+        while (isalpha(c)) {
             c = in.get();
             str += c;
         }
-    }
+        // TODO: Endless loop in some cases.
+        *//*while (!isspace(c) || !in.eof()) {
+            c = in.get();
+            str += c;
+        }*//*
+    }*/
     return new Var(str);
     /*while (1) {
         char c = in.peek();
@@ -143,13 +157,13 @@ Expr *parse_let(std::istream &in) {
                     skip_whitespace(in);
                     body = parse_expr(in);
                 } else {
-                    throw new std::runtime_error("Invalid input. '_in' was expected.");
+                    throw std::runtime_error("Invalid input. '_in' was expected.");
                 }
             } else {
-                throw new std::runtime_error("Invalid input. '=' was expected.");
+                throw std::runtime_error("Invalid input. '=' was expected.");
             }
         } else {
-            throw new std::runtime_error("Invalid input. A variable was expected after '_let'.");
+            throw std::runtime_error("Invalid input. A variable was expected after '_let'.");
         }
     } else {
         throw std::runtime_error("Invalid keyword.");
@@ -183,7 +197,6 @@ static void consume(std::istream &in, int expect) {
 TEST_CASE("Parse Numbers") {
     CHECK(parse_str("2")->equals(new Num(2)));
     CHECK(parse_str("(2)")->equals(new Num(2)));
-    CHECK_THROWS_WITH(parse_str("(2")->equals(new Num(2)), "Missing close parenthesis.");
     CHECK(parse_str(" 2")->equals(new Num(2)));
     CHECK(parse_str(" 2 ")->equals(new Num(2)));
     CHECK(parse_str("\n 2 ")->equals(new Num(2)));
@@ -192,14 +205,62 @@ TEST_CASE("Parse Numbers") {
     CHECK(parse_str("\n    -232    \n")->equals(new Num(-232)));
     CHECK(parse_str("\n    - 232    \n")->equals(new Num(0))); // Space between characters.
 
+    CHECK_THROWS_WITH(parse_str("(2"), "Missing close parenthesis.");
+
 }
 
 TEST_CASE("Parse Variables") {
     CHECK(parse_str("a")->equals(new Var("a")));
     CHECK(parse_str("   a   ")->equals(new Var("a")));
-    CHECK(parse_str("   a")->equals(new Var("a")));
+    CHECK(parse_str("   aa")->equals(new Var("aa")));
     CHECK(parse_str("a   \n")->equals(new Var("a")));
     CHECK(parse_str("\na   \n")->equals(new Var("a")));
     CHECK(parse_str("\n  a   \n")->equals(new Var("a")));
     CHECK(parse_str("\n  a")->equals(new Var("a")));
 }
+
+TEST_CASE("Parse Let") {
+    Expr *e1 = new Let(new Var("a"), new Num(1), new Add(new Var("a"), new Num(2)));
+    CHECK(parse_str("_let a = 1 _in a + 2")->equals(e1));
+    CHECK(parse_str("    _let a = 1 _in a + 2")->equals(e1));
+    CHECK(parse_str("_let a     = 1 _in a + 2")->equals(e1));
+    CHECK(parse_str("_let     a = 1 _in a + 2")->equals(e1));
+    CHECK(parse_str("_let a = 1 _in     a + 2")->equals(e1));
+    CHECK(parse_str("_let a = 1 _in a +     2  ")->equals(e1));
+    CHECK(parse_str("_let    a = 1 _in a +     2  ")->equals(e1));
+    CHECK(parse_str("_let  a = 1 _in a +     2  ")->equals(e1));
+    CHECK(parse_str("  _let  \n a    =   1    _in    a    +  \n   2  \n")->equals(e1));
+
+    CHECK_THROWS_WITH(parse_str("_let 2"), "Invalid input. A variable was expected after '_let'.");
+    CHECK_THROWS_WITH(parse_str("_let a *"), "Invalid input. '=' was expected.");
+    CHECK_THROWS_WITH(parse_str("_let a = 2 _let"), "Invalid input. '_in' was expected.");
+    CHECK_THROWS_WITH(parse_str("_in"), "Invalid keyword.");
+}
+
+TEST_CASE("Parse Add") {
+    Expr *e1 = new Add(new Num(1), new Num(1));
+
+    CHECK(parse_str("1+1")->equals(e1));
+    CHECK(parse_str("1   +1")->equals(e1));
+    CHECK(parse_str("1 \n+1")->equals(e1));
+    CHECK(parse_str("   1+1  \n")->equals(e1));
+    CHECK(parse_str("(1 + 1 )\n")->equals(e1));
+    CHECK(parse_str("(1+1)")->equals(e1));
+    CHECK(parse_str("(  1  +  1  )")->equals(e1));
+
+}
+
+TEST_CASE("Parse Multiply") {
+    Expr *e1 = new Mult(new Num(1), new Num(1));
+
+    CHECK(parse_str("1*1")->equals(e1));
+    CHECK(parse_str("1   *1")->equals(e1));
+    CHECK(parse_str("1 \n*1")->equals(e1));
+    CHECK(parse_str("   1*1  \n")->equals(e1));
+    CHECK(parse_str("(1 * 1 )\n")->equals(e1));
+    CHECK(parse_str("(1*1)")->equals(e1));
+    CHECK(parse_str("(  1  *  1  )")->equals(e1));
+
+}
+
+// TODO: Abstract parse tests.
