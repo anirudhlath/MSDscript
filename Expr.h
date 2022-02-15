@@ -12,13 +12,18 @@
 class Expr {
 public:
     bool has_variable();
+
     std::string to_string(bool isPretty);
 
 
-    virtual Expr* subst(std::string var, Expr* e) = 0;
+    virtual Expr *subst(std::string var, Expr *e) = 0;
+
     virtual void print(std::ostream &out) = 0;
+
     virtual void pretty_print(std::ostream &out, int precedence) = 0;
+
     virtual bool equals(Expr *e) = 0;
+
     virtual int interp() = 0;
 };
 
@@ -29,9 +34,13 @@ public:
     Num(int val);
 
     bool equals(Expr *e);
+
     int interp();
-    Expr* subst(std::string var, Expr* e);
+
+    Expr *subst(std::string var, Expr *e);
+
     void print(std::ostream &out);
+
     void pretty_print(std::ostream &out, int precedence);
 
 };
@@ -44,9 +53,13 @@ public:
     Add(Expr *lhs, Expr *rhs);
 
     bool equals(Expr *e);
+
     int interp();
-    Expr* subst(std::string var, Expr* e);
+
+    Expr *subst(std::string var, Expr *e);
+
     void print(std::ostream &out);
+
     void pretty_print(std::ostream &out, int precedence);
 };
 
@@ -58,9 +71,13 @@ public:
     Mult(Expr *lhs, Expr *rhs);
 
     bool equals(Expr *e);
+
     int interp();
-    Expr* subst(std::string var, Expr* e);
+
+    Expr *subst(std::string var, Expr *e);
+
     void print(std::ostream &out);
+
     void pretty_print(std::ostream &out, int precedence);
 };
 
@@ -71,10 +88,34 @@ public:
     Var(std::string val);
 
     bool equals(Expr *e);
+
     int interp();
-    Expr* subst(std::string var, Expr* e);
+
+    Expr *subst(std::string var, Expr *e);
+
     void print(std::ostream &out);
+
     void pretty_print(std::ostream &out, int precedence);
+};
+
+class Let : public Expr {
+public:
+    Var *lhs;
+    Expr *rhs;
+    Expr *in;
+
+    Let(Var *lhs, Expr *rhs, Expr *in);
+
+    Expr *subst(std::string var, Expr *e);
+
+    void print(std::ostream &out);
+
+    void pretty_print(std::ostream &out, int precedence);
+
+    bool equals(Expr *e);
+
+    int interp();
+
 };
 
 #endif //ASSIGNMENT02_EXPR_H
