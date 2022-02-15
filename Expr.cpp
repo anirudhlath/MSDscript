@@ -264,8 +264,22 @@ TEST_CASE("equals") {
     CHECK((new Mult(new Num(1), new Mult(new Num(2), new Num(3))))->to_string(true) == "1 * 2 * 3");
     CHECK((new Mult(new Num(1), new Add(new Num(2), new Num(3))))->to_string(true) == "1 * (2 + 3)");
 
-    // _let
-    Expr *let1 = new _let(new Var("x"), new Num(1), new Var("x"));
+    // Let
+    Expr *let1 = new Let(new Var("x"), new Num(1), new Var("x"));
+    Expr *let1Duplicate = new Let(new Var("x"), new Num(1), new Var("x"));
+    Expr *let2 = new Let(new Var("x"), new Num(2), new Var("x"));
+    Expr *let3 = new Let(new Var("x"), new Num(5),
+                         new Add(new Let(new Var("y"), new Num(3), new Add(new Var("y"), new Num(2))), new Var("x")));
+
+    CHECK(let1->equals(let1Duplicate) == true);
+    CHECK(let1->equals(let2) == false);
+    CHECK(let1->interp() == 1);
+    CHECK(let2->interp() == 2);
+    CHECK(let1->subst("x", new Num(1))->equals(let1));
+    CHECK(let1->subst("y", new Num(1))->equals(let1));
+    CHECK(let3->to_string(false) == "(_let x=5 _in ((_let y=3 _in (y+2))+x))");
+    CHECK(let3->to_string(true) == "(_let x=5 _in ((_let y=3 _in (y+2))+x))");
+    let3->to_string(true);
 
     // Nullptr
     CHECK(two->equals(add3) == false);
@@ -277,21 +291,61 @@ TEST_CASE("equals") {
 }
 
 
-_let::_let(Var *lhs, Expr *rhs, Expr *in) {
+Let::Let(Var *lhs, Expr *rhs, Expr *in) {
     this->lhs = lhs;
     this->rhs = rhs;
     this->in = in;
 }
 
-bool _let::equals(Expr *e) {
-    _let *let = dynamic_cast<_let *>(e);
+bool Let::equals(Expr *e) {
+    Let *let = dynamic_cast<Let *>(e);
     if (let == nullptr) {
         return false;
     } else {
-        return (this->lhs->equals(let->lhs) && this->rhs->equals(let->rhs));
+        return (this->lhs->equals(let->lhs) && this->rhs->equals(let->rhs) && this->in->equals(let->in));
     }
 }
 
-int _let::interp() {
-    return 0;
+int Let::interp() {
+    Expr *val = new Num(rhs->interp());
+    return in->subst(lhs->to_string(false), val)->interp();
+}
+
+Expr *Let::subst(std::string var, Expr *e) {
+    if (lhs->to_string(false) != var) {
+        return new Let(this->lhs, this->rhs, this->in->subst(var, e));
+    }
+    return new Let(this->lhs, this->rhs, this->in);
+}
+
+void Let::print(std::ostream &out) {
+    out << "(_let ";
+    lhs->print(out);
+    out << '=';
+    rhs->print(out);
+    out << " _in ";
+    in->print(out);
+    out << ')';
+}
+
+void Let::pretty_print(std::ostream &out, int precedence) {
+    if (precedence > 0) {
+        out << '(';
+    }
+    int position = out.tellp();
+    out << "_let ";
+    lhs->print(out);
+    out << " = ";
+    rhs->pretty_print(out, 0);
+    out << "\n";
+    if (position > 0) {
+        for (int i = 0; i < position; i++) {
+            out << ' ';
+        }
+    }
+    out << "_in ";
+    in->pretty_print(out, 0);
+    if (precedence > 0) {
+        out << ')';
+    }
 }

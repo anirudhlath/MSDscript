@@ -98,13 +98,13 @@ public:
     void pretty_print(std::ostream &out, int precedence);
 };
 
-class _let : public Expr {
+class Let : public Expr {
 public:
     Var *lhs;
     Expr *rhs;
     Expr *in;
 
-    _let(Var *lhs, Expr *rhs, Expr *in);
+    Let(Var *lhs, Expr *rhs, Expr *in);
 
     Expr *subst(std::string var, Expr *e);
 
