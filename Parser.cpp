@@ -86,6 +86,9 @@ Expr *parse_num(std::istream &in) {
             break;
         }
     }
+    /*if (!isspace(in.peek()) && !isdigit(in.peek())) {
+        throw std::runtime_error("Invalid input.");
+    }*/
     if (negative)
         n = -n;
     return new Num(n);
@@ -110,7 +113,7 @@ Expr *parse_var(std::istream &in) {
             c = in.get();
             str += c;
         }
-        // TODO: Endless loop in some cases.
+        // TODO: Tried to add support for 'add1' alphanumeric variables, doesn't fully work. Endless loop in most cases.
         *//*while (!isspace(c) || !in.eof()) {
             c = in.get();
             str += c;
@@ -260,7 +263,64 @@ TEST_CASE("Parse Multiply") {
     CHECK(parse_str("(1 * 1 )\n")->equals(e1));
     CHECK(parse_str("(1*1)")->equals(e1));
     CHECK(parse_str("(  1  *  1  )")->equals(e1));
+}
+
+TEST_CASE("Parser Test") {
+
+    // TODO: The to_string() doesn't parenthesize -100 which looks weird, what to do?
+
+    Var *var1 = new Var("x");
+    Var *var2 = new Var("y");
+    Var *var3 = new Var("xyz");
+
+    Num *num1 = new Num(1);
+    Num *num2 = new Num(2);
+    Num *num3 = new Num(-100);
+
+    Add *add1 = new Add(num1, num2); // 1 + 2 = 3
+    Add *add2 = new Add(var1, num2); // x + 2
+    Add *add3 = new Add(var1, var2); // x + y
+    Add *add4 = new Add(var3, num3); // xyz + (-100)
+
+    Mult *mult1 = new Mult(num1, num2); // 1 * 2 = 2
+    Mult *mult2 = new Mult(var1, num2); // x * 2
+    Mult *mult3 = new Mult(var1, var2); // x * y
+    Mult *mult4 = new Mult(var3, num3); // xyz * (-100)
+
+    Let *let1 = new Let(var1, num1, add2); // _let x = 1 _in x + 2
+    Let *let2 = new Let(var3, num3, mult4); // _let xyz = -100 _in (xyz * (-100))
+    Let *let3 = new Let(var1, var2, add3); // _let x = y _in x + y
+    Let *let4 = new Let(var1, num1, let3); // _let x = 1 _in ( _let x = y _in x + y )
+
+    Expr *e1 = new Add(num1, add1); // 1 + ( 1 + 2 ) || 1 + 1 + 2
+    Expr *e2 = new Add(add1, num1); // ( 1 + 2 ) + 1
+    Expr *e3 = new Add(add4, add3); // ( xyz + (-100) ) + ( x + y )
+    Expr *e4 = new Add(var1, add3); // x + ( x + y )
+    Expr *e5 = new Add(add4, mult1); // ( xyz + (-100) ) + ( 1 * 2 )
+    Expr *e6 = new Add(mult1, add4); // ( 1 * 2 ) + ( xyz + (-100) )
+    Expr *e7 = new Add(mult4, let4); // ( xyz * (-100) ) + ( _let x = 1 _in ( _let x = y _in x + y ) )
+    Expr *e8 = new Mult(mult4, let4); // ( xyz * (-100) ) * ( _let x = 1 _in ( _let x = y _in x + y ) )
+    Expr *e9 = new Mult(e7,
+                        e8); // (( xyz * (-100) ) + ( _let x = 1 _in ( _let x = y _in x + y ) )) * ( ( xyz * (-100) ) * ( _let x = 1 _in ( _let x = y _in x + y ) ) )
+
+    CHECK(parse_str("1 + ( 1 + 2 )")->equals(e1));
+    CHECK(parse_str("1 + 1 + 2")->equals(e1));
+    CHECK(parse_str("( 1 + 2 ) + 1")->equals(e2));
+    CHECK(parse_str("( xyz + (-100) ) + ( x + y )")->equals(e3));
+    CHECK(parse_str("x + ( x + y )")->equals(e4));
+    CHECK(parse_str("( xyz + (-100) ) + ( 1 * 2 )")->equals(e5));
+    CHECK(parse_str("( 1 * 2 ) + ( xyz + (-100) )")->equals(e6));
+    CHECK(parse_str("( xyz * (-100) ) + ( _let x = 1 _in ( _let x = y _in x + y ) )")->equals(e7));
+    CHECK(parse_str("( xyz * (-100) ) * ( _let x = 1 _in ( _let x = y _in x + y ) )")->equals(e8));
+    CHECK(parse_str(
+            "(( xyz * (-100) ) + ( _let x = 1 _in ( _let x = y _in x + y ) )) * ( ( xyz * (-100) ) * ( _let x = 1 _in ( _let x = y _in x + y ) ) )")->equals(
+            e9));
+
+    // TODO: This seems to be broken but also doesn't seem to be expected from the assignment based on lecture videos, is this okay?
+    /*CHECK_THROWS_WITH(parse_str("1 + ( 1 + 2 )g"), "Invalid Input.");
+    CHECK(parse_str("1 + ( 1 + 2 )g")->to_string(false) == "");
+    CHECK_THROWS_WITH(parse_str("1g + (g 1 + 2g )g"), "Invalid Input.");
+    CHECK(parse_str("1g + (g 1 + 2g )g")->to_string(false) == "");*/
 
 }
 
-// TODO: Abstract parse tests.

@@ -330,7 +330,7 @@ void Let::print(std::ostream &out) {
 
 void Let::pretty_print(std::ostream &out, int precedence) {
 
-    /* TODO:
+    /* TODO: Let::pretty_print(...)
      * 1. Implement the let and in alignment properly.
      * 2. Implement parenthesis system properly.
      */
