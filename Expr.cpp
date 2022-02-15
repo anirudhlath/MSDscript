@@ -11,16 +11,6 @@ Num::Num(int val) {
     this->val = val;
 }
 
-Add::Add(Expr *lhs, Expr *rhs) {
-    this->lhs = lhs;
-    this->rhs = rhs;
-}
-
-Mult::Mult(Expr *lhs, Expr *rhs) {
-    this->lhs = lhs;
-    this->rhs = rhs;
-}
-
 bool Num::equals(Expr *e) {
     Num *num = dynamic_cast<Num *>(e);
     if (num == nullptr) {
@@ -30,78 +20,11 @@ bool Num::equals(Expr *e) {
     }
 }
 
-bool Mult::equals(Expr *e) {
-    Mult *mult = dynamic_cast<Mult *>(e);
-    if (mult == nullptr) {
-        return false;
-    } else {
-        return (this->lhs->equals(mult->lhs) && this->rhs->equals(mult->rhs));
-    }
-}
-
-bool Add::equals(Expr *e) {
-    Add *add = dynamic_cast<Add *>(e);
-    if (add == nullptr) {
-        return false;
-    } else {
-        return (this->lhs->equals(add->lhs) && this->rhs->equals(add->rhs));
-    }
-}
-
-Var::Var(std::string val) {
-    this->val = val;
-}
-
-bool Var::equals(Expr *e) {
-    Var *var = dynamic_cast<Var *>(e);
-    if (var == nullptr) {
-        return false;
-    } else {
-        return this->val == var->val;
-    }
-}
-
 int Num::interp() {
     return this->val;
 }
 
-int Mult::interp() {
-    return this->lhs->interp() * this->rhs->interp();
-}
-
-int Add::interp() {
-    return this->lhs->interp() + this->rhs->interp();
-}
-
-int Var::interp() {
-    throw std::runtime_error("Error occurred, a variable cannot be interpreted.");
-}
-
-bool Expr::has_variable() {
-    bool result = false;
-    try {
-        this->interp();
-    } catch (std::runtime_error) {
-        result = true;
-    }
-    return result;
-}
-
 Expr *Num::subst(std::string var, Expr *e) {
-    return this;
-}
-
-Expr *Add::subst(std::string var, Expr *e) {
-    return new Add(lhs->subst(var, e), rhs->subst(var, e));
-}
-
-Expr *Mult::subst(std::string var, Expr *e) {
-    return new Mult(lhs->subst(var, e), rhs->subst(var, e));
-}
-
-Expr *Var::subst(std::string var, Expr *e) {
-    if (this->val == var)
-        return e;
     return this;
 }
 
@@ -114,24 +37,23 @@ void Num::pretty_print(std::ostream &out, int precedence) {
 
 }
 
-void Mult::print(std::ostream &out) {
-    out << '(';
-    lhs->print(out);
-    out << '*';
-    rhs->print(out);
-    out << ')';
+
+Add::Add(Expr *lhs, Expr *rhs) {
+    this->lhs = lhs;
+    this->rhs = rhs;
 }
 
-void Mult::pretty_print(std::ostream &out, int precedence) {
-    if (precedence >= 2) {
-        out << '(';
+bool Add::equals(Expr *e) {
+    Add *add = dynamic_cast<Add *>(e);
+    if (add == nullptr) {
+        return false;
+    } else {
+        return (this->lhs->equals(add->lhs) && this->rhs->equals(add->rhs));
     }
-    lhs->pretty_print(out, 2);
-    out << " * ";
-    rhs->pretty_print(out, 1);
-    if (precedence >= 2) {
-        out << ')';
-    }
+}
+
+int Add::interp() {
+    return this->lhs->interp() + this->rhs->interp();
 }
 
 void Add::print(std::ostream &out) {
@@ -154,6 +76,69 @@ void Add::pretty_print(std::ostream &out, int precedence) {
     }
 }
 
+Expr *Add::subst(std::string var, Expr *e) {
+    return new Add(lhs->subst(var, e), rhs->subst(var, e));
+}
+
+Mult::Mult(Expr *lhs, Expr *rhs) {
+    this->lhs = lhs;
+    this->rhs = rhs;
+}
+
+bool Mult::equals(Expr *e) {
+    Mult *mult = dynamic_cast<Mult *>(e);
+    if (mult == nullptr) {
+        return false;
+    } else {
+        return (this->lhs->equals(mult->lhs) && this->rhs->equals(mult->rhs));
+    }
+}
+
+int Mult::interp() {
+    return this->lhs->interp() * this->rhs->interp();
+}
+
+void Mult::print(std::ostream &out) {
+    out << '(';
+    lhs->print(out);
+    out << '*';
+    rhs->print(out);
+    out << ')';
+}
+
+void Mult::pretty_print(std::ostream &out, int precedence) {
+    if (precedence >= 2) {
+        out << '(';
+    }
+    lhs->pretty_print(out, 2);
+    out << " * ";
+    rhs->pretty_print(out, 1);
+    if (precedence >= 2) {
+        out << ')';
+    }
+}
+
+Expr *Mult::subst(std::string var, Expr *e) {
+    return new Mult(lhs->subst(var, e), rhs->subst(var, e));
+}
+
+Var::Var(std::string val) {
+    this->val = val;
+}
+
+bool Var::equals(Expr *e) {
+    Var *var = dynamic_cast<Var *>(e);
+    if (var == nullptr) {
+        return false;
+    } else {
+        return this->val == var->val;
+    }
+}
+
+int Var::interp() {
+    throw std::runtime_error("Error occurred, a variable cannot be interpreted.");
+}
+
 void Var::print(std::ostream &out) {
     out << val;
 }
@@ -161,6 +146,22 @@ void Var::print(std::ostream &out) {
 void Var::pretty_print(std::ostream &out, int precedence) {
     this->print(out);
 
+}
+
+Expr *Var::subst(std::string var, Expr *e) {
+    if (this->val == var)
+        return e;
+    return this;
+}
+
+bool Expr::has_variable() {
+    bool result = false;
+    try {
+        this->interp();
+    } catch (std::runtime_error) {
+        result = true;
+    }
+    return result;
 }
 
 std::string Expr::to_string(bool isPretty) {
@@ -172,6 +173,9 @@ std::string Expr::to_string(bool isPretty) {
     }
     return out.str();
 }
+
+
+/* ********** TESTS ********** */
 
 TEST_CASE("equals") {
     // Num
@@ -228,7 +232,7 @@ TEST_CASE("equals") {
     CHECK(add1->interp() == 5);
     CHECK(add1->has_variable() == false);
     CHECK(add1->subst("x", add3)->equals(add1));
-    
+
     // Expr
     Expr *e1 = new Mult(add1, mult1);
     Expr *e2 = new Mult(add1, mult1);
@@ -260,6 +264,9 @@ TEST_CASE("equals") {
     CHECK((new Mult(new Num(1), new Mult(new Num(2), new Num(3))))->to_string(true) == "1 * 2 * 3");
     CHECK((new Mult(new Num(1), new Add(new Num(2), new Num(3))))->to_string(true) == "1 * (2 + 3)");
 
+    // _let
+    Expr *let1 = new _let(new Var("x"), new Num(1), new Var("x"));
+
     // Nullptr
     CHECK(two->equals(add3) == false);
     CHECK(mult1->equals(add3) == false);
@@ -270,3 +277,21 @@ TEST_CASE("equals") {
 }
 
 
+_let::_let(Var *lhs, Expr *rhs, Expr *in) {
+    this->lhs = lhs;
+    this->rhs = rhs;
+    this->in = in;
+}
+
+bool _let::equals(Expr *e) {
+    _let *let = dynamic_cast<_let *>(e);
+    if (let == nullptr) {
+        return false;
+    } else {
+        return (this->lhs->equals(let->lhs) && this->rhs->equals(let->rhs));
+    }
+}
+
+int _let::interp() {
+    return 0;
+}

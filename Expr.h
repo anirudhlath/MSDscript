@@ -98,4 +98,24 @@ public:
     void pretty_print(std::ostream &out, int precedence);
 };
 
+class _let : public Expr {
+public:
+    Var *lhs;
+    Expr *rhs;
+    Expr *in;
+
+    _let(Var *lhs, Expr *rhs, Expr *in);
+
+    Expr *subst(std::string var, Expr *e);
+
+    void print(std::ostream &out);
+
+    void pretty_print(std::ostream &out, int precedence);
+
+    bool equals(Expr *e);
+
+    int interp();
+
+};
+
 #endif //ASSIGNMENT02_EXPR_H
