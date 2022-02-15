@@ -3,6 +3,18 @@
 //
 
 #include "Parser.h"
+#include "catch.hpp"
+#include <sstream>
+
+Expr *parse(std::istream &in) {
+    skip_whitespace(in);
+    return parse_expr(in);
+}
+
+Expr *parse_str(std::string s) {
+    std::istringstream str(s);
+    return parse_expr(str);
+}
 
 Expr *parse_multicand(std::istream &in) {
     skip_whitespace(in);
@@ -57,6 +69,8 @@ Expr *parse_expr(std::istream &in) {
 
 
 Expr *parse_num(std::istream &in) {
+    // TODO: What will happen if the input is "- 22"?
+
     int n = 0;
     bool negative = false;
     if (in.peek() == '-') {
@@ -68,8 +82,9 @@ Expr *parse_num(std::istream &in) {
         if (isdigit(c)) {
             consume(in, c);
             n = n * 10 + (c - '0');
-        } else
+        } else {
             break;
+        }
     }
     if (negative)
         n = -n;
@@ -163,4 +178,28 @@ static void consume(std::istream &in, int expect) {
     int c = in.get();
     if (c != expect)
         throw std::runtime_error("Consume mismatch!");
+}
+
+TEST_CASE("Parse Numbers") {
+    CHECK(parse_str("2")->equals(new Num(2)));
+    CHECK(parse_str("(2)")->equals(new Num(2)));
+    CHECK_THROWS_WITH(parse_str("(2")->equals(new Num(2)), "Missing close parenthesis.");
+    CHECK(parse_str(" 2")->equals(new Num(2)));
+    CHECK(parse_str(" 2 ")->equals(new Num(2)));
+    CHECK(parse_str("\n 2 ")->equals(new Num(2)));
+    CHECK(parse_str("\n 2 \n")->equals(new Num(2)));
+    CHECK(parse_str("\n    232    \n")->equals(new Num(232)));
+    CHECK(parse_str("\n    -232    \n")->equals(new Num(-232)));
+    CHECK(parse_str("\n    - 232    \n")->equals(new Num(0))); // Space between characters.
+
+}
+
+TEST_CASE("Parse Variables") {
+    CHECK(parse_str("a")->equals(new Var("a")));
+    CHECK(parse_str("   a   ")->equals(new Var("a")));
+    CHECK(parse_str("   a")->equals(new Var("a")));
+    CHECK(parse_str("a   \n")->equals(new Var("a")));
+    CHECK(parse_str("\na   \n")->equals(new Var("a")));
+    CHECK(parse_str("\n  a   \n")->equals(new Var("a")));
+    CHECK(parse_str("\n  a")->equals(new Var("a")));
 }

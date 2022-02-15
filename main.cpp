@@ -8,12 +8,12 @@
 #include <iostream>
 
 int main(int argc, char **argv) {
-    const std::string TEST = "--test"; // Won't work without assignment of "--test" as a variable.
+    const std::string TEST = "--test"; // Won't work without assignment of "--test" as a constant variable.
     if (argc > 1)
         if (argv[1] == TEST)
-            if (Catch::Session().run(1, argv) != 0)
+            if (Catch::Session().run() != 0)
                 exit(1);
 
-    std::cout << "The program has finished running." << std::endl;
+    std::cout << "The program has successfully compiled!" << std::endl;
     return 0;
 }

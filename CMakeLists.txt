@@ -9,4 +9,6 @@ add_executable(msdscript
         catch.hpp
         Expr.cpp
         Expr.h
+        Parser.cpp
+        Parser.h
         main.cpp)
