@@ -284,7 +284,7 @@ TEST_CASE("equals") {
     CHECK(let3->to_string(false) == "(_let x=5 _in ((_let y=3 _in (y+2))+x))");
     CHECK(let3->to_string(true) == "_let x = 5\n_in  (_let y = 3\n      _in  y + 2) + x");
 //    CHECK(let5->to_string(true) == "5 * _let x = 5\n"
-                                   "    _in  x + 1");
+//                                  "    _in  x + 1");
 
     // Nullptr
     CHECK(two->equals(add3) == false);

@@ -1,9 +1,19 @@
 SRCS = main.cpp Expr.cpp Parser.cpp
-INCS = Expr.h catch.hpp Parser.h
+tSRCS = main.cpp exec.cpp
 
-expr: $(SRCS) $(INCS)
-	$(CXX) --std=c++14 -O2 -o expr $(SRCS)
+INCS = Expr.h catch.hpp Parser.h
+tINCS = exec.h
+
+
+msdscript: $(SRCS) $(INCS)
+	$(CXX) --std=c++14 -O2 -o msdscript $(SRCS)
 
 .PHONY: test
-test: expr
-	./expr --test
+test: msdscript
+	./msdscript --test
+
+.PHONY: default
+default: msdscript;
+
+test_msdscript: $(tSRCS) $(tINCS)
+	$(CXX) --std=c++14 -O2 -o test_msdscript $(tSRCS)
