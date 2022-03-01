@@ -32,7 +32,7 @@ void Num::print(std::ostream &out) {
     out << val;
 }
 
-void Num::pretty_print(std::ostream &out, int precedence, int &n_position) {
+void Num::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
     this->print(out);
 
 }
@@ -64,13 +64,13 @@ void Add::print(std::ostream &out) {
     out << ')';
 }
 
-void Add::pretty_print(std::ostream &out, int precedence, int &n_position) {
+void Add::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
     if (precedence >= 1) {
         out << '(';
     }
-    lhs->pretty_print(out, 1, n_position);
+    lhs->pretty_print(out, 1, n_position, true);
     out << " + ";
-    rhs->pretty_print(out, 0, n_position);
+    rhs->pretty_print(out, 0, n_position, false);
     if (precedence >= 1) {
         out << ')';
     }
@@ -106,13 +106,13 @@ void Mult::print(std::ostream &out) {
     out << ')';
 }
 
-void Mult::pretty_print(std::ostream &out, int precedence, int &n_position) {
+void Mult::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
     if (precedence >= 2) {
         out << '(';
     }
-    lhs->pretty_print(out, 2, n_position);
+    lhs->pretty_print(out, 2, n_position, true);
     out << " * ";
-    rhs->pretty_print(out, 1, n_position);
+    rhs->pretty_print(out, 1, n_position, false);
     if (precedence >= 2) {
         out << ')';
     }
@@ -143,7 +143,7 @@ void Var::print(std::ostream &out) {
     out << val;
 }
 
-void Var::pretty_print(std::ostream &out, int precedence, int &n_position) {
+void Var::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
     this->print(out);
 
 }
@@ -170,7 +170,7 @@ std::string Expr::to_string(bool isPretty) {
         this->print(out);
     } else {
         int n = 0;
-        this->pretty_print(out, 0, n);
+        this->pretty_print(out, 0, n, false);
     }
     return out.str();
 }
@@ -283,8 +283,8 @@ TEST_CASE("equals") {
     CHECK(let1->subst("y", new Num(1))->equals(let1));
     CHECK(let3->to_string(false) == "(_let x=5 _in ((_let y=3 _in (y+2))+x))");
     CHECK(let3->to_string(true) == "_let x = 5\n_in  (_let y = 3\n      _in  y + 2) + x");
-//    CHECK(let5->to_string(true) == "5 * _let x = 5\n"
-//                                  "    _in  x + 1");
+    CHECK(let5->to_string(true) == "5 * _let x = 5\n"
+                                  "    _in  x");
 
     // Nullptr
     CHECK(two->equals(add3) == false);
@@ -333,37 +333,30 @@ void Let::print(std::ostream &out) {
     out << ')';
 }
 
-void Let::pretty_print(std::ostream &out, int precedence, int &n_position) {
+void Let::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
 
-    /* TODO: Let::pretty_print(...)
-     * 1. Implement parenthesis system properly.
-     * 2. Indentation is not working properly in some cases. // let5 test.
-     */
-
-    if (precedence > 0) {
+    if (letPrecedence) {
         out << '(';
-        n_position += 1; // Offset n_pos by one if brackets are added
     }
 
+    int position = out.tellp();
+    int indent = position - n_position;
     out << "_let ";
     lhs->print(out);
     out << " = ";
-    rhs->pretty_print(out, precedence, n_position);
+    rhs->pretty_print(out, 0, n_position, true);
 
     out << "\n";
-    int position = out.tellp(); // Record newline location
 
-    if (n_position > 0) {
-        for (int i = 0; i < n_position; i++) {
-            out << ' ';
-        }
+    n_position = out.tellp();
+    for (int i = 0; i < indent; i++) {
+        out << ' ';
     }
-    out << "_in  ";
-    n_position = out.tellp(); // Record new expr start position.
-    int indent = abs(position - n_position); // Calculate space in one line.
 
-    in->pretty_print(out, precedence, indent);
-    if (precedence > 0) {
+    out << "_in  ";
+
+    in->pretty_print(out, 0, n_position, false);
+    if (letPrecedence) {
         out << ')';
     }
 }

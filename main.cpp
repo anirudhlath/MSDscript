@@ -1,5 +1,5 @@
 //
-// Created by aniru on 1/23/2022.
+// Created by Anirudh Lath on 1/23/2022.
 //
 
 #define CATCH_CONFIG_RUNNER
@@ -7,6 +7,7 @@
 #include "catch.hpp"
 #include "Parser.h"
 #include <iostream>
+
 void helper(int argc, char **argv);
 
 using namespace std;
@@ -34,7 +35,7 @@ void helper(int argc, char **argv) {
     if (argc > 1) {
         bool isValidCommand = false;
         for (int i = 0; i < commands->size(); ++i) {
-            if(argv[1] == commands[i]) {
+            if (argv[1] == commands[i]) {
                 isValidCommand = true;
             }
         }

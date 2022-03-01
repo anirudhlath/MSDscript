@@ -1,6 +1,8 @@
 #include <string>
 #include <iostream>
 #include <cassert>
+#include <sys/wait.h>
+#include <string.h>
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -41,6 +43,7 @@ ExecResult exec_program(int argc, const char * const *argv, std::string input) {
   command[argc] = NULL;
 
   signal(SIGPIPE, SIG_IGN);
+
   
   int in[2];
   if (pipe(in) != 0)

@@ -69,7 +69,6 @@ Expr *parse_expr(std::istream &in) {
 
 
 Expr *parse_num(std::istream &in) {
-    // TODO: What will happen if the input is "- 22"?
 
     int n = 0;
     bool negative = false;
@@ -86,9 +85,6 @@ Expr *parse_num(std::istream &in) {
             break;
         }
     }
-    /*if (!isspace(in.peek()) && !isdigit(in.peek())) {
-        throw std::runtime_error("Invalid input.");
-    }*/
     if (negative)
         n = -n;
     return new Num(n);
@@ -106,34 +102,7 @@ Expr *parse_var(std::istream &in) {
             break;
         }
     }
-    /*if (isalpha(c)) {
-        consume(in, c);
-        str += c;
-        while (isalpha(c)) {
-            c = in.get();
-            str += c;
-        }
-        // TODO: Tried to add support for 'add1' alphanumeric variables, doesn't fully work. Endless loop in most cases.
-        *//*while (!isspace(c) || !in.eof()) {
-            c = in.get();
-            str += c;
-        }*//*
-    }*/
     return new Var(str);
-    /*while (1) {
-        char c = in.peek();
-        if (isalpha(c)) {
-            consume(in, c);
-            str += c;
-            while (!isspace(c)) {
-                c = in.get();
-                str += c;
-            }
-
-        } else {
-            break;
-        }
-    }*/
 }
 
 Expr *parse_let(std::istream &in) {
@@ -267,7 +236,6 @@ TEST_CASE("Parse Multiply") {
 
 TEST_CASE("Parser Test") {
 
-    // TODO: The to_string() doesn't parenthesize -100 which looks weird, what to do?
 
     Var *var1 = new Var("x");
     Var *var2 = new Var("y");
@@ -316,11 +284,6 @@ TEST_CASE("Parser Test") {
             "(( xyz * (-100) ) + ( _let x = 1 _in ( _let x = y _in x + y ) )) * ( ( xyz * (-100) ) * ( _let x = 1 _in ( _let x = y _in x + y ) ) )")->equals(
             e9));
 
-    // TODO: This seems to be broken but also doesn't seem to be expected from the assignment based on lecture videos, is this okay?
-    /*CHECK_THROWS_WITH(parse_str("1 + ( 1 + 2 )g"), "Invalid Input.");
-    CHECK(parse_str("1 + ( 1 + 2 )g")->to_string(false) == "");
-    CHECK_THROWS_WITH(parse_str("1g + (g 1 + 2g )g"), "Invalid Input.");
-    CHECK(parse_str("1g + (g 1 + 2g )g")->to_string(false) == "");*/
 
 }
 

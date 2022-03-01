@@ -1,5 +1,5 @@
 SRCS = main.cpp Expr.cpp Parser.cpp
-tSRCS = main.cpp exec.cpp
+tSRCS = testMain.cpp exec.cpp
 
 INCS = Expr.h catch.hpp Parser.h
 tINCS = exec.h
