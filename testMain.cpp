@@ -8,7 +8,7 @@
 using namespace std;
 string random_expr_string();
 
-void compare(char *const *argv, const ExecResult &lhs, const ExecResult &rhs);
+void compare(int argc, char *const *argv, const ExecResult &lhs, const ExecResult &rhs);
 
 int main(int argc, char **argv) {
     if (argc == 2) {
@@ -28,12 +28,12 @@ int main(int argc, char **argv) {
 
             if (interp_again_result.exit_code == 0 && interp_result.exit_code == 0) {
                 if (interp_again_result.out != interp_result.out) {
-                    compare(argv, interp_result, interp_again_result);
+                    compare(argc, argv, interp_result, interp_again_result);
                     throw std::runtime_error("Different result for printed.");
                 }
                 interp_again_result = exec_program(2, interp_argv, pretty_print_result.out);
                 if (interp_again_result.out != interp_result.out) {
-                    compare(argv, interp_result, interp_again_result);
+                    compare(argc, argv, interp_result, interp_again_result);
                     throw std::runtime_error("Different result for pretty printed.");
                 }
             } else {
@@ -65,15 +65,15 @@ int main(int argc, char **argv) {
 
             if (interp_result.exit_code == 0 && interp_result2.exit_code == 0) {
                 if (interp_result.out != interp_result2.out) {
-                    compare(argv, interp_result, interp_result2);
+                    compare(argc, argv, interp_result, interp_result2);
                     throw std::runtime_error("Different result for interpret.");
                 }
                 if (print_result.out != print_result2.out) {
-                    compare(argv, print_result, print_result2);
+                    compare(argc, argv, print_result, print_result2);
                     throw std::runtime_error("Different result for print.");
                 }
                 if (pretty_print_result.out != pretty_print_result2.out) {
-                    compare(argv, pretty_print_result, pretty_print_result2);
+                    compare(argc, argv, pretty_print_result, pretty_print_result2);
                     throw std::runtime_error("Different result for pretty-print.");
                 }
             } else {
@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
     return 0;
 }
 
-void compare(char *const *argv, const ExecResult &lhs, const ExecResult &rhs) {
+void compare(int argc, char *const *argv, const ExecResult &lhs, const ExecResult &rhs) {
     if(!lhs.out.empty() || !lhs.err.empty()) {
         cout << "LHS Results: " << endl;
         cout << "EXIT_CODE: " << lhs.exit_code << endl;
@@ -110,7 +110,13 @@ void compare(char *const *argv, const ExecResult &lhs, const ExecResult &rhs) {
         cout << "ERROR: " << lhs.err << endl << endl;
     }
     else {
-        cerr << argv[1] << " has no output. Make sure you have entered the program name correctly amongst other possible problems.";
+        if (argc == 3) {
+            cerr << argv[2]
+                 << " has no output. Make sure you have entered the program name correctly amongst other possible problems.";
+        } else {
+            cerr << argv[1]
+                 << " has no output. Make sure you have entered the program name correctly amongst other possible problems.";
+        }
         exit(1);
     }
 }
