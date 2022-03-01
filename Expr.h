@@ -20,7 +20,7 @@ public:
 
     virtual void print(std::ostream &out) = 0;
 
-    virtual void pretty_print(std::ostream &out, int precedence) = 0;
+    virtual void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) = 0;
 
     virtual bool equals(Expr *e) = 0;
 
@@ -41,7 +41,7 @@ public:
 
     void print(std::ostream &out);
 
-    void pretty_print(std::ostream &out, int precedence);
+    void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 
 };
 
@@ -60,7 +60,7 @@ public:
 
     void print(std::ostream &out);
 
-    void pretty_print(std::ostream &out, int precedence);
+    void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 };
 
 class Mult : public Expr {
@@ -78,7 +78,7 @@ public:
 
     void print(std::ostream &out);
 
-    void pretty_print(std::ostream &out, int precedence);
+    void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 };
 
 class Var : public Expr {
@@ -95,7 +95,7 @@ public:
 
     void print(std::ostream &out);
 
-    void pretty_print(std::ostream &out, int precedence);
+    void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 };
 
 class Let : public Expr {
@@ -110,7 +110,7 @@ public:
 
     void print(std::ostream &out);
 
-    void pretty_print(std::ostream &out, int precedence);
+    void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 
     bool equals(Expr *e);
 
