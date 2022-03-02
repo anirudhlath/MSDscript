@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
 }
 
 void helper(int argc, char **argv) {
-    const std::string TEST = "--test"; // TODO: Won't work without assignment of "--test" as a constant variable.
+    const std::string TEST = "--test";
     const std::string INTERP = "--interp";
     const std::string PRINT = "--print";
     const std::string PRETTY_PRINT = "--pretty-print";
@@ -78,7 +78,8 @@ void helper(int argc, char **argv) {
                     exit(1);
                 }
             }
-        } else {
+        }
+        else {
             cerr << "Invalid command. ";
             cout << "The only valid commands are:" << endl;
             for (int i = 0; i < commands->size(); ++i) {
@@ -87,7 +88,8 @@ void helper(int argc, char **argv) {
             cout << endl << "Please try again using valid commands, the program will now exit." << endl;
             exit(1);
         }
-    } else {
+    }
+    else {
         std::cout << "The program has successfully compiled!" << std::endl;
     }
 }

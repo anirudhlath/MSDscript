@@ -15,7 +15,8 @@ bool NumExpr::equals(Expr *e) {
     NumExpr *num = dynamic_cast<NumExpr *>(e);
     if (num == nullptr) {
         return false;
-    } else {
+    }
+    else {
         return this->val == num->val;
     }
 }
@@ -47,7 +48,8 @@ bool AddExpr::equals(Expr *e) {
     AddExpr *add = dynamic_cast<AddExpr *>(e);
     if (add == nullptr) {
         return false;
-    } else {
+    }
+    else {
         return (this->lhs->equals(add->lhs) && this->rhs->equals(add->rhs));
     }
 }
@@ -89,7 +91,8 @@ bool MultExpr::equals(Expr *e) {
     MultExpr *mult = dynamic_cast<MultExpr *>(e);
     if (mult == nullptr) {
         return false;
-    } else {
+    }
+    else {
         return (this->lhs->equals(mult->lhs) && this->rhs->equals(mult->rhs));
     }
 }
@@ -130,7 +133,8 @@ bool VarExpr::equals(Expr *e) {
     VarExpr *var = dynamic_cast<VarExpr *>(e);
     if (var == nullptr) {
         return false;
-    } else {
+    }
+    else {
         return this->val == var->val;
     }
 }
@@ -149,8 +153,9 @@ void VarExpr::pretty_print(std::ostream &out, int precedence, int &n_position, b
 }
 
 Expr *VarExpr::subst(std::string var, Expr *e) {
-    if (this->val == var)
+    if (this->val == var) {
         return e;
+    }
     return this;
 }
 
@@ -158,7 +163,8 @@ bool Expr::has_variable() {
     bool result = false;
     try {
         this->interp();
-    } catch (std::runtime_error) {
+    }
+    catch (std::runtime_error) {
         result = true;
     }
     return result;
@@ -168,7 +174,8 @@ std::string Expr::to_string(bool isPretty) {
     std::stringstream out("");
     if (!isPretty) {
         this->print(out);
-    } else {
+    }
+    else {
         int n = 0;
         this->pretty_print(out, 0, n, false);
     }
@@ -263,14 +270,18 @@ TEST_CASE("equals") {
     CHECK(e9->to_string(true) == "(2 + 3 + 2) * 2");
     CHECK((new AddExpr(new NumExpr(1), new MultExpr(new NumExpr(2), new NumExpr(3))))->to_string(true) == "1 + 2 * 3");
     CHECK((new MultExpr(new NumExpr(1), new MultExpr(new NumExpr(2), new NumExpr(3))))->to_string(true) == "1 * 2 * 3");
-    CHECK((new MultExpr(new NumExpr(1), new AddExpr(new NumExpr(2), new NumExpr(3))))->to_string(true) == "1 * (2 + 3)");
+    CHECK((new MultExpr(new NumExpr(1), new AddExpr(new NumExpr(2), new NumExpr(3))))->to_string(true) ==
+          "1 * (2 + 3)");
 
     // LetExpr
     Expr *let1 = new LetExpr(new VarExpr("x"), new NumExpr(1), new VarExpr("x"));
     Expr *let1Duplicate = new LetExpr(new VarExpr("x"), new NumExpr(1), new VarExpr("x"));
     Expr *let2 = new LetExpr(new VarExpr("x"), new NumExpr(2), new VarExpr("x"));
     Expr *let3 = new LetExpr(new VarExpr("x"), new NumExpr(5),
-                             new AddExpr(new LetExpr(new VarExpr("y"), new NumExpr(3), new AddExpr(new VarExpr("y"), new NumExpr(2))), new VarExpr("x")));
+                             new AddExpr(new LetExpr(new VarExpr("y"),
+                                                     new NumExpr(3),
+                                                     new AddExpr(new VarExpr("y"), new NumExpr(2))),
+                                         new VarExpr("x")));
     Expr *let4 = new LetExpr(new VarExpr("x"), new NumExpr(5),
                              new AddExpr(new LetExpr(new VarExpr("y"), new NumExpr(3), let2), new NumExpr(2)));
     Expr *let5 = new MultExpr(new NumExpr(5), new LetExpr(new VarExpr("x"), new NumExpr(5), new VarExpr("x")));
@@ -284,7 +295,7 @@ TEST_CASE("equals") {
     CHECK(let3->to_string(false) == "(_let x=5 _in ((_let y=3 _in (y+2))+x))");
     CHECK(let3->to_string(true) == "_let x = 5\n_in  (_let y = 3\n      _in  y + 2) + x");
     CHECK(let5->to_string(true) == "5 * _let x = 5\n"
-                                  "    _in  x");
+                                   "    _in  x");
 
     // Nullptr
     CHECK(two->equals(add3) == false);
@@ -306,7 +317,8 @@ bool LetExpr::equals(Expr *e) {
     LetExpr *let = dynamic_cast<LetExpr *>(e);
     if (let == nullptr) {
         return false;
-    } else {
+    }
+    else {
         return (this->lhs->equals(let->lhs) && this->rhs->equals(let->rhs) && this->in->equals(let->in));
     }
 }

@@ -19,23 +19,28 @@ Expr *parse_str(std::string s) {
 Expr *parse_multicand(std::istream &in) {
     skip_whitespace(in);
     int c = in.peek();
-    if ((c == '-') || isdigit(c))
+    if ((c == '-') || isdigit(c)) {
         return parse_num(in);
+    }
     else if (c == '(') {
         consume(in, '(');
         Expr *e = parse_expr(in);
         skip_whitespace(in);
         c = in.get();
-        if (c != ')')
+        if (c != ')') {
             throw std::runtime_error("Missing close parenthesis.");
+        }
         return e;
-    } else if (isalpha(c)) {
+    }
+    else if (isalpha(c)) {
         Expr *e = parse_var(in);
         return e;
-    } else if (c == '_') {
+    }
+    else if (c == '_') {
         Expr *e = parse_let(in);
         return e;
-    } else {
+    }
+    else {
         consume(in, c);
         throw std::runtime_error("Invalid input.");
     }
@@ -50,8 +55,10 @@ Expr *parse_addend(std::istream &in) {
         consume(in, '*');
         Expr *rhs = parse_addend(in);
         return new MultExpr(e, rhs);
-    } else
+    }
+    else {
         return e;
+    }
 }
 
 Expr *parse_expr(std::istream &in) {
@@ -63,8 +70,10 @@ Expr *parse_expr(std::istream &in) {
         consume(in, '+');
         Expr *rhs = parse_expr(in);
         return new AddExpr(e, rhs);
-    } else
+    }
+    else {
         return e;
+    }
 }
 
 
@@ -81,12 +90,14 @@ Expr *parse_num(std::istream &in) {
         if (isdigit(c)) {
             consume(in, c);
             n = n * 10 + (c - '0');
-        } else {
+        }
+        else {
             break;
         }
     }
-    if (negative)
+    if (negative) {
         n = -n;
+    }
     return new NumExpr(n);
 }
 
@@ -98,7 +109,8 @@ Expr *parse_var(std::istream &in) {
         if (isalpha(c)) {
             consume(in, c);
             str += c;
-        } else {
+        }
+        else {
             break;
         }
     }
@@ -128,23 +140,27 @@ Expr *parse_let(std::istream &in) {
                 if (parse_keyword(in, "_in")) {
                     skip_whitespace(in);
                     body = parse_expr(in);
-                } else {
+                }
+                else {
                     throw std::runtime_error("Invalid input. '_in' was expected.");
                 }
-            } else {
+            }
+            else {
                 throw std::runtime_error("Invalid input. '=' was expected.");
             }
-        } else {
+        }
+        else {
             throw std::runtime_error("Invalid input. A variable was expected after '_let'.");
         }
-    } else {
+    }
+    else {
         throw std::runtime_error("Invalid keyword.");
     }
     return new LetExpr(lhs, rhs, body);
 }
 
 bool parse_keyword(std::istream &in, std::string keyword) {
-    std::string temp = "";
+    std::string temp;
     for (int i = 0; i < keyword.length(); i++) {
         temp += in.get();
     }
@@ -154,16 +170,18 @@ bool parse_keyword(std::istream &in, std::string keyword) {
 static void skip_whitespace(std::istream &in) {
     while (1) {
         int c = in.peek();
-        if (!isspace(c))
+        if (!isspace(c)) {
             break;
+        }
         consume(in, c);
     }
 }
 
 static void consume(std::istream &in, int expect) {
     int c = in.get();
-    if (c != expect)
+    if (c != expect) {
         throw std::runtime_error("Consume mismatch!");
+    }
 }
 
 TEST_CASE("Parse Numbers") {
@@ -281,8 +299,9 @@ TEST_CASE("Parser Test") {
     CHECK(parse_str("( xyz * (-100) ) + ( _let x = 1 _in ( _let x = y _in x + y ) )")->equals(e7));
     CHECK(parse_str("( xyz * (-100) ) * ( _let x = 1 _in ( _let x = y _in x + y ) )")->equals(e8));
     CHECK(parse_str(
-            "(( xyz * (-100) ) + ( _let x = 1 _in ( _let x = y _in x + y ) )) * ( ( xyz * (-100) ) * ( _let x = 1 _in ( _let x = y _in x + y ) ) )")->equals(
-            e9));
+            "(( xyz * (-100) ) + ( _let x = 1 _in ( _let x = y _in x + y ) )) * ( ( xyz * (-100) ) * ( _let x = 1 _in ( _let x = y _in x + y ) ) )")
+                  ->equals(
+                          e9));
 
 
 }
