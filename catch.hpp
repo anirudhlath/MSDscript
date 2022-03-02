@@ -1531,8 +1531,9 @@ namespace Catch {
             static_assert(sizeof(int) >= sizeof(E), "Cannot serialize enum to int");
             std::vector<int> intValues;
             intValues.reserve(values.size());
-            for (auto enumValue: values)
+            for (auto enumValue: values) {
                 intValues.push_back(static_cast<int>( enumValue ));
+            }
             return registerEnum(enumName, allEnums, intValues);
         }
     };
@@ -1863,7 +1864,8 @@ namespace Catch {
         static std::string convert(U *p) {
             if (p) {
                 return ::Catch::Detail::rawMemoryToString(p);
-            } else {
+            }
+            else {
                 return "nullptr";
             }
         }
@@ -1874,7 +1876,8 @@ namespace Catch {
         static std::string convert(R C::* p) {
             if (p) {
                 return ::Catch::Detail::rawMemoryToString(p);
-            } else {
+            }
+            else {
                 return "nullptr";
             }
         }
@@ -1896,8 +1899,9 @@ namespace Catch {
             rss << "{ ";
             if (first != last) {
                 rss << ::Catch::Detail::stringify(*first);
-                for (++first; first != last; ++first)
+                for (++first; first != last; ++first) {
                     rss << ", " << ::Catch::Detail::stringify(*first);
+                }
             }
             rss << " }";
             return rss.str();
@@ -2091,10 +2095,12 @@ namespace Catch {
         rss << "{ ";
         bool first = true;
         for (bool b: v) {
-            if (first)
+            if (first) {
                 first = false;
-            else
+            }
+            else {
                 rss << ", ";
+            }
             rss << ::Catch::Detail::stringify(b);
         }
         rss << " }";
@@ -2499,7 +2505,7 @@ namespace Catch {
         }
 
         auto operator<=(bool value) -> ExprLhs<bool> {
-            return ExprLhs<bool>{value};
+            return ExprLhs < bool > {value};
         }
     };
 
@@ -3172,10 +3178,12 @@ namespace Catch {
                 return "";
 #else
                 try {
-                    if (it == itEnd)
+                    if (it == itEnd) {
                         std::rethrow_exception(std::current_exception());
-                    else
+                    }
+                    else {
                         return (*it)->translate(it + 1, itEnd);
+                    }
                 }
                 catch (T &ex) {
                     return m_translateFunction(ex);
@@ -3449,8 +3457,9 @@ namespace Catch {
             struct MatchAllOf : MatcherBase<ArgT> {
                 bool match(ArgT const &arg) const override {
                     for (auto matcher: m_matchers) {
-                        if (!matcher->match(arg))
+                        if (!matcher->match(arg)) {
                             return false;
+                        }
                     }
                     return true;
                 }
@@ -3461,10 +3470,12 @@ namespace Catch {
                     description += "( ";
                     bool first = true;
                     for (auto matcher: m_matchers) {
-                        if (first)
+                        if (first) {
                             first = false;
-                        else
+                        }
+                        else {
                             description += " and ";
+                        }
                         description += matcher->toString();
                     }
                     description += " )";
@@ -3485,8 +3496,9 @@ namespace Catch {
 
                 bool match(ArgT const &arg) const override {
                     for (auto matcher: m_matchers) {
-                        if (matcher->match(arg))
+                        if (matcher->match(arg)) {
                             return true;
+                        }
                     }
                     return false;
                 }
@@ -3497,10 +3509,12 @@ namespace Catch {
                     description += "( ";
                     bool first = true;
                     for (auto matcher: m_matchers) {
-                        if (first)
+                        if (first) {
                             first = false;
-                        else
+                        }
+                        else {
                             description += " or ";
+                        }
                         description += matcher->toString();
                     }
                     description += " )";
@@ -3832,8 +3846,9 @@ namespace Catch {
 
                 bool match(std::vector<T, AllocMatch> const &v) const override {
                     // !TBD: see note in EqualsMatcher
-                    if (m_comparator.size() > v.size())
+                    if (m_comparator.size() > v.size()) {
                         return false;
+                    }
                     for (auto const &comparator: m_comparator) {
                         auto present = false;
                         for (const auto &el: v) {
@@ -3866,11 +3881,14 @@ namespace Catch {
                     // - a more general approach would be via a compare template that defaults
                     // to using !=. but could be specialised for, e.g. std::vector<T, Alloc> etc
                     // - then just call that directly
-                    if (m_comparator.size() != v.size())
+                    if (m_comparator.size() != v.size()) {
                         return false;
-                    for (std::size_t i = 0; i < v.size(); ++i)
-                        if (m_comparator[i] != v[i])
+                    }
+                    for (std::size_t i = 0; i < v.size(); ++i) {
+                        if (m_comparator[i] != v[i]) {
                             return false;
+                        }
+                    }
                     return true;
                 }
 
@@ -3887,11 +3905,14 @@ namespace Catch {
                 ApproxMatcher(std::vector<T, AllocComp> const &comparator) : m_comparator(comparator) {}
 
                 bool match(std::vector<T, AllocMatch> const &v) const override {
-                    if (m_comparator.size() != v.size())
+                    if (m_comparator.size() != v.size()) {
                         return false;
-                    for (std::size_t i = 0; i < v.size(); ++i)
-                        if (m_comparator[i] != approx(v[i]))
+                    }
+                    for (std::size_t i = 0; i < v.size(); ++i) {
+                        if (m_comparator[i] != approx(v[i])) {
                             return false;
+                        }
+                    }
                     return true;
                 }
 
@@ -3992,10 +4013,12 @@ namespace Catch {
         void streamReconstructedExpression(std::ostream &os) const override {
             auto matcherAsString = m_matcher.toString();
             os << Catch::Detail::stringify(m_arg) << ' ';
-            if (matcherAsString == Detail::unprintableString)
+            if (matcherAsString == Detail::unprintableString) {
                 os << m_matcherString;
-            else
+            }
+            else {
                 os << matcherAsString;
+            }
         }
     };
 
@@ -4322,10 +4345,10 @@ namespace Catch {
 
             IGeneratorTracker &tracker = acquireGeneratorTracker(generatorName, lineInfo);
             if (!tracker.hasGenerator()) {
-                tracker.setGenerator(pf::make_unique<Generators<UnderlyingType>>(generatorExpression()));
+                tracker.setGenerator(pf::make_unique < Generators < UnderlyingType >> (generatorExpression()));
             }
 
-            auto const &generator = static_cast<IGenerator<UnderlyingType> const &>( *tracker.getGenerator());
+            auto const &generator = static_cast<IGenerator <UnderlyingType> const &>( *tracker.getGenerator());
             return generator.get();
         }
 
@@ -4421,7 +4444,7 @@ namespace Catch {
                 if (!success) {
                     return false;
                 }
-                while (!m_predicate(m_generator.get()) && (success = m_generator.next()) == true);
+                while (!m_predicate(m_generator.get()) && (success = m_generator.next()) == true) {}
                 return success;
             }
         };
@@ -4570,7 +4593,7 @@ namespace Catch {
         template<typename T>
         GeneratorWrapper<std::vector<T>> chunk(size_t size, GeneratorWrapper<T> &&generator) {
             return GeneratorWrapper<std::vector<T>>(
-                    pf::make_unique<ChunkGenerator<T>>(size, std::move(generator))
+                    pf::make_unique < ChunkGenerator < T >> (size, std::move(generator))
             );
         }
 
@@ -4623,8 +4646,9 @@ namespace Catch {
     };
 
     inline IMutableContext &getCurrentMutableContext() {
-        if (!IMutableContext::currentContext)
+        if (!IMutableContext::currentContext) {
             IMutableContext::createContext();
+        }
         // NOLINTNEXTLINE(clang-analyzer-core.uninitialized.UndefReturn)
         return *IMutableContext::currentContext;
     }
@@ -4666,8 +4690,9 @@ namespace Catch {
         Option &operator=(Option const &_other) {
             if (&_other != this) {
                 reset();
-                if (_other)
+                if (_other) {
                     nullableValue = new(storage) T(*_other);
+                }
             }
             return *this;
         }
@@ -4679,8 +4704,9 @@ namespace Catch {
         }
 
         void reset() {
-            if (nullableValue)
+            if (nullableValue) {
                 nullableValue->~T();
+            }
             nullableValue = nullptr;
         }
 
@@ -5030,7 +5056,9 @@ namespace Catch {
         template<typename Container,
                 typename ResultType = typename Container::value_type>
         GeneratorWrapper<ResultType> from_range(Container const &cnt) {
-            return GeneratorWrapper<ResultType>(pf::make_unique<IteratorGenerator<ResultType>>(cnt.begin(), cnt.end()));
+            return GeneratorWrapper<ResultType>(pf::make_unique <
+                                                IteratorGenerator <
+                                                ResultType >> (cnt.begin(), cnt.end()));
         }
 
     } // namespace Generators

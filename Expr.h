@@ -9,6 +9,8 @@
 #include <string>
 #include <iostream>
 
+class Val;
+
 class Expr {
 public:
     bool has_variable();
@@ -24,18 +26,18 @@ public:
 
     virtual bool equals(Expr *e) = 0;
 
-    virtual int interp() = 0;
+    virtual Val *interp() = 0;
 };
 
-class Num : public Expr {
+class NumExpr : public Expr {
 public:
     int val;
 
-    Num(int val);
+    NumExpr(int val);
 
     bool equals(Expr *e);
 
-    int interp();
+    Val *interp();
 
     Expr *subst(std::string var, Expr *e);
 
@@ -45,16 +47,16 @@ public:
 
 };
 
-class Add : public Expr {
+class AddExpr : public Expr {
 public:
     Expr *lhs;
     Expr *rhs;
 
-    Add(Expr *lhs, Expr *rhs);
+    AddExpr(Expr *lhs, Expr *rhs);
 
     bool equals(Expr *e);
 
-    int interp();
+    Val *interp(); // Update with Val::add_to();
 
     Expr *subst(std::string var, Expr *e);
 
@@ -63,16 +65,16 @@ public:
     void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 };
 
-class Mult : public Expr {
+class MultExpr : public Expr {
 public:
     Expr *lhs;
     Expr *rhs;
 
-    Mult(Expr *lhs, Expr *rhs);
+    MultExpr(Expr *lhs, Expr *rhs);
 
     bool equals(Expr *e);
 
-    int interp();
+    Val *interp();
 
     Expr *subst(std::string var, Expr *e);
 
@@ -81,15 +83,15 @@ public:
     void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 };
 
-class Var : public Expr {
+class VarExpr : public Expr {
 public:
     std::string val;
 
-    Var(std::string val);
+    VarExpr(std::string val);
 
     bool equals(Expr *e);
 
-    int interp();
+    Val *interp();
 
     Expr *subst(std::string var, Expr *e);
 
@@ -98,13 +100,13 @@ public:
     void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 };
 
-class Let : public Expr {
+class LetExpr : public Expr {
 public:
-    Var *lhs;
+    VarExpr *lhs;
     Expr *rhs;
     Expr *in;
 
-    Let(Var *lhs, Expr *rhs, Expr *in);
+    LetExpr(VarExpr *lhs, Expr *rhs, Expr *in);
 
     Expr *subst(std::string var, Expr *e);
 
@@ -114,7 +116,7 @@ public:
 
     bool equals(Expr *e);
 
-    int interp();
+    Val *interp();
 
 };
 
