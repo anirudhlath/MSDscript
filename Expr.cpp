@@ -4,9 +4,35 @@
 
 #include "Expr.h"
 #include "catch.hpp"
+#include "Val.h"
 #include <stdexcept>
 #include <sstream>
 
+// Expr Methods
+bool Expr::has_variable() {
+    bool result = false;
+    try {
+        this->interp();
+    }
+    catch (std::runtime_error) {
+        result = true;
+    }
+    return result;
+}
+
+std::string Expr::to_string(bool isPretty) {
+    std::stringstream out("");
+    if (!isPretty) {
+        this->print(out);
+    }
+    else {
+        int n = 0;
+        this->pretty_print(out, 0, n, false);
+    }
+    return out.str();
+}
+
+// NumExpr Methods
 NumExpr::NumExpr(int val) {
     this->val = val;
 }
@@ -21,8 +47,8 @@ bool NumExpr::equals(Expr *e) {
     }
 }
 
-int NumExpr::interp() {
-    return this->val;
+Val *NumExpr::interp() {
+    return new NumVal(this->val);
 }
 
 Expr *NumExpr::subst(std::string var, Expr *e) {
@@ -38,7 +64,7 @@ void NumExpr::pretty_print(std::ostream &out, int precedence, int &n_position, b
 
 }
 
-
+// AddExpr Methods
 AddExpr::AddExpr(Expr *lhs, Expr *rhs) {
     this->lhs = lhs;
     this->rhs = rhs;
@@ -54,8 +80,8 @@ bool AddExpr::equals(Expr *e) {
     }
 }
 
-int AddExpr::interp() {
-    return this->lhs->interp() + this->rhs->interp();
+Val *AddExpr::interp() {
+    return this->lhs->interp()->add_to(this->rhs->interp());
 }
 
 void AddExpr::print(std::ostream &out) {
@@ -82,6 +108,7 @@ Expr *AddExpr::subst(std::string var, Expr *e) {
     return new AddExpr(lhs->subst(var, e), rhs->subst(var, e));
 }
 
+// MultExpr Methods
 MultExpr::MultExpr(Expr *lhs, Expr *rhs) {
     this->lhs = lhs;
     this->rhs = rhs;
@@ -97,8 +124,8 @@ bool MultExpr::equals(Expr *e) {
     }
 }
 
-int MultExpr::interp() {
-    return this->lhs->interp() * this->rhs->interp();
+Val *MultExpr::interp() {
+    return this->lhs->interp()->mult_to(this->rhs->interp());
 }
 
 void MultExpr::print(std::ostream &out) {
@@ -125,6 +152,7 @@ Expr *MultExpr::subst(std::string var, Expr *e) {
     return new MultExpr(lhs->subst(var, e), rhs->subst(var, e));
 }
 
+// VarExpr Methods
 VarExpr::VarExpr(std::string val) {
     this->val = val;
 }
@@ -139,7 +167,7 @@ bool VarExpr::equals(Expr *e) {
     }
 }
 
-int VarExpr::interp() {
+Val *VarExpr::interp() {
     throw std::runtime_error("Error occurred, a variable cannot be interpreted.");
 }
 
@@ -159,27 +187,71 @@ Expr *VarExpr::subst(std::string var, Expr *e) {
     return this;
 }
 
-bool Expr::has_variable() {
-    bool result = false;
-    try {
-        this->interp();
-    }
-    catch (std::runtime_error) {
-        result = true;
-    }
-    return result;
+// LetExpr Methods
+LetExpr::LetExpr(VarExpr *lhs, Expr *rhs, Expr *in) {
+    this->lhs = lhs;
+    this->rhs = rhs;
+    this->in = in;
 }
 
-std::string Expr::to_string(bool isPretty) {
-    std::stringstream out("");
-    if (!isPretty) {
-        this->print(out);
+bool LetExpr::equals(Expr *e) {
+    LetExpr *let = dynamic_cast<LetExpr *>(e);
+    if (let == nullptr) {
+        return false;
     }
     else {
-        int n = 0;
-        this->pretty_print(out, 0, n, false);
+        return (this->lhs->equals(let->lhs) && this->rhs->equals(let->rhs) && this->in->equals(let->in));
     }
-    return out.str();
+}
+
+Val *LetExpr::interp() {
+    Expr *val = rhs->interp()->to_expr();
+    return in->subst(lhs->to_string(false), val)->interp();
+}
+
+Expr *LetExpr::subst(std::string var, Expr *e) {
+    if (lhs->to_string(false) != var) {
+        return new LetExpr(this->lhs, this->rhs, this->in->subst(var, e));
+    }
+    return new LetExpr(this->lhs, this->rhs, this->in);
+}
+
+void LetExpr::print(std::ostream &out) {
+    out << "(_let ";
+    lhs->print(out);
+    out << '=';
+    rhs->print(out);
+    out << " _in ";
+    in->print(out);
+    out << ')';
+}
+
+void LetExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
+
+    if (letPrecedence) {
+        out << '(';
+    }
+
+    int position = out.tellp();
+    int indent = position - n_position;
+    out << "_let ";
+    lhs->print(out);
+    out << " = ";
+    rhs->pretty_print(out, 0, n_position, true);
+
+    out << "\n";
+
+    n_position = out.tellp();
+    for (int i = 0; i < indent; i++) {
+        out << ' ';
+    }
+
+    out << "_in  ";
+
+    in->pretty_print(out, 0, n_position, false);
+    if (letPrecedence) {
+        out << ')';
+    }
 }
 
 
@@ -194,8 +266,8 @@ TEST_CASE("equals") {
     CHECK(two->equals(two) == true);
     CHECK(two->equals(twod) == true);
     CHECK(two->equals(three) == false);
-    CHECK(two->interp() == 2);
-    CHECK(three->interp() == 3);
+    CHECK(two->interp()->equals(new NumVal(2)) == true);
+    CHECK(three->interp()->equals(new NumVal(3)) == true);
     CHECK(three->has_variable() == false);
     CHECK(three->subst("x", two) == three);
 
@@ -223,7 +295,7 @@ TEST_CASE("equals") {
     CHECK(mult1->equals(mult2) == false);
     CHECK(mult2->equals(mult3) == true);
     CHECK(mult1->equals(mult4) == false);
-    CHECK(mult1->interp() == 6);
+    CHECK(mult1->interp()->equals(new NumVal(6)) == true);
     CHECK(mult1->has_variable() == false);
     CHECK(mult1->subst("x", mult3)->equals(mult1));
 
@@ -237,7 +309,7 @@ TEST_CASE("equals") {
     CHECK(add1->equals(add2) == true);
     CHECK(add1->equals(add3) == false);
     CHECK(add1->equals(add4) == false);
-    CHECK(add1->interp() == 5);
+    CHECK(add1->interp()->equals(new NumVal(5)) == true);
     CHECK(add1->has_variable() == false);
     CHECK(add1->subst("x", add3)->equals(add1));
 
@@ -288,8 +360,8 @@ TEST_CASE("equals") {
 
     CHECK(let1->equals(let1Duplicate) == true);
     CHECK(let1->equals(let2) == false);
-    CHECK(let1->interp() == 1);
-    CHECK(let2->interp() == 2);
+    CHECK(let1->interp()->equals(new NumVal(1)) == true);
+    CHECK(let2->interp()->equals(new NumVal(2)) == true);
     CHECK(let1->subst("x", new NumExpr(1))->equals(let1));
     CHECK(let1->subst("y", new NumExpr(1))->equals(let1));
     CHECK(let3->to_string(false) == "(_let x=5 _in ((_let y=3 _in (y+2))+x))");
@@ -304,71 +376,4 @@ TEST_CASE("equals") {
     CHECK(var1->equals(mult1) == false);
 
 
-}
-
-
-LetExpr::LetExpr(VarExpr *lhs, Expr *rhs, Expr *in) {
-    this->lhs = lhs;
-    this->rhs = rhs;
-    this->in = in;
-}
-
-bool LetExpr::equals(Expr *e) {
-    LetExpr *let = dynamic_cast<LetExpr *>(e);
-    if (let == nullptr) {
-        return false;
-    }
-    else {
-        return (this->lhs->equals(let->lhs) && this->rhs->equals(let->rhs) && this->in->equals(let->in));
-    }
-}
-
-int LetExpr::interp() {
-    Expr *val = new NumExpr(rhs->interp());
-    return in->subst(lhs->to_string(false), val)->interp();
-}
-
-Expr *LetExpr::subst(std::string var, Expr *e) {
-    if (lhs->to_string(false) != var) {
-        return new LetExpr(this->lhs, this->rhs, this->in->subst(var, e));
-    }
-    return new LetExpr(this->lhs, this->rhs, this->in);
-}
-
-void LetExpr::print(std::ostream &out) {
-    out << "(_let ";
-    lhs->print(out);
-    out << '=';
-    rhs->print(out);
-    out << " _in ";
-    in->print(out);
-    out << ')';
-}
-
-void LetExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
-
-    if (letPrecedence) {
-        out << '(';
-    }
-
-    int position = out.tellp();
-    int indent = position - n_position;
-    out << "_let ";
-    lhs->print(out);
-    out << " = ";
-    rhs->pretty_print(out, 0, n_position, true);
-
-    out << "\n";
-
-    n_position = out.tellp();
-    for (int i = 0; i < indent; i++) {
-        out << ' ';
-    }
-
-    out << "_in  ";
-
-    in->pretty_print(out, 0, n_position, false);
-    if (letPrecedence) {
-        out << ')';
-    }
 }

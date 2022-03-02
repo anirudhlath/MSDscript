@@ -9,6 +9,8 @@
 #include <string>
 #include <iostream>
 
+class Val;
+
 class Expr {
 public:
     bool has_variable();
@@ -24,7 +26,7 @@ public:
 
     virtual bool equals(Expr *e) = 0;
 
-    virtual int interp() = 0;
+    virtual Val *interp() = 0;
 };
 
 class NumExpr : public Expr {
@@ -35,7 +37,7 @@ public:
 
     bool equals(Expr *e);
 
-    int interp();
+    Val *interp();
 
     Expr *subst(std::string var, Expr *e);
 
@@ -54,7 +56,7 @@ public:
 
     bool equals(Expr *e);
 
-    int interp();
+    Val *interp(); // Update with Val::add_to();
 
     Expr *subst(std::string var, Expr *e);
 
@@ -72,7 +74,7 @@ public:
 
     bool equals(Expr *e);
 
-    int interp();
+    Val *interp();
 
     Expr *subst(std::string var, Expr *e);
 
@@ -89,7 +91,7 @@ public:
 
     bool equals(Expr *e);
 
-    int interp();
+    Val *interp();
 
     Expr *subst(std::string var, Expr *e);
 
@@ -114,7 +116,7 @@ public:
 
     bool equals(Expr *e);
 
-    int interp();
+    Val *interp();
 
 };
 
