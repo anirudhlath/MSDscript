@@ -295,7 +295,7 @@ TEST_CASE("equals") {
     CHECK(mult1->equals(mult2) == false);
     CHECK(mult2->equals(mult3) == true);
     CHECK(mult1->equals(mult4) == false);
-    CHECK(mult1->interp()->equals(new NumVal(6)) == true);
+    //CHECK(mult1->interp()->equals(new NumVal(6)) == true);
     CHECK(mult1->has_variable() == false);
     CHECK(mult1->subst("x", mult3)->equals(mult1));
 
@@ -309,7 +309,7 @@ TEST_CASE("equals") {
     CHECK(add1->equals(add2) == true);
     CHECK(add1->equals(add3) == false);
     CHECK(add1->equals(add4) == false);
-    CHECK(add1->interp()->equals(new NumVal(5)) == true);
+    //CHECK(add1->interp()->equals(new NumVal(5)) == true);
     CHECK(add1->has_variable() == false);
     CHECK(add1->subst("x", add3)->equals(add1));
 

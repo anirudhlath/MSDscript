@@ -11,13 +11,13 @@ class Expr;
 
 class Val {
 public:
-    Expr *to_expr();
+    virtual Expr *to_expr() = 0;
 
     virtual bool equals(Val *rhs) = 0;
 
-    virtual Val *add_to(Val *pVal) = 0;
+    virtual Val *add_to(Val *rhs) = 0;
 
-    virtual Val *mult_to(Val *pVal) = 0;
+    virtual Val *mult_to(Val *rhs) = 0;
 
     virtual std::string to_string() = 0;
 };
@@ -27,11 +27,13 @@ class NumVal : public Val {
 public:
     NumVal(int num);
 
+    Expr *to_expr();
+
     bool equals(Val *rhs);
 
-    Val *add_to(Val *pVal);
+    Val *add_to(Val *rhs);
 
-    Val *mult_to(Val *pVal);
+    Val *mult_to(Val *rhs);
 
     std::string to_string();
 };
