@@ -5,7 +5,7 @@
 #ifndef ASSIGNMENT02_EXPR_H
 #define ASSIGNMENT02_EXPR_H
 
-
+// TODO: Organise elements in proper private and public scopes.
 #include <string>
 #include <iostream>
 
@@ -30,10 +30,31 @@ public:
 };
 
 class NumExpr : public Expr {
-public:
+
     int val;
 
+public:
+
     NumExpr(int val);
+
+    bool equals(Expr *e);
+
+    Val *interp();
+
+    Expr *subst(std::string var, Expr *e);
+
+    void print(std::ostream &out);
+
+    void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
+
+};
+
+class BoolExpr : public Expr {
+
+    bool boolean;
+
+public:
+    BoolExpr(bool boolean);
 
     bool equals(Expr *e);
 
