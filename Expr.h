@@ -56,7 +56,7 @@ public:
 
     bool equals(Expr *e);
 
-    Val *interp(); // Update with Val::add_to();
+    Val *interp();
 
     Expr *subst(std::string var, Expr *e);
 

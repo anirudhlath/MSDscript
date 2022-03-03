@@ -38,4 +38,20 @@ public:
     std::string to_string();
 };
 
+class BoolVal : public Val {
+    bool boolean;
+public:
+    BoolVal(bool boolean);
+
+    Expr *to_expr();
+
+    bool equals(Val *rhs);
+
+    Val *add_to(Val *rhs);
+
+    Val *mult_to(Val *rhs);
+
+    std::string to_string();
+};
+
 #endif //MSDSCRIPT_VAL_H
