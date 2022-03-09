@@ -11,4 +11,6 @@ add_executable(msdscript
         Expr.h
         Parser.cpp
         Parser.h
-        main.cpp testMain.cpp Val.cpp Val.h)
+        Val.cpp
+        Val.h
+        main.cpp)
