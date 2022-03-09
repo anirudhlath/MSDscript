@@ -93,13 +93,13 @@ void AddExpr::print(std::ostream &out) {
 }
 
 void AddExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
-    if (precedence >= 1) {
+    if (precedence >= 2) {
         out << '(';
     }
-    lhs->pretty_print(out, 1, n_position, true);
+    lhs->pretty_print(out, 2, n_position, true);
     out << " + ";
-    rhs->pretty_print(out, 0, n_position, false);
-    if (precedence >= 1) {
+    rhs->pretty_print(out, 1, n_position, false);
+    if (precedence >= 2) {
         out << ')';
     }
 }
@@ -137,13 +137,13 @@ void MultExpr::print(std::ostream &out) {
 }
 
 void MultExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
-    if (precedence >= 2) {
+    if (precedence >= 3) {
         out << '(';
     }
-    lhs->pretty_print(out, 2, n_position, true);
+    lhs->pretty_print(out, 3, n_position, true);
     out << " * ";
-    rhs->pretty_print(out, 1, n_position, false);
-    if (precedence >= 2) {
+    rhs->pretty_print(out, 2, n_position, false);
+    if (precedence >= 3) {
         out << ')';
     }
 }
@@ -299,7 +299,7 @@ bool EqualExpr::equals(Expr *e) {
         return false;
     }
     else {
-        return this->lhs == expr->lhs && this->rhs == expr->rhs;
+        return this->lhs->equals(expr->lhs) && this->rhs->equals(expr->rhs);
     }
 }
 
@@ -320,12 +320,104 @@ void EqualExpr::print(std::ostream &out) {
 }
 
 void EqualExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
+    if (precedence >= 1) {
+        out << '(';
+    }
+    lhs->pretty_print(out, 1, n_position, true);
+    out << " == ";
+    rhs->pretty_print(out, 0, n_position, false);
+    if (precedence >= 1) {
+        out << ')';
+    }
+}
 
-} // TODO
+// IfExpr
+IfExpr::IfExpr(Expr *ifExpr, Expr *thenExpr, Expr *elseExpr) {
+    this->ifExpr = ifExpr;
+    this->thenExpr = thenExpr;
+    this->elseExpr = elseExpr;
+}
+
+Expr *IfExpr::subst(std::string var, Expr *e) {
+    return new IfExpr(this->ifExpr->subst(var, e), this->thenExpr->subst(var, e), this->elseExpr->subst(var, e));
+}
+
+void IfExpr::print(std::ostream &out) {
+    out << "(_if ";
+    ifExpr->print(out);
+    out << "_then ";
+    thenExpr->print(out);
+    out << "_else ";
+    elseExpr->print(out);
+    out << ')';
+}
+
+bool IfExpr::equals(Expr *e) {
+    IfExpr *expr = dynamic_cast<IfExpr *>(e);
+    if (expr == nullptr) {
+        throw std::runtime_error("The expression passed in is a non-conditional expression.\n");
+        return false;
+    }
+    else {
+        return ifExpr->equals(expr->ifExpr) && thenExpr->equals(expr->thenExpr) && elseExpr->equals(expr->elseExpr);
+    }
+}
+
+Val *IfExpr::interp() {
+    BoolVal *e = dynamic_cast<BoolVal *>(ifExpr->interp());
+    if (e == nullptr) {
+        throw std::runtime_error("The expression passed into the if statement is not a boolean.\n");
+        exit(1);
+    }
+    else {
+        if (e->to_string() == "_true") {
+            return thenExpr->interp();
+        }
+        else if (e->to_string() == "_false") {
+            return elseExpr->interp();
+        }
+        else {
+            throw std::runtime_error("Invalid boolean value. Fatal error has occurred, program will exit.\n");
+            exit(1);
+        }
+
+    }
+}
+
+void IfExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
+    if (letPrecedence) {
+        out << '(';
+    }
+
+    int position = out.tellp();
+    int indent = position - n_position;
+
+    out << "_if ";
+    ifExpr->pretty_print(out, 0, n_position, true);
+    out << "\n";
+    n_position = out.tellp();
+
+    for (int i = 0; i < indent; i++) {
+        out << ' ';
+    }
+    out << "_then ";
+    thenExpr->pretty_print(out, 0, n_position, false);
+    out << "\n";
+    n_position = out.tellp();
+
+    for (int i = 0; i < indent; i++) {
+        out << ' ';
+    }
+    out << "_else ";
+    elseExpr->pretty_print(out, 0, n_position, false);
+    if (letPrecedence) {
+        out << ')';
+    }
+}
 
 /* ********** TESTS ********** */
 
-TEST_CASE("equals") {
+TEST_CASE("Expressions") {
     // NumExpr
     Expr *two = new NumExpr(2);
     Expr *twod = new NumExpr(2);
@@ -445,3 +537,5 @@ TEST_CASE("equals") {
 
 
 }
+
+

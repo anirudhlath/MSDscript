@@ -159,4 +159,24 @@ public:
     void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 };
 
+class IfExpr : public Expr {
+public:
+    Expr *ifExpr;
+    Expr *thenExpr;
+    Expr *elseExpr;
+
+    IfExpr(Expr *ifExpr, Expr *thenExpr, Expr *elseExpr);
+
+    Expr *subst(std::string var, Expr *e);
+
+    void print(std::ostream &out);
+
+    void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
+
+    bool equals(Expr *e);
+
+    Val *interp();
+
+};
+
 #endif //ASSIGNMENT02_EXPR_H

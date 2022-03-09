@@ -46,7 +46,7 @@ BoolVal::BoolVal(bool boolean) {
 }
 
 Expr *BoolVal::to_expr() {
-    return nullptr; // TODO: Implement BoolVal::to_expr()
+    return new NumExpr(this->boolean);
 }
 
 bool BoolVal::equals(Val *rhs) {
