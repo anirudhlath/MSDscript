@@ -345,9 +345,9 @@ Expr *IfExpr::subst(std::string var, Expr *e) {
 void IfExpr::print(std::ostream &out) {
     out << "(_if ";
     ifExpr->print(out);
-    out << "_then ";
+    out << " _then ";
     thenExpr->print(out);
-    out << "_else ";
+    out << " _else ";
     elseExpr->print(out);
     out << ')';
 }
