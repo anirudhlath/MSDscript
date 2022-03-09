@@ -3,8 +3,10 @@
 //
 
 #include "Parser.h"
+#include "Val.h"
 #include "catch.hpp"
 #include <sstream>
+#include <iostream>
 
 Expr *parse(std::istream &in) {
     skip_whitespace(in);
@@ -37,7 +39,21 @@ Expr *parse_multicand(std::istream &in) {
         return e;
     }
     else if (c == '_') {
-        Expr *e = parse_let(in);
+        std::string  temp = parse_keyword(in);
+        Expr *e = nullptr;
+        if (temp == "_let") {
+            e = parse_let(in);
+        }
+        else if (temp == "_true" || temp == "_false") {
+            e = parse_bool(in, temp);
+        }
+        else if (temp == "_if") {
+            e = parse_if(in);
+        }
+        else {
+            throw std::runtime_error("Invalid keyword.");
+            exit(1);
+        }
         return e;
     }
     else {
@@ -61,14 +77,14 @@ Expr *parse_addend(std::istream &in) {
     }
 }
 
-Expr *parse_expr(std::istream &in) {
+Expr *parse_comparg(std::istream &in) {
     Expr *e;
     e = parse_addend(in);
     skip_whitespace(in);
     int c = in.peek();
     if (c == '+') {
         consume(in, '+');
-        Expr *rhs = parse_expr(in);
+        Expr *rhs = parse_comparg(in);
         return new AddExpr(e, rhs);
     }
     else {
@@ -76,6 +92,24 @@ Expr *parse_expr(std::istream &in) {
     }
 }
 
+Expr *parse_expr(std::istream &in) {
+    Expr *e;
+    e = parse_comparg(in);
+    skip_whitespace(in);
+    int c = in.peek();
+    if (c == '=') {
+        if (parse_keyword(in, "==")) {
+            Expr *rhs = parse_expr(in);
+            return new EqualExpr(e, rhs);
+        }
+        else {
+            throw std::runtime_error("Expected '==' but not found.");
+        }
+    }
+    else {
+        return e;
+    }
+}
 
 Expr *parse_num(std::istream &in) {
 
@@ -122,39 +156,34 @@ Expr *parse_let(std::istream &in) {
     Expr *rhs;
     Expr *body;
     int c;
-    if (parse_keyword(in, "_let")) {
-        skip_whitespace(in);
-        c = in.peek();
-        if (isalpha(c)) {
+    skip_whitespace(in);
+    c = in.peek();
+    if (isalpha(c)) {
 
-            lhs = dynamic_cast<VarExpr *>(parse_var(in));
+        lhs = dynamic_cast<VarExpr *>(parse_var(in));
+
+        skip_whitespace(in);
+        if (in.peek() == '=') {
+            consume(in, '=');
+            skip_whitespace(in);
+
+            rhs = parse_expr(in);
 
             skip_whitespace(in);
-            if (in.peek() == '=') {
-                consume(in, '=');
+            if (parse_keyword(in, "_in")) {
                 skip_whitespace(in);
-
-                rhs = parse_expr(in);
-
-                skip_whitespace(in);
-                if (parse_keyword(in, "_in")) {
-                    skip_whitespace(in);
-                    body = parse_expr(in);
-                }
-                else {
-                    throw std::runtime_error("Invalid input. '_in' was expected.");
-                }
+                body = parse_expr(in);
             }
             else {
-                throw std::runtime_error("Invalid input. '=' was expected.");
+                throw std::runtime_error("Invalid input. '_in' was expected.");
             }
         }
         else {
-            throw std::runtime_error("Invalid input. A variable was expected after '_let'.");
+            throw std::runtime_error("Invalid input. '=' was expected.");
         }
     }
     else {
-        throw std::runtime_error("Invalid keyword.");
+        throw std::runtime_error("Invalid input. A variable was expected after '_let'.");
     }
     return new LetExpr(lhs, rhs, body);
 }
@@ -183,6 +212,68 @@ static void consume(std::istream &in, int expect) {
         throw std::runtime_error("Consume mismatch!");
     }
 }
+
+Expr *parse_bool(std::istream &in, std::string keyword) {
+    if (keyword == "_true") {
+        return new BoolExpr(true);
+    }
+    else {
+        return new BoolExpr(false);
+    }
+}
+
+Expr *parse_if(std::istream &in) {
+    Expr *ifExpr;
+    Expr *thenExpr;
+    Expr *elseExpr;
+
+    skip_whitespace(in);
+    ifExpr = parse_expr(in);
+    while(isspace(in.peek())) {
+        in.get();
+    }
+    if (parse_keyword(in, "_then")) {
+        skip_whitespace(in);
+        thenExpr = parse_expr(in);
+        skip_whitespace(in);
+        if (parse_keyword(in, "_else")) {
+            skip_whitespace(in);
+            elseExpr = parse_expr(in);
+            skip_whitespace(in);
+        }
+        else {
+            throw std::runtime_error("Invalid input. '_else' was expected.");
+        }
+    }
+    else {
+        throw std::runtime_error("Invalid input. '_then' was expected.");
+    }
+
+/*    if (parse_keyword(in, "_if")) {
+
+    }
+    else {
+        throw std::runtime_error("Invalid keyword.");
+    }*/
+    return new IfExpr(ifExpr, thenExpr, elseExpr);
+}
+
+std::string parse_keyword(std::istream &in) {
+    std::string temp = "";
+    while (1) {
+        if (in.peek() == -1) {
+            break;
+        }
+        if (in.peek() != ' ') {
+            temp += in.get();
+        }
+        else {
+            break;
+        }
+    }
+    return temp;
+}
+
 
 TEST_CASE("Parse Numbers") {
     CHECK(parse_str("2")->equals(new NumExpr(2)));
@@ -305,4 +396,26 @@ TEST_CASE("Parser Test") {
 
 
 }
+
+TEST_CASE("Parse IfExpr") {
+    Expr *e1 = new IfExpr(new BoolExpr(true), new NumExpr(1), new NumExpr(2));
+    CHECK(parse_str("_if _true _then 1 _else 2")->equals(e1));
+    CHECK(parse_str("_let same = 1 == 2\n"
+                    "_in  _if 1 == 2\n"
+                    "     _then _false + 5\n"
+                    "     _else 88")->to_string(true) == "_let same = 1 == 2\n"
+                                                         "_in  _if 1 == 2\n"
+                                                         "     _then _false + 5\n"
+                                                         "     _else 88");
+    CHECK(parse_str("_let same = 1 == 2\n"
+                    "_in  _if 1 == 2\n"
+                    "     _then _false + 5\n"
+                    "     _else 88")->interp()->equals(new NumVal(88)));
+
+    CHECK_THROWS_WITH(parse_str("_if 4 + 1\n"
+                                "_then 2\n"
+                                "_else 3")->interp(), "The expression passed into the if statement is not a boolean"
+                                                      ".\n");
+}
+
 

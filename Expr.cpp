@@ -256,7 +256,7 @@ void LetExpr::pretty_print(std::ostream &out, int precedence, int &n_position, b
 
 // BoolExpr
 BoolExpr::BoolExpr(bool boolean) {
-    this->boolean == boolean;
+    this->boolean = boolean;
 }
 
 bool BoolExpr::equals(Expr *e) {
@@ -279,7 +279,7 @@ Expr *BoolExpr::subst(std::string var, Expr *e) {
 }
 
 void BoolExpr::print(std::ostream &out) {
-    out << (new BoolVal(this->boolean))->to_string();
+    out << ((new BoolVal(this->boolean))->to_string());
 }
 
 void BoolExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) { // TODO
@@ -314,7 +314,7 @@ Expr *EqualExpr::subst(std::string var, Expr *e) {
 void EqualExpr::print(std::ostream &out) {
     out << '(';
     lhs->print(out);
-    out << '==';
+    out << "==";
     rhs->print(out);
     out << ')';
 }

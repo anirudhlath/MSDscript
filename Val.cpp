@@ -46,7 +46,7 @@ BoolVal::BoolVal(bool boolean) {
 }
 
 Expr *BoolVal::to_expr() {
-    return new NumExpr(this->boolean);
+    return new BoolExpr(this->boolean);
 }
 
 bool BoolVal::equals(Val *rhs) {
@@ -94,7 +94,7 @@ TEST_CASE("BoolVal") {
     CHECK(bool1->equals(bool1) == true);
     CHECK(bool2->equals(bool3) == true);
     CHECK(bool1->equals(bool2) == false);
-    CHECK(bool1->to_expr() == nullptr);
+    CHECK(bool1->to_expr()->equals(new BoolExpr(true)));
 
     CHECK_THROWS_WITH(bool1->equals(num1), "The value passed in is not a boolean-value.\n");
     CHECK_THROWS_WITH(bool2->add_to(bool1), "Addition cannot be performed on a boolean-value.\n");
