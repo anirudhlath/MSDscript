@@ -141,4 +141,22 @@ public:
 
 };
 
+class EqualExpr : public Expr {
+public:
+    Expr *lhs;
+    Expr *rhs;
+
+    EqualExpr(Expr *lhs, Expr *rhs);
+
+    bool equals(Expr *e);
+
+    Val *interp();
+
+    Expr *subst(std::string var, Expr *e);
+
+    void print(std::ostream &out);
+
+    void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
+};
+
 #endif //ASSIGNMENT02_EXPR_H

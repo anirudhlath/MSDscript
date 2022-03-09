@@ -254,6 +254,74 @@ void LetExpr::pretty_print(std::ostream &out, int precedence, int &n_position, b
     }
 }
 
+// BoolExpr
+BoolExpr::BoolExpr(bool boolean) {
+    this->boolean == boolean;
+}
+
+bool BoolExpr::equals(Expr *e) {
+    BoolExpr *rhs = dynamic_cast<BoolExpr *>(e);
+    if (rhs == nullptr) {
+        throw std::runtime_error("The expression passed in is a non-boolean expression.\n");
+        return false;
+    }
+    else {
+        return this->boolean == rhs->boolean;
+    }
+}
+
+Val *BoolExpr::interp() {
+    return new BoolVal(this->boolean);
+}
+
+Expr *BoolExpr::subst(std::string var, Expr *e) {
+    return this;
+}
+
+void BoolExpr::print(std::ostream &out) {
+    out << (new BoolVal(this->boolean))->to_string();
+}
+
+void BoolExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) { // TODO
+    this->print(out);
+}
+
+// EqualExpr
+EqualExpr::EqualExpr(Expr *lhs, Expr *rhs) {
+    this->lhs = lhs;
+    this->rhs = rhs;
+}
+
+bool EqualExpr::equals(Expr *e) {
+    EqualExpr *expr = dynamic_cast<EqualExpr *>(e);
+    if (expr == nullptr) {
+        throw std::runtime_error("The expression passed in is a non-equality expression.\n");
+        return false;
+    }
+    else {
+        return this->lhs == expr->lhs && this->rhs == expr->rhs;
+    }
+}
+
+Val *EqualExpr::interp() {
+    return new BoolVal(this->lhs->interp() == this->rhs->interp());
+}
+
+Expr *EqualExpr::subst(std::string var, Expr *e) {
+    return new EqualExpr(lhs->subst(var, e), rhs->subst(var, e));
+}
+
+void EqualExpr::print(std::ostream &out) {
+    out << '(';
+    lhs->print(out);
+    out << '==';
+    rhs->print(out);
+    out << ')';
+}
+
+void EqualExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
+
+} // TODO
 
 /* ********** TESTS ********** */
 
@@ -375,36 +443,5 @@ TEST_CASE("equals") {
     CHECK(add1->equals(mult1) == false);
     CHECK(var1->equals(mult1) == false);
 
-
-}
-
-BoolExpr::BoolExpr(bool boolean) {
-    this->boolean == boolean;
-}
-
-bool BoolExpr::equals(Expr *e) {
-    BoolExpr *rhs = dynamic_cast<BoolExpr *>(e);
-    if (rhs == nullptr) {
-        throw std::runtime_error("The expression passed in is a non-boolean expression.\n");
-        return false;
-    }
-    else {
-        return this->boolean == rhs->boolean;
-    }
-}
-
-Val *BoolExpr::interp() {
-    return new BoolVal(this->boolean);
-}
-
-Expr *BoolExpr::subst(std::string var, Expr *e) {
-    return this;
-}
-
-void BoolExpr::print(std::ostream &out) {
-    out << (new BoolVal(this->boolean))->to_string();
-}
-
-void BoolExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) { // TODO
 
 }
