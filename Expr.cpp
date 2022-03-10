@@ -465,6 +465,42 @@ Expr *FunExpr::subst(std::string var, Expr *e) {
     return new FunExpr(var, e->subst(var, e));
 }
 
+// CallExpr
+CallExpr::CallExpr(Expr *to_be_called, Expr *actual_arg) {
+    this->to_be_called = to_be_called;
+    this->actual_arg = actual_arg;
+}
+
+bool CallExpr::equals(Expr *e) {
+    CallExpr *expr = dynamic_cast<CallExpr *>(e);
+    if (expr == nullptr) {
+        return false;
+    }
+    else {
+        return this->to_be_called == expr->to_be_called && this->actual_arg == expr->actual_arg;
+    }
+}
+
+void CallExpr::print(std::ostream &out) {
+    to_be_called->print(out);
+    out << '(';
+    actual_arg->print(out);
+    out << ')';
+}
+
+void CallExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
+    // TODO
+}
+
+Expr *CallExpr::subst(std::string var, Expr *e) {
+    return new CallExpr(to_be_called->subst(var, e), actual_arg->subst(var, e));
+}
+
+Val *CallExpr::interp() {
+    to_be_called->interp()->call(actual_arg->interp());
+}
+
+
 /* ********** TESTS ********** */
 
 TEST_CASE("Expressions") {
@@ -586,35 +622,4 @@ TEST_CASE("Expressions") {
     CHECK(var1->equals(mult1) == false);
 
 
-}
-
-CallExpr::CallExpr(Expr *to_be_called, Expr *actual_arg) {
-    this->to_be_called = to_be_called;
-    this->actual_arg = actual_arg;
-}
-
-bool CallExpr::equals(Expr *e) {
-    CallExpr *expr = dynamic_cast<CallExpr *>(e);
-    if (expr == nullptr) {
-        return false;
-    }
-    else {
-        return this->to_be_called == expr->to_be_called && this->actual_arg == expr->actual_arg;
-    }
-}
-
-void CallExpr::print(std::ostream &out) {
-
-}
-
-void CallExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
-
-}
-
-Expr *CallExpr::subst(std::string var, Expr *e) {
-    return nullptr;
-}
-
-Val *CallExpr::interp() {
-    return nullptr;
 }

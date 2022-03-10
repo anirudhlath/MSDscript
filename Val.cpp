@@ -6,6 +6,7 @@
 #include "Expr.h"
 #include "catch.hpp"
 
+// NumVal
 NumVal::NumVal(int num) {
     this->num = num;
 }
@@ -41,6 +42,11 @@ Expr *NumVal::to_expr() {
     return new NumExpr(this->num);
 }
 
+Val *NumVal::call(Val *actual_arg) {
+    throw std::runtime_error("A non-function value cannot be called.");
+}
+
+// BoolVal
 BoolVal::BoolVal(bool boolean) {
     this->boolean = boolean;
 }
@@ -77,34 +83,11 @@ std::string BoolVal::to_string() {
     }
 }
 
-// TESTS
-// TODO: NumVal
-TEST_CASE("NumVal") {
-
+Val *BoolVal::call(Val *actual_arg) {
+    throw std::runtime_error("A non-function value cannot be called.");
 }
 
-TEST_CASE("BoolVal") {
-    Val *bool1 = new BoolVal(true);
-    Val *bool2 = new BoolVal(false);
-    Val *bool3 = new BoolVal(false);
-    Val *num1 = new NumVal(5);
-
-    CHECK(bool1->to_string() == "_true");
-    CHECK(bool2->to_string() == "_false");
-    CHECK(bool1->equals(bool1) == true);
-    CHECK(bool2->equals(bool3) == true);
-    CHECK(bool1->equals(bool2) == false);
-    CHECK(bool1->to_expr()->equals(new BoolExpr(true)));
-
-    CHECK_THROWS_WITH(bool1->equals(num1), "The value passed in is not a boolean-value.");
-    CHECK_THROWS_WITH(bool2->add_to(bool1), "Addition cannot be performed on a boolean-value.");
-    CHECK_THROWS_WITH(bool2->add_to(bool2), "Addition cannot be performed on a boolean-value.");
-    CHECK_THROWS_WITH(bool1->add_to(num1), "Addition cannot be performed on a boolean-value.");
-    CHECK_THROWS_WITH(bool2->mult_to(bool1), "Multiplication cannot be performed on a boolean-value.");
-    CHECK_THROWS_WITH(bool2->mult_to(bool2), "Multiplication cannot be performed on a boolean-value.");
-    CHECK_THROWS_WITH(bool1->mult_to(num1), "Multiplication cannot be performed on a boolean-value.");
-}
-
+// FunVal
 FunVal::FunVal(std::string formal_arg, Expr *body) {
     this->formal_arg = formal_arg;
     this->body = body;
@@ -136,4 +119,37 @@ Val *FunVal::mult_to(Val *rhs) {
 
 std::string FunVal::to_string() {
     return (new FunExpr(this->formal_arg, this->body))->to_string(true);
+}
+
+Val *FunVal::call(Val *actual_arg) {
+    return body->subst(formal_arg, actual_arg->to_expr())->interp();
+}
+
+
+// TESTS
+// TODO: NumVal
+TEST_CASE("NumVal") {
+
+}
+
+TEST_CASE("BoolVal") {
+    Val *bool1 = new BoolVal(true);
+    Val *bool2 = new BoolVal(false);
+    Val *bool3 = new BoolVal(false);
+    Val *num1 = new NumVal(5);
+
+    CHECK(bool1->to_string() == "_true");
+    CHECK(bool2->to_string() == "_false");
+    CHECK(bool1->equals(bool1) == true);
+    CHECK(bool2->equals(bool3) == true);
+    CHECK(bool1->equals(bool2) == false);
+    CHECK(bool1->to_expr()->equals(new BoolExpr(true)));
+
+    CHECK_THROWS_WITH(bool1->equals(num1), "The value passed in is not a boolean-value.");
+    CHECK_THROWS_WITH(bool2->add_to(bool1), "Addition cannot be performed on a boolean-value.");
+    CHECK_THROWS_WITH(bool2->add_to(bool2), "Addition cannot be performed on a boolean-value.");
+    CHECK_THROWS_WITH(bool1->add_to(num1), "Addition cannot be performed on a boolean-value.");
+    CHECK_THROWS_WITH(bool2->mult_to(bool1), "Multiplication cannot be performed on a boolean-value.");
+    CHECK_THROWS_WITH(bool2->mult_to(bool2), "Multiplication cannot be performed on a boolean-value.");
+    CHECK_THROWS_WITH(bool1->mult_to(num1), "Multiplication cannot be performed on a boolean-value.");
 }
