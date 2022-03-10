@@ -415,6 +415,56 @@ void IfExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bo
     }
 }
 
+// FunExpr
+FunExpr::FunExpr(std::string formal_arg, Expr *body) {
+    this->formal_arg = formal_arg;
+    this->body = body;
+}
+
+bool FunExpr::equals(Expr *e) {
+    FunExpr *expr = dynamic_cast<FunExpr *>(e);
+    if (expr == nullptr) {
+        return false;
+    }
+    else {
+        return this->formal_arg == expr->formal_arg && this->body == expr->body;
+    }
+
+}
+
+Val *FunExpr::interp() {
+    return new FunVal(this->formal_arg, this->body);
+}
+
+void FunExpr::print(std::ostream &out) {
+    out << "(_fun (" << formal_arg;
+    out << ") ";
+    body->print(out);
+    out << ')';
+}
+
+void FunExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
+    if (letPrecedence) {
+        out << '(';
+    }
+    int position = out.tellp();
+    int indent = position - n_position;
+    out << "_fun (" << formal_arg;
+    out << ")\n";
+    n_position = out.tellp();
+    for (int i = 0; i < indent + 2; i++) {
+        out << ' ';
+    }
+    body->pretty_print(out, 0, n_position, false);
+    if (letPrecedence) {
+        out << ')';
+    }
+}
+
+Expr *FunExpr::subst(std::string var, Expr *e) {
+    return new FunExpr(var, e->subst(var, e));
+}
+
 /* ********** TESTS ********** */
 
 TEST_CASE("Expressions") {
@@ -538,4 +588,33 @@ TEST_CASE("Expressions") {
 
 }
 
+CallExpr::CallExpr(Expr *to_be_called, Expr *actual_arg) {
+    this->to_be_called = to_be_called;
+    this->actual_arg = actual_arg;
+}
 
+bool CallExpr::equals(Expr *e) {
+    CallExpr *expr = dynamic_cast<CallExpr *>(e);
+    if (expr == nullptr) {
+        return false;
+    }
+    else {
+        return this->to_be_called == expr->to_be_called && this->actual_arg == expr->actual_arg;
+    }
+}
+
+void CallExpr::print(std::ostream &out) {
+
+}
+
+void CallExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
+
+}
+
+Expr *CallExpr::subst(std::string var, Expr *e) {
+    return nullptr;
+}
+
+Val *CallExpr::interp() {
+    return nullptr;
+}

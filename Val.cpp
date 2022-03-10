@@ -52,7 +52,7 @@ Expr *BoolVal::to_expr() {
 bool BoolVal::equals(Val *rhs) {
     auto *rhsBool = dynamic_cast<BoolVal *>(rhs);
     if (rhsBool == nullptr) {
-        throw std::runtime_error("The value passed in is not a boolean-value.\n");
+        throw std::runtime_error("The value passed in is not a boolean-value.");
         return false;
     }
     else {
@@ -61,11 +61,11 @@ bool BoolVal::equals(Val *rhs) {
 }
 
 Val *BoolVal::add_to(Val *rhs) {
-    throw std::runtime_error("Addition cannot be performed on a boolean-value.\n");
+    throw std::runtime_error("Addition cannot be performed on a boolean-value.");
 }
 
 Val *BoolVal::mult_to(Val *rhs) {
-    throw std::runtime_error("Multiplication cannot be performed on a boolean-value.\n");
+    throw std::runtime_error("Multiplication cannot be performed on a boolean-value.");
 }
 
 std::string BoolVal::to_string() {
@@ -96,11 +96,44 @@ TEST_CASE("BoolVal") {
     CHECK(bool1->equals(bool2) == false);
     CHECK(bool1->to_expr()->equals(new BoolExpr(true)));
 
-    CHECK_THROWS_WITH(bool1->equals(num1), "The value passed in is not a boolean-value.\n");
-    CHECK_THROWS_WITH(bool2->add_to(bool1), "Addition cannot be performed on a boolean-value.\n");
-    CHECK_THROWS_WITH(bool2->add_to(bool2), "Addition cannot be performed on a boolean-value.\n");
-    CHECK_THROWS_WITH(bool1->add_to(num1), "Addition cannot be performed on a boolean-value.\n");
-    CHECK_THROWS_WITH(bool2->mult_to(bool1), "Multiplication cannot be performed on a boolean-value.\n");
-    CHECK_THROWS_WITH(bool2->mult_to(bool2), "Multiplication cannot be performed on a boolean-value.\n");
-    CHECK_THROWS_WITH(bool1->mult_to(num1), "Multiplication cannot be performed on a boolean-value.\n");
+    CHECK_THROWS_WITH(bool1->equals(num1), "The value passed in is not a boolean-value.");
+    CHECK_THROWS_WITH(bool2->add_to(bool1), "Addition cannot be performed on a boolean-value.");
+    CHECK_THROWS_WITH(bool2->add_to(bool2), "Addition cannot be performed on a boolean-value.");
+    CHECK_THROWS_WITH(bool1->add_to(num1), "Addition cannot be performed on a boolean-value.");
+    CHECK_THROWS_WITH(bool2->mult_to(bool1), "Multiplication cannot be performed on a boolean-value.");
+    CHECK_THROWS_WITH(bool2->mult_to(bool2), "Multiplication cannot be performed on a boolean-value.");
+    CHECK_THROWS_WITH(bool1->mult_to(num1), "Multiplication cannot be performed on a boolean-value.");
+}
+
+FunVal::FunVal(std::string formal_arg, Expr *body) {
+    this->formal_arg = formal_arg;
+    this->body = body;
+}
+
+Expr *FunVal::to_expr() {
+    return new FunExpr(this->formal_arg, this->body);
+}
+
+bool FunVal::equals(Val *rhs) {
+    FunVal *expr = dynamic_cast<FunVal *>(rhs);
+    if (expr == nullptr) {
+        throw std::runtime_error("The value passed in is a non-function value.");
+        return false;
+    }
+    else {
+        return this->formal_arg == expr->formal_arg && this->body == expr->body;
+    }
+
+}
+
+Val *FunVal::add_to(Val *rhs) {
+    throw std::runtime_error("Addition cannot be performed on a function-value.");
+}
+
+Val *FunVal::mult_to(Val *rhs) {
+    throw std::runtime_error("Multiplication cannot be performed on a function-value.");
+}
+
+std::string FunVal::to_string() {
+    return (new FunExpr(this->formal_arg, this->body))->to_string(true);
 }

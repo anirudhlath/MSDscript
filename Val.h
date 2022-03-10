@@ -54,4 +54,23 @@ public:
     std::string to_string();
 };
 
+class FunVal : public Val {
+
+    std::string formal_arg;
+    Expr *body;
+
+public:
+    FunVal(std::string formal_arg, Expr *body);
+
+    Expr *to_expr();
+
+    bool equals(Val *rhs);
+
+    Val *add_to(Val *rhs);
+
+    Val *mult_to(Val *rhs);
+
+    std::string to_string();
+};
+
 #endif //MSDSCRIPT_VAL_H

@@ -179,4 +179,44 @@ public:
 
 };
 
+class FunExpr : public Expr {
+
+    std::string formal_arg;
+    Expr *body;
+
+public:
+    FunExpr(std::string formal_arg, Expr *body);
+
+    bool equals(Expr *e);
+
+    Val *interp();
+
+    void print(std::ostream &out);
+
+    void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
+
+    Expr *subst(std::string var, Expr *e);
+};
+
+class CallExpr : public Expr {
+
+    Expr *to_be_called;
+    Expr *actual_arg;
+
+public:
+
+    CallExpr(Expr *to_be_called, Expr *actual_arg);
+
+    bool equals(Expr *e);
+
+    Val *interp();
+
+    void print(std::ostream &out);
+
+    void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
+
+    Expr *subst(std::string var, Expr *e);
+
+};
+
 #endif //ASSIGNMENT02_EXPR_H
