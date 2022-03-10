@@ -39,7 +39,7 @@ Expr *parse_multicand(std::istream &in) {
         return e;
     }
     else if (c == '_') {
-        std::string  temp = parse_keyword(in);
+        std::string temp = parse_keyword(in);
         Expr *e = nullptr;
         if (temp == "_let") {
             e = parse_let(in);
@@ -229,7 +229,7 @@ Expr *parse_if(std::istream &in) {
 
     skip_whitespace(in);
     ifExpr = parse_expr(in);
-    while(isspace(in.peek())) {
+    while (isspace(in.peek())) {
         in.get();
     }
     if (parse_keyword(in, "_then")) {
