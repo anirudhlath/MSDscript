@@ -304,7 +304,7 @@ bool EqualExpr::equals(Expr *e) {
 }
 
 Val *EqualExpr::interp() {
-    return new BoolVal(this->lhs->interp() == this->rhs->interp());
+    return new BoolVal(this->lhs->interp()->equals(this->rhs->interp()));
 }
 
 Expr *EqualExpr::subst(std::string var, Expr *e) {
@@ -694,4 +694,28 @@ TEST_CASE("Function Expressions") {
 
     CHECK(e5->interp()->equals(new NumVal(1)));
     CHECK_THROWS_WITH(e6->interp(), "Error occurred, a variable cannot be interpreted.");
+}
+
+TEST_CASE("Equality Tests") {
+    Expr *one = new NumExpr(1);
+    Expr *two = new NumExpr(2);
+    Expr *x = new VarExpr("x");
+    Expr *y = new VarExpr("y");
+    Expr *trueExpr = new BoolExpr(true);
+    Expr *falseExpr = new BoolExpr(false);
+
+    Expr *e1 = new EqualExpr(one, one);
+    Expr *e1d = new EqualExpr(one, one);
+    Expr *e2 = new EqualExpr(one, two);
+    Expr *e3 = new EqualExpr(x, two);
+    Expr *e4 = new EqualExpr(trueExpr, falseExpr);
+    Expr *e5 = new EqualExpr(trueExpr, trueExpr);
+    CHECK(e1->equals(e1));
+    CHECK(e1->equals(e1d));
+    CHECK(e1->equals(e2) == false);
+    CHECK(e3->subst("x", one)->equals(e2));
+    CHECK(e3->subst("x", one)->interp()->to_expr()->equals(falseExpr));
+    CHECK(e3->subst("x", two)->interp()->to_expr()->equals(trueExpr));
+    CHECK(e4->interp()->to_expr()->equals(falseExpr));
+    CHECK(e5->interp()->to_expr()->equals(trueExpr));
 }
