@@ -210,10 +210,12 @@ Val *LetExpr::interp() {
 }
 
 Expr *LetExpr::subst(std::string var, Expr *e) {
-    if (lhs->to_string(false) != var) {
-        return new LetExpr(this->lhs, this->rhs, this->in->subst(var, e));
+    if (lhs->to_string(true) != var) {
+        return new LetExpr(this->lhs, this->rhs->subst(var, e), this->in->subst(var, e));
     }
-    return new LetExpr(this->lhs, this->rhs, this->in);
+    else {
+        return new LetExpr(this->lhs, this->rhs->subst(var, e), this->in);
+    }
 }
 
 void LetExpr::print(std::ostream &out) {
@@ -237,7 +239,7 @@ void LetExpr::pretty_print(std::ostream &out, int precedence, int &n_position, b
     out << "_let ";
     lhs->print(out);
     out << " = ";
-    rhs->pretty_print(out, 0, n_position, true);
+    rhs->pretty_print(out, 0, n_position, false);
 
     out << "\n";
 
@@ -262,7 +264,6 @@ BoolExpr::BoolExpr(bool boolean) {
 bool BoolExpr::equals(Expr *e) {
     BoolExpr *rhs = dynamic_cast<BoolExpr *>(e);
     if (rhs == nullptr) {
-        throw std::runtime_error("The expression passed in is a non-boolean expression.\n");
         return false;
     }
     else {
@@ -295,7 +296,6 @@ EqualExpr::EqualExpr(Expr *lhs, Expr *rhs) {
 bool EqualExpr::equals(Expr *e) {
     EqualExpr *expr = dynamic_cast<EqualExpr *>(e);
     if (expr == nullptr) {
-        throw std::runtime_error("The expression passed in is a non-equality expression.\n");
         return false;
     }
     else {
@@ -355,7 +355,6 @@ void IfExpr::print(std::ostream &out) {
 bool IfExpr::equals(Expr *e) {
     IfExpr *expr = dynamic_cast<IfExpr *>(e);
     if (expr == nullptr) {
-        throw std::runtime_error("The expression passed in is a non-conditional expression.\n");
         return false;
     }
     else {
@@ -364,23 +363,15 @@ bool IfExpr::equals(Expr *e) {
 }
 
 Val *IfExpr::interp() {
-    BoolVal *e = dynamic_cast<BoolVal *>(ifExpr->interp());
-    if (e == nullptr) {
-        throw std::runtime_error("The expression passed into the if statement is not a boolean.\n");
-        exit(1);
+    Val *expr = ifExpr->interp();
+    if (expr->equals(new BoolVal(true))) {
+        return thenExpr->interp();
+    }
+    else if (expr->equals(new BoolVal(false))) {
+        return elseExpr->interp();
     }
     else {
-        if (e->to_string() == "_true") {
-            return thenExpr->interp();
-        }
-        else if (e->to_string() == "_false") {
-            return elseExpr->interp();
-        }
-        else {
-            throw std::runtime_error("Invalid boolean value. Fatal error has occurred, program will exit.\n");
-            exit(1);
-        }
-
+        throw std::runtime_error("The expression passed into the if statement is not a boolean.\n");
     }
 }
 
@@ -489,7 +480,10 @@ void CallExpr::print(std::ostream &out) {
 }
 
 void CallExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
-    // TODO
+    to_be_called->pretty_print(out, 0, n_position, true);
+    out << '(';
+    actual_arg->pretty_print(out, 0, n_position, false);
+    out << ')';
 }
 
 Expr *CallExpr::subst(std::string var, Expr *e) {
@@ -593,6 +587,8 @@ TEST_CASE("Expressions") {
 
     // LetExpr
     Expr *let1 = new LetExpr(new VarExpr("x"), new NumExpr(1), new VarExpr("x"));
+    Expr *let6 = new LetExpr(new VarExpr("x"), new AddExpr(new VarExpr("x"), new NumExpr(1)), new VarExpr("x"));
+    Expr *let7 = new LetExpr(new VarExpr("x"), new NumExpr(1), new VarExpr("x"));
     Expr *let1Duplicate = new LetExpr(new VarExpr("x"), new NumExpr(1), new VarExpr("x"));
     Expr *let2 = new LetExpr(new VarExpr("x"), new NumExpr(2), new VarExpr("x"));
     Expr *let3 = new LetExpr(new VarExpr("x"), new NumExpr(5),
@@ -620,6 +616,31 @@ TEST_CASE("Expressions") {
     CHECK(mult1->equals(add3) == false);
     CHECK(add1->equals(mult1) == false);
     CHECK(var1->equals(mult1) == false);
+}
 
+TEST_CASE("Let Subst Method") {
+    VarExpr *x = new VarExpr("x");
+    VarExpr *y = new VarExpr("y");
+    Expr *eight = new NumExpr(8);
+    Expr *seven = new NumExpr(7);
 
+    LetExpr *example1 = new LetExpr(x, y, seven);
+    LetExpr *solution1 = new LetExpr(x, eight, seven);
+    CHECK(example1->subst("y", eight)->equals(solution1));
+
+    LetExpr *example2 = new LetExpr(x, seven, y);
+    LetExpr *solution2 = new LetExpr(x, seven, eight);
+    CHECK(example2->subst("y", eight)->equals(solution2));
+
+    LetExpr *example3 = new LetExpr(x, y, y);
+    LetExpr *solution3 = new LetExpr(x, eight, eight);
+    CHECK(example3->subst("y", eight)->equals(solution3));
+
+    LetExpr *example4 = new LetExpr(y, seven, y);
+    LetExpr *solution4 = new LetExpr(y, seven, y);
+    CHECK(example4->subst("y", eight)->equals(solution4));
+
+    LetExpr *example5 = new LetExpr(y, y, seven);
+    LetExpr *solution5 = new LetExpr(y, eight, seven);
+    CHECK(example5->subst("y", eight)->equals(solution5));
 }

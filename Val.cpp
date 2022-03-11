@@ -14,7 +14,6 @@ NumVal::NumVal(int num) {
 bool NumVal::equals(Val *rhs) {
     auto *rhsNum = dynamic_cast<NumVal *>(rhs);
     if (rhsNum == nullptr) {
-        throw std::runtime_error("The value passed in is not a number-value.\n");
         return false;
     }
     else {
@@ -58,7 +57,6 @@ Expr *BoolVal::to_expr() {
 bool BoolVal::equals(Val *rhs) {
     auto *rhsBool = dynamic_cast<BoolVal *>(rhs);
     if (rhsBool == nullptr) {
-        throw std::runtime_error("The value passed in is not a boolean-value.");
         return false;
     }
     else {
@@ -100,7 +98,6 @@ Expr *FunVal::to_expr() {
 bool FunVal::equals(Val *rhs) {
     FunVal *expr = dynamic_cast<FunVal *>(rhs);
     if (expr == nullptr) {
-        throw std::runtime_error("The value passed in is a non-function value.");
         return false;
     }
     else {
@@ -129,7 +126,23 @@ Val *FunVal::call(Val *actual_arg) {
 // TESTS
 // TODO: NumVal
 TEST_CASE("NumVal") {
+    Val *num1 = new NumVal(5);
+    Val *num2 = new NumVal(15);
+    Val *num1d = new NumVal(5);
+    Val *bool1 = new BoolVal(true);
 
+    CHECK(num1->to_expr()->equals(new NumExpr(5)));
+    CHECK(num1->equals(num1) == true);
+    CHECK(num1->equals(num2) == false);
+    CHECK(num1->equals(bool1) == false);
+    CHECK(num1->equals(num1d) == true);
+    CHECK(num1->add_to(num2)->equals(new NumVal(20)));
+    CHECK(num1->mult_to(num1)->equals(new NumVal(25)));
+    CHECK(num1->to_string() == "5");
+
+    CHECK_THROWS_WITH(num1->add_to(bool1), "Addition of non-number value.");
+    CHECK_THROWS_WITH(num1->mult_to(bool1), "Multiplication of non-number value.");
+    CHECK_THROWS_WITH(num1->call(num2), "A non-function value cannot be called.");
 }
 
 TEST_CASE("BoolVal") {
@@ -143,13 +156,14 @@ TEST_CASE("BoolVal") {
     CHECK(bool1->equals(bool1) == true);
     CHECK(bool2->equals(bool3) == true);
     CHECK(bool1->equals(bool2) == false);
+    CHECK(bool1->equals(num1) == false);
     CHECK(bool1->to_expr()->equals(new BoolExpr(true)));
 
-    CHECK_THROWS_WITH(bool1->equals(num1), "The value passed in is not a boolean-value.");
     CHECK_THROWS_WITH(bool2->add_to(bool1), "Addition cannot be performed on a boolean-value.");
     CHECK_THROWS_WITH(bool2->add_to(bool2), "Addition cannot be performed on a boolean-value.");
     CHECK_THROWS_WITH(bool1->add_to(num1), "Addition cannot be performed on a boolean-value.");
     CHECK_THROWS_WITH(bool2->mult_to(bool1), "Multiplication cannot be performed on a boolean-value.");
     CHECK_THROWS_WITH(bool2->mult_to(bool2), "Multiplication cannot be performed on a boolean-value.");
     CHECK_THROWS_WITH(bool1->mult_to(num1), "Multiplication cannot be performed on a boolean-value.");
+    CHECK_THROWS_WITH(bool1->call(bool2), "A non-function value cannot be called.");
 }
