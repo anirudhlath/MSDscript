@@ -69,7 +69,7 @@ Expr *parse_multicand(std::istream &in) {
     Expr *e;
     Expr *actual_arg;
     e = parse_inner(in);
-    while(in.peek() == '(') {
+    while (in.peek() == '(') {
         consume(in, '(');
         actual_arg = parse_expr(in);
         consume(in, ')');
@@ -155,7 +155,7 @@ Expr *parse_var(std::istream &in) {
     std::string str = "";
     skip_whitespace(in);
     char c = in.peek();
-    if(!isalpha(c)) {
+    if (!isalpha(c)) {
         throw std::runtime_error("A variable was expected but not found.");
     }
     while (1) {
@@ -291,11 +291,11 @@ Expr *parse_fun(std::istream &in) {
     Expr *var;
     Expr *e;
     skip_whitespace(in);
-    if(in.peek() == '(') {
+    if (in.peek() == '(') {
         consume(in, '(');
         var = parse_var(in);
         skip_whitespace(in);
-        if(in.peek() == ')') {
+        if (in.peek() == ')') {
             consume(in, ')');
             skip_whitespace(in);
             e = parse_expr(in);
@@ -484,7 +484,8 @@ TEST_CASE("Parse Functions") {
                     "                  _if x == 1\n"
                     "                  _then 1\n"
                     "                  _else x * factrl(factrl)(x + -1)\n"
-                    "_in  factrl(factrl)(10)")->to_string(false) == "(_let factrl=(_fun (factrl) (_fun (x) (_if (x==1) _then 1 _else (x*factrl(factrl)((x+-1)))))) _in factrl(factrl)(10))");
+                    "_in  factrl(factrl)(10)")->to_string(false) ==
+          "(_let factrl=(_fun (factrl) (_fun (x) (_if (x==1) _then 1 _else (x*factrl(factrl)((x+-1)))))) _in factrl(factrl)(10))");
     CHECK(parse_str("_let factrl = _fun (factrl)\n"
                     "                _fun (x)\n"
                     "                  _if x == 1\n"
@@ -497,11 +498,11 @@ TEST_CASE("Parse Functions") {
                                                                    "                  _else x * factrl(factrl)(x + -1)\n"
                                                                    "_in  factrl(factrl)(10)");
     CHECK(parse_str("_let factrl = _fun (factrl)\n"
-              "                _fun (x)\n"
-              "                  _if x == 1\n"
-              "                  _then 1\n"
-              "                  _else x * factrl(factrl)(x + -1)\n"
-              "_in  factrl(factrl)(10)")->interp()->equals(new NumVal(3628800)));
+                    "                _fun (x)\n"
+                    "                  _if x == 1\n"
+                    "                  _then 1\n"
+                    "                  _else x * factrl(factrl)(x + -1)\n"
+                    "_in  factrl(factrl)(10)")->interp()->equals(new NumVal(3628800)));
 }
 
 

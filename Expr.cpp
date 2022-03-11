@@ -453,7 +453,7 @@ void FunExpr::pretty_print(std::ostream &out, int precedence, int &n_position, b
 }
 
 Expr *FunExpr::subst(std::string var, Expr *e) {
-    if(this->formal_arg != var) {
+    if (this->formal_arg != var) {
         return new FunExpr(this->formal_arg, this->body->subst(var, e));
     }
     else {
@@ -677,19 +677,19 @@ TEST_CASE("Function Expressions") {
     Expr *one = new NumExpr(1);
     Expr *two = new NumExpr(2);
     Expr *add1 = new AddExpr(one, new VarExpr("y"));
-    Expr *e5 = new CallExpr(e1,one);
-    Expr *e5d = new CallExpr(e1,one);
-    Expr *e5dx = new CallExpr(e1,two);
+    Expr *e5 = new CallExpr(e1, one);
+    Expr *e5d = new CallExpr(e1, one);
+    Expr *e5dx = new CallExpr(e1, two);
     CHECK(e5->equals(e5d));
     CHECK(e5->equals(e5));
     CHECK(e5->equals(e5dx) == false);
 
-    Expr *e6 = new CallExpr(e2,one);
-    Expr *p6 = new CallExpr(p2,one);
+    Expr *e6 = new CallExpr(e2, one);
+    Expr *p6 = new CallExpr(p2, one);
     CHECK(e6->subst("y", new NumExpr(2))->equals(p6));
 
-    Expr *e7 = new CallExpr(e2,add1);
-    Expr *p7 = new CallExpr(p2,new AddExpr(one, two));
+    Expr *e7 = new CallExpr(e2, add1);
+    Expr *p7 = new CallExpr(p2, new AddExpr(one, two));
     CHECK(e7->subst("y", new NumExpr(2))->equals(p7));
 
     CHECK(e5->interp()->equals(new NumVal(1)));
