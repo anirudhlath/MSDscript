@@ -496,12 +496,13 @@ TEST_CASE("Parse Functions") {
                                                                    "                  _then 1\n"
                                                                    "                  _else x * factrl(factrl)(x + -1)\n"
                                                                    "_in  factrl(factrl)(10)");
-    CHECK(parse_str("_let factrl = _fun (factrl)\n"
-                    "                _fun (x)\n"
-                    "                  _if x == 1\n"
-                    "                  _then 1\n"
-                    "                  _else x * factrl(factrl)(x + -1)\n"
-                    "_in  factrl(factrl)(10)")->interp()->equals(new NumVal(3628800)));
+    CHECK(parse_str("_fun (fact)"));
+    parse_str("_let factrl = _fun (factrl)\n"
+              "                _fun (x)\n"
+              "                  _if x == 1\n"
+              "                  _then 1\n"
+              "                  _else x * factrl(factrl)(x + -1)\n"
+              "_in  factrl(factrl)(10)")->interp();
 }
 
 

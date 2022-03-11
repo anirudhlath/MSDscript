@@ -101,7 +101,7 @@ bool FunVal::equals(Val *rhs) {
         return false;
     }
     else {
-        return this->formal_arg == expr->formal_arg && this->body == expr->body;
+        return this->formal_arg == expr->formal_arg && this->body->equals(expr->body);
     }
 
 }
