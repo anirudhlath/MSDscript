@@ -11,6 +11,8 @@ Expr *parse(std::istream &in);
 
 Expr *parse_str(std::string s);
 
+Expr *parse_inner(std::istream &in);
+
 Expr *parse_multicand(std::istream &in);
 
 Expr *parse_addend(std::istream &in);
@@ -28,6 +30,8 @@ Expr *parse_let(std::istream &in);
 Expr *parse_bool(std::istream &in, std::string keyword);
 
 Expr *parse_if(std::istream &in);
+
+Expr *parse_fun(std::istream &in);
 
 bool parse_keyword(std::istream &in, std::string keyword);
 

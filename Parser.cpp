@@ -18,7 +18,7 @@ Expr *parse_str(std::string s) {
     return parse_expr(str);
 }
 
-Expr *parse_multicand(std::istream &in) {
+Expr *parse_inner(std::istream &in) {
     skip_whitespace(in);
     int c = in.peek();
     if ((c == '-') || isdigit(c)) {
@@ -39,7 +39,7 @@ Expr *parse_multicand(std::istream &in) {
         return e;
     }
     else if (c == '_') {
-        std::string  temp = parse_keyword(in);
+        std::string temp = parse_keyword(in);
         Expr *e = nullptr;
         if (temp == "_let") {
             e = parse_let(in);
@@ -49,6 +49,9 @@ Expr *parse_multicand(std::istream &in) {
         }
         else if (temp == "_if") {
             e = parse_if(in);
+        }
+        else if (temp == "_fun") {
+            e = parse_fun(in);
         }
         else {
             throw std::runtime_error("Invalid keyword.");
@@ -60,6 +63,19 @@ Expr *parse_multicand(std::istream &in) {
         consume(in, c);
         throw std::runtime_error("Invalid input.");
     }
+}
+
+Expr *parse_multicand(std::istream &in) {
+    Expr *e;
+    Expr *actual_arg;
+    e = parse_inner(in);
+    while (in.peek() == '(') {
+        consume(in, '(');
+        actual_arg = parse_expr(in);
+        consume(in, ')');
+        e = new CallExpr(e, actual_arg);
+    }
+    return e;
 }
 
 Expr *parse_addend(std::istream &in) {
@@ -137,7 +153,11 @@ Expr *parse_num(std::istream &in) {
 
 Expr *parse_var(std::istream &in) {
     std::string str = "";
+    skip_whitespace(in);
     char c = in.peek();
+    if (!isalpha(c)) {
+        throw std::runtime_error("A variable was expected but not found.");
+    }
     while (1) {
         c = in.peek();
         if (isalpha(c)) {
@@ -229,7 +249,7 @@ Expr *parse_if(std::istream &in) {
 
     skip_whitespace(in);
     ifExpr = parse_expr(in);
-    while(isspace(in.peek())) {
+    while (isspace(in.peek())) {
         in.get();
     }
     if (parse_keyword(in, "_then")) {
@@ -248,13 +268,6 @@ Expr *parse_if(std::istream &in) {
     else {
         throw std::runtime_error("Invalid input. '_then' was expected.");
     }
-
-/*    if (parse_keyword(in, "_if")) {
-
-    }
-    else {
-        throw std::runtime_error("Invalid keyword.");
-    }*/
     return new IfExpr(ifExpr, thenExpr, elseExpr);
 }
 
@@ -264,7 +277,7 @@ std::string parse_keyword(std::istream &in) {
         if (in.peek() == -1) {
             break;
         }
-        if (in.peek() != ' ') {
+        if (!isspace(in.peek())) {
             temp += in.get();
         }
         else {
@@ -272,6 +285,29 @@ std::string parse_keyword(std::istream &in) {
         }
     }
     return temp;
+}
+
+Expr *parse_fun(std::istream &in) {
+    Expr *var;
+    Expr *e;
+    skip_whitespace(in);
+    if (in.peek() == '(') {
+        consume(in, '(');
+        var = parse_var(in);
+        skip_whitespace(in);
+        if (in.peek() == ')') {
+            consume(in, ')');
+            skip_whitespace(in);
+            e = parse_expr(in);
+        }
+        else {
+            throw std::runtime_error("Missing close parenthesis.");
+        }
+    }
+    else {
+        throw std::runtime_error("Missing open parenthesis.");
+    }
+    return new FunExpr(var->to_string(true), e);
 }
 
 
@@ -394,12 +430,26 @@ TEST_CASE("Parser Test") {
                   ->equals(
                           e9));
 
+    CHECK(parse_str("_let x = 1\n"
+                    "_in _let y = 2\n"
+                    "_in _let z = 2\n"
+                    "_in _if x == y\n"
+                    "    _then 1\n"
+                    "    _else _if (y == z) == _true\n"
+                    "    _then 3\n"
+                    "    _else 0")->interp()->to_string() == "3");
+
+
+    CHECK_THROWS_WITH(parse_str("_zyx"), "Invalid keyword.");
+    CHECK_THROWS_WITH(parse_str("*"), "Invalid input.");
+
 
 }
 
 TEST_CASE("Parse IfExpr") {
     Expr *e1 = new IfExpr(new BoolExpr(true), new NumExpr(1), new NumExpr(2));
     CHECK(parse_str("_if _true _then 1 _else 2")->equals(e1));
+    CHECK(parse_str("_if _true _then 1 _else 2")->equals(parse_str("x")) == false);
     CHECK(parse_str("_let same = 1 == 2\n"
                     "_in  _if 1 == 2\n"
                     "     _then _false + 5\n"
@@ -416,6 +466,43 @@ TEST_CASE("Parse IfExpr") {
                                 "_then 2\n"
                                 "_else 3")->interp(), "The expression passed into the if statement is not a boolean"
                                                       ".\n");
+}
+
+TEST_CASE("Parse Booleans") {
+    CHECK(parse_str("_true")->interp()->equals(new BoolVal(true)));
+}
+
+TEST_CASE("Parse Equality") {
+    CHECK(parse_str("2 == 2")->equals(parse_str("  2 == 2")));
+    CHECK(parse_str("2 == 2")->equals(parse_str("  2 == 3")) == false);
+    CHECK(parse_str("2 == 2")->equals(parse_str("  x")) == false);
+}
+
+TEST_CASE("Parse Functions") {
+    CHECK(parse_str("_let factrl = _fun (factrl)\n"
+                    "                _fun (x)\n"
+                    "                  _if x == 1\n"
+                    "                  _then 1\n"
+                    "                  _else x * factrl(factrl)(x + -1)\n"
+                    "_in  factrl(factrl)(10)")->to_string(false) ==
+          "(_let factrl=(_fun (factrl) (_fun (x) (_if (x==1) _then 1 _else (x*factrl(factrl)((x+-1)))))) _in factrl(factrl)(10))");
+    CHECK(parse_str("_let factrl = _fun (factrl)\n"
+                    "                _fun (x)\n"
+                    "                  _if x == 1\n"
+                    "                  _then 1\n"
+                    "                  _else x * factrl(factrl)(x + -1)\n"
+                    "_in  factrl(factrl)(10)")->to_string(true) == "_let factrl = _fun (factrl)\n"
+                                                                   "                _fun (x)\n"
+                                                                   "                  _if x == 1\n"
+                                                                   "                  _then 1\n"
+                                                                   "                  _else x * factrl(factrl)(x + -1)\n"
+                                                                   "_in  factrl(factrl)(10)");
+    CHECK(parse_str("_let factrl = _fun (factrl)\n"
+                    "                _fun (x)\n"
+                    "                  _if x == 1\n"
+                    "                  _then 1\n"
+                    "                  _else x * factrl(factrl)(x + -1)\n"
+                    "_in  factrl(factrl)(10)")->interp()->equals(new NumVal(3628800)));
 }
 
 
