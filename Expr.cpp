@@ -632,6 +632,7 @@ TEST_CASE("Let Subst Method") {
     LetExpr *example1 = new LetExpr(x, y, seven);
     LetExpr *solution1 = new LetExpr(x, eight, seven);
     CHECK(example1->subst("y", eight)->equals(solution1));
+    CHECK(example1->equals(x) == false);
 
     LetExpr *example2 = new LetExpr(x, seven, y);
     LetExpr *solution2 = new LetExpr(x, seven, eight);
@@ -718,4 +719,45 @@ TEST_CASE("Equality Tests") {
     CHECK(e3->subst("x", two)->interp()->to_expr()->equals(trueExpr));
     CHECK(e4->interp()->to_expr()->equals(falseExpr));
     CHECK(e5->interp()->to_expr()->equals(trueExpr));
+}
+
+TEST_CASE("IfExpr") {
+    VarExpr *x = new VarExpr("x");
+    VarExpr *y = new VarExpr("y");
+    Expr *eight = new NumExpr(8);
+    Expr *seven = new NumExpr(7);
+    Expr *one = new NumExpr(1);
+    Expr *two = new NumExpr(2);
+    Expr *trueExpr = new BoolExpr(true);
+    Expr *falseExpr = new BoolExpr(false);
+
+    Expr *e1 = new IfExpr(trueExpr, eight, seven);
+    Expr *e1d = new IfExpr(trueExpr, eight, seven);
+    Expr *e2 = new IfExpr(trueExpr, eight, one);
+    Expr *e5 = new IfExpr(falseExpr, eight, one);
+    Expr *e3 = new IfExpr(trueExpr, x, y);
+    Expr *e4 = new IfExpr(trueExpr, eight, y);
+
+    CHECK(e1->equals(x) == false);
+    CHECK(e1->equals(e1));
+    CHECK(e1->equals(e1d));
+    CHECK(e1->equals(e2) == false);
+    CHECK(e3->subst("x", eight)->equals(e4));
+    CHECK(e3->subst("x", eight)->subst("y", seven)->equals(e1));
+    CHECK(e1->interp()->equals(eight->interp()));
+    CHECK(e5->interp()->equals(one->interp()));
+
+
+}
+
+TEST_CASE("BoolExpr") {
+    Expr *trueExpr1 = new BoolExpr(true);
+    Expr *trueExpr1d = new BoolExpr(true);
+    Expr *falseExpr1 = new BoolExpr(false);
+    Expr *falseExpr1d = new BoolExpr(false);
+
+    CHECK(trueExpr1->equals(trueExpr1));
+    CHECK(trueExpr1->equals(trueExpr1d));
+    CHECK(trueExpr1->equals(falseExpr1) == false);
+
 }

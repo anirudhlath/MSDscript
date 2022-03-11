@@ -167,3 +167,24 @@ TEST_CASE("BoolVal") {
     CHECK_THROWS_WITH(bool1->mult_to(num1), "Multiplication cannot be performed on a boolean-value.");
     CHECK_THROWS_WITH(bool1->call(bool2), "A non-function value cannot be called.");
 }
+
+TEST_CASE("FunVal") {
+    Val *bool1 = new BoolVal(true);
+    Val *fun1 = new FunVal("fact", new NumExpr(2));
+    Val *fun1d = new FunVal("fact", new NumExpr(2));
+    Val *fun2 = new FunVal("fact", new NumExpr(1));
+
+    CHECK(fun1->equals(fun1));
+    CHECK(fun1->equals(fun1d));
+    CHECK(fun1->equals(fun2) == false);
+    CHECK(fun1->equals(bool1) == false);
+    CHECK(fun1->to_string() == fun1->to_expr()->to_string(true));
+
+    CHECK_THROWS_WITH(fun1->add_to(fun1), "Addition cannot be performed on a function-value.");
+    CHECK_THROWS_WITH(fun1->add_to(fun2), "Addition cannot be performed on a function-value.");
+    CHECK_THROWS_WITH(fun1->add_to(bool1), "Addition cannot be performed on a function-value.");
+    CHECK_THROWS_WITH(fun1->mult_to(fun1), "Multiplication cannot be performed on a function-value.");
+    CHECK_THROWS_WITH(fun1->mult_to(fun2), "Multiplication cannot be performed on a function-value.");
+    CHECK_THROWS_WITH(fun1->mult_to(bool1), "Multiplication cannot be performed on a function-value.");
+
+}
