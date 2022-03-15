@@ -46,7 +46,7 @@ void helper(int argc, char **argv) {
                 }
             }
             if (argv[1] == INTERP) {
-                 PTR(Expr) e = parse(cin);
+                PTR(Expr)e = parse(cin);
                 try {
                     cout << e->interp() << endl;
                     exit(0);
@@ -57,7 +57,7 @@ void helper(int argc, char **argv) {
                 }
             }
             if (argv[1] == PRINT) {
-                 PTR(Expr) e = parse(cin);
+                PTR(Expr)e = parse(cin);
                 try {
                     cout << e->to_string(false) << endl;
                     exit(0);
@@ -68,7 +68,7 @@ void helper(int argc, char **argv) {
                 }
             }
             if (argv[1] == PRETTY_PRINT) {
-                 PTR(Expr) e = parse(cin);
+                PTR(Expr)e = parse(cin);
                 try {
                     cout << e->to_string(true) << endl;
                     exit(0);
