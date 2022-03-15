@@ -1,7 +1,7 @@
 SRCS = main.cpp Expr.cpp Parser.cpp Val.cpp
 tSRCS = testMain.cpp exec.cpp
 
-INCS = Expr.h catch.hpp Parser.h Val.h
+INCS = Expr.h catch.hpp Parser.h Val.h pointer.h
 tINCS = exec.h
 
 
