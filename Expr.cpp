@@ -12,7 +12,7 @@
 bool Expr::has_variable() {
     bool result = false;
     try {
-        this->interp();
+        THIS->interp();
     }
     catch (std::runtime_error) {
         result = true;
@@ -23,18 +23,18 @@ bool Expr::has_variable() {
 std::string Expr::to_string(bool isPretty) {
     std::stringstream out("");
     if (!isPretty) {
-        this->print(out);
+        THIS->print(out);
     }
     else {
         int n = 0;
-        this->pretty_print(out, 0, n, false);
+        THIS->pretty_print(out, 0, n, false);
     }
     return out.str();
 }
 
 // NumExpr Methods
 NumExpr::NumExpr(int val) {
-    this->val = val;
+    THIS->val = val;
 }
 
 bool NumExpr::equals( PTR(Expr) e) {
@@ -43,16 +43,16 @@ bool NumExpr::equals( PTR(Expr) e) {
         return false;
     }
     else {
-        return this->val == num->val;
+        return THIS->val == num->val;
     }
 }
 
  PTR(Val) NumExpr::interp() {
-    return new NumVal(this->val);
+    return new NumVal(THIS->val);
 }
 
  PTR(Expr) NumExpr::subst(std::string var,  PTR(Expr) e) {
-    return this;
+    return THIS;
 }
 
 void NumExpr::print(std::ostream &out) {
@@ -60,14 +60,14 @@ void NumExpr::print(std::ostream &out) {
 }
 
 void NumExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
-    this->print(out);
+    THIS->print(out);
 
 }
 
 // AddExpr Methods
 AddExpr::AddExpr( PTR(Expr) lhs,  PTR(Expr) rhs) {
-    this->lhs = lhs;
-    this->rhs = rhs;
+    THIS->lhs = lhs;
+    THIS->rhs = rhs;
 }
 
 bool AddExpr::equals( PTR(Expr) e) {
@@ -76,12 +76,12 @@ bool AddExpr::equals( PTR(Expr) e) {
         return false;
     }
     else {
-        return (this->lhs->equals(add->lhs) && this->rhs->equals(add->rhs));
+        return (THIS->lhs->equals(add->lhs) && THIS->rhs->equals(add->rhs));
     }
 }
 
  PTR(Val) AddExpr::interp() {
-    return this->lhs->interp()->add_to(this->rhs->interp());
+    return THIS->lhs->interp()->add_to(THIS->rhs->interp());
 }
 
 void AddExpr::print(std::ostream &out) {
@@ -110,8 +110,8 @@ void AddExpr::pretty_print(std::ostream &out, int precedence, int &n_position, b
 
 // MultExpr Methods
 MultExpr::MultExpr( PTR(Expr) lhs,  PTR(Expr) rhs) {
-    this->lhs = lhs;
-    this->rhs = rhs;
+    THIS->lhs = lhs;
+    THIS->rhs = rhs;
 }
 
 bool MultExpr::equals( PTR(Expr) e) {
@@ -120,12 +120,12 @@ bool MultExpr::equals( PTR(Expr) e) {
         return false;
     }
     else {
-        return (this->lhs->equals(mult->lhs) && this->rhs->equals(mult->rhs));
+        return (THIS->lhs->equals(mult->lhs) && THIS->rhs->equals(mult->rhs));
     }
 }
 
  PTR(Val) MultExpr::interp() {
-    return this->lhs->interp()->mult_to(this->rhs->interp());
+    return THIS->lhs->interp()->mult_to(THIS->rhs->interp());
 }
 
 void MultExpr::print(std::ostream &out) {
@@ -154,7 +154,7 @@ void MultExpr::pretty_print(std::ostream &out, int precedence, int &n_position, 
 
 // VarExpr Methods
 VarExpr::VarExpr(std::string val) {
-    this->val = val;
+    THIS->val = val;
 }
 
 bool VarExpr::equals( PTR(Expr) e) {
@@ -163,7 +163,7 @@ bool VarExpr::equals( PTR(Expr) e) {
         return false;
     }
     else {
-        return this->val == var->val;
+        return THIS->val == var->val;
     }
 }
 
@@ -176,22 +176,22 @@ void VarExpr::print(std::ostream &out) {
 }
 
 void VarExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) {
-    this->print(out);
+    THIS->print(out);
 
 }
 
  PTR(Expr) VarExpr::subst(std::string var,  PTR(Expr) e) {
-    if (this->val == var) {
+    if (THIS->val == var) {
         return e;
     }
-    return this;
+    return THIS;
 }
 
 // LetExpr Methods
 LetExpr::LetExpr(PTR(VarExpr) lhs,  PTR(Expr) rhs,  PTR(Expr) in) {
-    this->lhs = lhs;
-    this->rhs = rhs;
-    this->in = in;
+    THIS->lhs = lhs;
+    THIS->rhs = rhs;
+    THIS->in = in;
 }
 
 bool LetExpr::equals( PTR(Expr) e) {
@@ -200,7 +200,7 @@ bool LetExpr::equals( PTR(Expr) e) {
         return false;
     }
     else {
-        return (this->lhs->equals(let->lhs) && this->rhs->equals(let->rhs) && this->in->equals(let->in));
+        return (THIS->lhs->equals(let->lhs) && THIS->rhs->equals(let->rhs) && THIS->in->equals(let->in));
     }
 }
 
@@ -211,10 +211,10 @@ bool LetExpr::equals( PTR(Expr) e) {
 
  PTR(Expr) LetExpr::subst(std::string var,  PTR(Expr) e) {
     if (lhs->to_string(true) != var) {
-        return new LetExpr(this->lhs, this->rhs->subst(var, e), this->in->subst(var, e));
+        return new LetExpr(THIS->lhs, THIS->rhs->subst(var, e), THIS->in->subst(var, e));
     }
     else {
-        return new LetExpr(this->lhs, this->rhs->subst(var, e), this->in);
+        return new LetExpr(THIS->lhs, THIS->rhs->subst(var, e), THIS->in);
     }
 }
 
@@ -258,7 +258,7 @@ void LetExpr::pretty_print(std::ostream &out, int precedence, int &n_position, b
 
 // BoolExpr
 BoolExpr::BoolExpr(bool boolean) {
-    this->boolean = boolean;
+    THIS->boolean = boolean;
 }
 
 bool BoolExpr::equals( PTR(Expr) e) {
@@ -267,30 +267,30 @@ bool BoolExpr::equals( PTR(Expr) e) {
         return false;
     }
     else {
-        return this->boolean == rhs->boolean;
+        return THIS->boolean == rhs->boolean;
     }
 }
 
  PTR(Val) BoolExpr::interp() {
-    return new BoolVal(this->boolean);
+    return new BoolVal(THIS->boolean);
 }
 
  PTR(Expr) BoolExpr::subst(std::string var,  PTR(Expr) e) {
-    return this;
+    return THIS;
 }
 
 void BoolExpr::print(std::ostream &out) {
-    out << ((new BoolVal(this->boolean))->to_string());
+    out << ((new BoolVal(THIS->boolean))->to_string());
 }
 
 void BoolExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) { // TODO
-    this->print(out);
+    THIS->print(out);
 }
 
 // EqualExpr
 EqualExpr::EqualExpr( PTR(Expr) lhs,  PTR(Expr) rhs) {
-    this->lhs = lhs;
-    this->rhs = rhs;
+    THIS->lhs = lhs;
+    THIS->rhs = rhs;
 }
 
 bool EqualExpr::equals( PTR(Expr) e) {
@@ -299,12 +299,12 @@ bool EqualExpr::equals( PTR(Expr) e) {
         return false;
     }
     else {
-        return this->lhs->equals(expr->lhs) && this->rhs->equals(expr->rhs);
+        return THIS->lhs->equals(expr->lhs) && THIS->rhs->equals(expr->rhs);
     }
 }
 
  PTR(Val) EqualExpr::interp() {
-    return new BoolVal(this->lhs->interp()->equals(this->rhs->interp()));
+    return new BoolVal(THIS->lhs->interp()->equals(THIS->rhs->interp()));
 }
 
  PTR(Expr) EqualExpr::subst(std::string var,  PTR(Expr) e) {
@@ -333,13 +333,13 @@ void EqualExpr::pretty_print(std::ostream &out, int precedence, int &n_position,
 
 // IfExpr
 IfExpr::IfExpr( PTR(Expr) ifExpr,  PTR(Expr) thenExpr,  PTR(Expr) elseExpr) {
-    this->ifExpr = ifExpr;
-    this->thenExpr = thenExpr;
-    this->elseExpr = elseExpr;
+    THIS->ifExpr = ifExpr;
+    THIS->thenExpr = thenExpr;
+    THIS->elseExpr = elseExpr;
 }
 
  PTR(Expr) IfExpr::subst(std::string var,  PTR(Expr) e) {
-    return new IfExpr(this->ifExpr->subst(var, e), this->thenExpr->subst(var, e), this->elseExpr->subst(var, e));
+    return new IfExpr(THIS->ifExpr->subst(var, e), THIS->thenExpr->subst(var, e), THIS->elseExpr->subst(var, e));
 }
 
 void IfExpr::print(std::ostream &out) {
@@ -408,8 +408,8 @@ void IfExpr::pretty_print(std::ostream &out, int precedence, int &n_position, bo
 
 // FunExpr
 FunExpr::FunExpr(std::string formal_arg,  PTR(Expr) body) {
-    this->formal_arg = formal_arg;
-    this->body = body;
+    THIS->formal_arg = formal_arg;
+    THIS->body = body;
 }
 
 bool FunExpr::equals( PTR(Expr) e) {
@@ -418,13 +418,13 @@ bool FunExpr::equals( PTR(Expr) e) {
         return false;
     }
     else {
-        return this->formal_arg == expr->formal_arg && this->body->equals(expr->body);
+        return THIS->formal_arg == expr->formal_arg && THIS->body->equals(expr->body);
     }
 }
 
  PTR(Val) FunExpr::interp() {
 
-    return new FunVal(this->formal_arg, this->body);
+    return new FunVal(THIS->formal_arg, THIS->body);
 }
 
 void FunExpr::print(std::ostream &out) {
@@ -453,18 +453,18 @@ void FunExpr::pretty_print(std::ostream &out, int precedence, int &n_position, b
 }
 
  PTR(Expr) FunExpr::subst(std::string var,  PTR(Expr) e) {
-    if (this->formal_arg != var) {
-        return new FunExpr(this->formal_arg, this->body->subst(var, e));
+    if (THIS->formal_arg != var) {
+        return new FunExpr(THIS->formal_arg, THIS->body->subst(var, e));
     }
     else {
-        return this;
+        return THIS;
     }
 }
 
 // CallExpr
 CallExpr::CallExpr( PTR(Expr) to_be_called,  PTR(Expr) actual_arg) {
-    this->to_be_called = to_be_called;
-    this->actual_arg = actual_arg;
+    THIS->to_be_called = to_be_called;
+    THIS->actual_arg = actual_arg;
 }
 
 bool CallExpr::equals( PTR(Expr) e) {
@@ -473,7 +473,7 @@ bool CallExpr::equals( PTR(Expr) e) {
         return false;
     }
     else {
-        return this->to_be_called->equals(expr->to_be_called) && this->actual_arg->equals(expr->actual_arg);
+        return THIS->to_be_called->equals(expr->to_be_called) && THIS->actual_arg->equals(expr->actual_arg);
     }
 }
 
