@@ -6,22 +6,23 @@
 #define MSDSCRIPT_VAL_H
 
 #include <string>
+#include "pointer.h"
 
 class Expr;
 
 class Val {
 public:
-    virtual Expr *to_expr() = 0;
+    virtual  PTR(Expr) to_expr() = 0;
 
-    virtual bool equals(Val *rhs) = 0;
+    virtual bool equals( PTR(Val) rhs) = 0;
 
-    virtual Val *add_to(Val *rhs) = 0;
+    virtual  PTR(Val) add_to( PTR(Val) rhs) = 0;
 
-    virtual Val *mult_to(Val *rhs) = 0;
+    virtual  PTR(Val) mult_to( PTR(Val) rhs) = 0;
 
     virtual std::string to_string() = 0;
 
-    virtual Val *call(Val *actual_arg) = 0;
+    virtual  PTR(Val) call( PTR(Val) actual_arg) = 0;
 };
 
 class NumVal : public Val {
@@ -29,17 +30,17 @@ class NumVal : public Val {
 public:
     NumVal(int num);
 
-    Expr *to_expr();
+     PTR(Expr) to_expr();
 
-    bool equals(Val *rhs);
+    bool equals( PTR(Val) rhs);
 
-    Val *add_to(Val *rhs);
+     PTR(Val) add_to( PTR(Val) rhs);
 
-    Val *mult_to(Val *rhs);
+     PTR(Val) mult_to( PTR(Val) rhs);
 
     std::string to_string();
 
-    Val *call(Val *actual_arg);
+     PTR(Val) call( PTR(Val) actual_arg);
 };
 
 class BoolVal : public Val {
@@ -47,38 +48,38 @@ class BoolVal : public Val {
 public:
     BoolVal(bool boolean);
 
-    Expr *to_expr();
+     PTR(Expr) to_expr();
 
-    bool equals(Val *rhs);
+    bool equals( PTR(Val) rhs);
 
-    Val *add_to(Val *rhs);
+     PTR(Val) add_to( PTR(Val) rhs);
 
-    Val *mult_to(Val *rhs);
+     PTR(Val) mult_to( PTR(Val) rhs);
 
     std::string to_string();
 
-    Val *call(Val *actual_arg);
+     PTR(Val) call( PTR(Val) actual_arg);
 };
 
 class FunVal : public Val {
 
     std::string formal_arg;
-    Expr *body;
+     PTR(Expr) body;
 
 public:
-    FunVal(std::string formal_arg, Expr *body);
+    FunVal(std::string formal_arg,  PTR(Expr) body);
 
-    Expr *to_expr();
+     PTR(Expr) to_expr();
 
-    bool equals(Val *rhs);
+    bool equals( PTR(Val) rhs);
 
-    Val *add_to(Val *rhs);
+     PTR(Val) add_to( PTR(Val) rhs);
 
-    Val *mult_to(Val *rhs);
+     PTR(Val) mult_to( PTR(Val) rhs);
 
     std::string to_string();
 
-    Val *call(Val *actual_arg);
+     PTR(Val) call( PTR(Val) actual_arg);
 };
 
 #endif //MSDSCRIPT_VAL_H

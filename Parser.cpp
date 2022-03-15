@@ -8,17 +8,17 @@
 #include <sstream>
 #include <iostream>
 
-Expr *parse(std::istream &in) {
+ PTR(Expr) parse(std::istream &in) {
     skip_whitespace(in);
     return parse_expr(in);
 }
 
-Expr *parse_str(std::string s) {
+ PTR(Expr) parse_str(std::string s) {
     std::istringstream str(s);
     return parse_expr(str);
 }
 
-Expr *parse_inner(std::istream &in) {
+ PTR(Expr) parse_inner(std::istream &in) {
     skip_whitespace(in);
     int c = in.peek();
     if ((c == '-') || isdigit(c)) {
@@ -26,7 +26,7 @@ Expr *parse_inner(std::istream &in) {
     }
     else if (c == '(') {
         consume(in, '(');
-        Expr *e = parse_expr(in);
+         PTR(Expr) e = parse_expr(in);
         skip_whitespace(in);
         c = in.get();
         if (c != ')') {
@@ -35,12 +35,12 @@ Expr *parse_inner(std::istream &in) {
         return e;
     }
     else if (isalpha(c)) {
-        Expr *e = parse_var(in);
+         PTR(Expr) e = parse_var(in);
         return e;
     }
     else if (c == '_') {
         std::string temp = parse_keyword(in);
-        Expr *e = nullptr;
+         PTR(Expr) e = nullptr;
         if (temp == "_let") {
             e = parse_let(in);
         }
@@ -65,9 +65,9 @@ Expr *parse_inner(std::istream &in) {
     }
 }
 
-Expr *parse_multicand(std::istream &in) {
-    Expr *e;
-    Expr *actual_arg;
+ PTR(Expr) parse_multicand(std::istream &in) {
+     PTR(Expr) e;
+     PTR(Expr) actual_arg;
     e = parse_inner(in);
     while (in.peek() == '(') {
         consume(in, '(');
@@ -78,14 +78,14 @@ Expr *parse_multicand(std::istream &in) {
     return e;
 }
 
-Expr *parse_addend(std::istream &in) {
-    Expr *e;
+ PTR(Expr) parse_addend(std::istream &in) {
+     PTR(Expr) e;
     e = parse_multicand(in);
     skip_whitespace(in);
     int c = in.peek();
     if (c == '*') {
         consume(in, '*');
-        Expr *rhs = parse_addend(in);
+         PTR(Expr) rhs = parse_addend(in);
         return new MultExpr(e, rhs);
     }
     else {
@@ -93,14 +93,14 @@ Expr *parse_addend(std::istream &in) {
     }
 }
 
-Expr *parse_comparg(std::istream &in) {
-    Expr *e;
+ PTR(Expr) parse_comparg(std::istream &in) {
+     PTR(Expr) e;
     e = parse_addend(in);
     skip_whitespace(in);
     int c = in.peek();
     if (c == '+') {
         consume(in, '+');
-        Expr *rhs = parse_comparg(in);
+         PTR(Expr) rhs = parse_comparg(in);
         return new AddExpr(e, rhs);
     }
     else {
@@ -108,14 +108,14 @@ Expr *parse_comparg(std::istream &in) {
     }
 }
 
-Expr *parse_expr(std::istream &in) {
-    Expr *e;
+ PTR(Expr) parse_expr(std::istream &in) {
+     PTR(Expr) e;
     e = parse_comparg(in);
     skip_whitespace(in);
     int c = in.peek();
     if (c == '=') {
         if (parse_keyword(in, "==")) {
-            Expr *rhs = parse_expr(in);
+             PTR(Expr) rhs = parse_expr(in);
             return new EqualExpr(e, rhs);
         }
         else {
@@ -127,7 +127,7 @@ Expr *parse_expr(std::istream &in) {
     }
 }
 
-Expr *parse_num(std::istream &in) {
+ PTR(Expr) parse_num(std::istream &in) {
 
     int n = 0;
     bool negative = false;
@@ -151,7 +151,7 @@ Expr *parse_num(std::istream &in) {
     return new NumExpr(n);
 }
 
-Expr *parse_var(std::istream &in) {
+ PTR(Expr) parse_var(std::istream &in) {
     std::string str = "";
     skip_whitespace(in);
     char c = in.peek();
@@ -171,16 +171,16 @@ Expr *parse_var(std::istream &in) {
     return new VarExpr(str);
 }
 
-Expr *parse_let(std::istream &in) {
-    VarExpr *lhs;
-    Expr *rhs;
-    Expr *body;
+ PTR(Expr) parse_let(std::istream &in) {
+    PTR(VarExpr) lhs;
+     PTR(Expr) rhs;
+     PTR(Expr) body;
     int c;
     skip_whitespace(in);
     c = in.peek();
     if (isalpha(c)) {
 
-        lhs = dynamic_cast<VarExpr *>(parse_var(in));
+        lhs = dynamic_cast< PTR(VarExpr) >(parse_var(in));
 
         skip_whitespace(in);
         if (in.peek() == '=') {
@@ -233,7 +233,7 @@ static void consume(std::istream &in, int expect) {
     }
 }
 
-Expr *parse_bool(std::istream &in, std::string keyword) {
+ PTR(Expr) parse_bool(std::istream &in, std::string keyword) {
     if (keyword == "_true") {
         return new BoolExpr(true);
     }
@@ -242,10 +242,10 @@ Expr *parse_bool(std::istream &in, std::string keyword) {
     }
 }
 
-Expr *parse_if(std::istream &in) {
-    Expr *ifExpr;
-    Expr *thenExpr;
-    Expr *elseExpr;
+ PTR(Expr) parse_if(std::istream &in) {
+     PTR(Expr) ifExpr;
+     PTR(Expr) thenExpr;
+     PTR(Expr) elseExpr;
 
     skip_whitespace(in);
     ifExpr = parse_expr(in);
@@ -287,9 +287,9 @@ std::string parse_keyword(std::istream &in) {
     return temp;
 }
 
-Expr *parse_fun(std::istream &in) {
-    Expr *var;
-    Expr *e;
+ PTR(Expr) parse_fun(std::istream &in) {
+     PTR(Expr) var;
+     PTR(Expr) e;
     skip_whitespace(in);
     if (in.peek() == '(') {
         consume(in, '(');
@@ -337,7 +337,7 @@ TEST_CASE("Parse Variables") {
 }
 
 TEST_CASE("Parse LetExpr") {
-    Expr *e1 = new LetExpr(new VarExpr("a"), new NumExpr(1), new AddExpr(new VarExpr("a"), new NumExpr(2)));
+     PTR(Expr) e1 = new LetExpr(new VarExpr("a"), new NumExpr(1), new AddExpr(new VarExpr("a"), new NumExpr(2)));
     CHECK(parse_str("_let a = 1 _in a + 2")->equals(e1));
     CHECK(parse_str("    _let a = 1 _in a + 2")->equals(e1));
     CHECK(parse_str("_let a     = 1 _in a + 2")->equals(e1));
@@ -355,7 +355,7 @@ TEST_CASE("Parse LetExpr") {
 }
 
 TEST_CASE("Parse AddExpr") {
-    Expr *e1 = new AddExpr(new NumExpr(1), new NumExpr(1));
+     PTR(Expr) e1 = new AddExpr(new NumExpr(1), new NumExpr(1));
 
     CHECK(parse_str("1+1")->equals(e1));
     CHECK(parse_str("1   +1")->equals(e1));
@@ -368,7 +368,7 @@ TEST_CASE("Parse AddExpr") {
 }
 
 TEST_CASE("Parse Multiply") {
-    Expr *e1 = new MultExpr(new NumExpr(1), new NumExpr(1));
+     PTR(Expr) e1 = new MultExpr(new NumExpr(1), new NumExpr(1));
 
     CHECK(parse_str("1*1")->equals(e1));
     CHECK(parse_str("1   *1")->equals(e1));
@@ -382,38 +382,38 @@ TEST_CASE("Parse Multiply") {
 TEST_CASE("Parser Test") {
 
 
-    VarExpr *var1 = new VarExpr("x");
-    VarExpr *var2 = new VarExpr("y");
-    VarExpr *var3 = new VarExpr("xyz");
+     PTR(VarExpr) var1 = new VarExpr("x");
+    PTR(VarExpr) var2 = new VarExpr("y");
+    PTR(VarExpr) var3 = new VarExpr("xyz");
 
-    NumExpr *num1 = new NumExpr(1);
-    NumExpr *num2 = new NumExpr(2);
-    NumExpr *num3 = new NumExpr(-100);
+     PTR(Expr) num1 = new NumExpr(1);
+     PTR(Expr) num2 = new NumExpr(2);
+     PTR(Expr) num3 = new NumExpr(-100);
 
-    AddExpr *add1 = new AddExpr(num1, num2); // 1 + 2 = 3
-    AddExpr *add2 = new AddExpr(var1, num2); // x + 2
-    AddExpr *add3 = new AddExpr(var1, var2); // x + y
-    AddExpr *add4 = new AddExpr(var3, num3); // xyz + (-100)
+     PTR(Expr) add1 = new AddExpr(num1, num2); // 1 + 2 = 3
+     PTR(Expr) add2 = new AddExpr(var1, num2); // x + 2
+     PTR(Expr) add3 = new AddExpr(var1, var2); // x + y
+     PTR(Expr) add4 = new AddExpr(var3, num3); // xyz + (-100)
 
-    MultExpr *mult1 = new MultExpr(num1, num2); // 1 * 2 = 2
-    MultExpr *mult2 = new MultExpr(var1, num2); // x * 2
-    MultExpr *mult3 = new MultExpr(var1, var2); // x * y
-    MultExpr *mult4 = new MultExpr(var3, num3); // xyz * (-100)
+     PTR(Expr) mult1 = new MultExpr(num1, num2); // 1 * 2 = 2
+     PTR(Expr) mult2 = new MultExpr(var1, num2); // x * 2
+     PTR(Expr) mult3 = new MultExpr(var1, var2); // x * y
+     PTR(Expr) mult4 = new MultExpr(var3, num3); // xyz * (-100)
 
-    LetExpr *let1 = new LetExpr(var1, num1, add2); // _let x = 1 _in x + 2
-    LetExpr *let2 = new LetExpr(var3, num3, mult4); // _let xyz = -100 _in (xyz * (-100))
-    LetExpr *let3 = new LetExpr(var1, var2, add3); // _let x = y _in x + y
-    LetExpr *let4 = new LetExpr(var1, num1, let3); // _let x = 1 _in ( _let x = y _in x + y )
+     PTR(Expr) let1 = new LetExpr(var1, num1, add2); // _let x = 1 _in x + 2
+     PTR(Expr) let2 = new LetExpr(var3, num3, mult4); // _let xyz = -100 _in (xyz * (-100))
+     PTR(Expr) let3 = new LetExpr(var1, var2, add3); // _let x = y _in x + y
+     PTR(Expr) let4 = new LetExpr(var1, num1, let3); // _let x = 1 _in ( _let x = y _in x + y )
 
-    Expr *e1 = new AddExpr(num1, add1); // 1 + ( 1 + 2 ) || 1 + 1 + 2
-    Expr *e2 = new AddExpr(add1, num1); // ( 1 + 2 ) + 1
-    Expr *e3 = new AddExpr(add4, add3); // ( xyz + (-100) ) + ( x + y )
-    Expr *e4 = new AddExpr(var1, add3); // x + ( x + y )
-    Expr *e5 = new AddExpr(add4, mult1); // ( xyz + (-100) ) + ( 1 * 2 )
-    Expr *e6 = new AddExpr(mult1, add4); // ( 1 * 2 ) + ( xyz + (-100) )
-    Expr *e7 = new AddExpr(mult4, let4); // ( xyz * (-100) ) + ( _let x = 1 _in ( _let x = y _in x + y ) )
-    Expr *e8 = new MultExpr(mult4, let4); // ( xyz * (-100) ) * ( _let x = 1 _in ( _let x = y _in x + y ) )
-    Expr *e9 = new MultExpr(e7,
+     PTR(Expr) e1 = new AddExpr(num1, add1); // 1 + ( 1 + 2 ) || 1 + 1 + 2
+     PTR(Expr) e2 = new AddExpr(add1, num1); // ( 1 + 2 ) + 1
+     PTR(Expr) e3 = new AddExpr(add4, add3); // ( xyz + (-100) ) + ( x + y )
+     PTR(Expr) e4 = new AddExpr(var1, add3); // x + ( x + y )
+     PTR(Expr) e5 = new AddExpr(add4, mult1); // ( xyz + (-100) ) + ( 1 * 2 )
+     PTR(Expr) e6 = new AddExpr(mult1, add4); // ( 1 * 2 ) + ( xyz + (-100) )
+     PTR(Expr) e7 = new AddExpr(mult4, let4); // ( xyz * (-100) ) + ( _let x = 1 _in ( _let x = y _in x + y ) )
+     PTR(Expr) e8 = new MultExpr(mult4, let4); // ( xyz * (-100) ) * ( _let x = 1 _in ( _let x = y _in x + y ) )
+     PTR(Expr) e9 = new MultExpr(e7,
                             e8); // (( xyz * (-100) ) + ( _let x = 1 _in ( _let x = y _in x + y ) )) * ( ( xyz * (-100) ) * ( _let x = 1 _in ( _let x = y _in x + y ) ) )
 
     CHECK(parse_str("1 + ( 1 + 2 )")->equals(e1));
@@ -447,7 +447,7 @@ TEST_CASE("Parser Test") {
 }
 
 TEST_CASE("Parse IfExpr") {
-    Expr *e1 = new IfExpr(new BoolExpr(true), new NumExpr(1), new NumExpr(2));
+     PTR(Expr) e1 = new IfExpr(new BoolExpr(true), new NumExpr(1), new NumExpr(2));
     CHECK(parse_str("_if _true _then 1 _else 2")->equals(e1));
     CHECK(parse_str("_if _true _then 1 _else 2")->equals(parse_str("x")) == false);
     CHECK(parse_str("_let same = 1 == 2\n"

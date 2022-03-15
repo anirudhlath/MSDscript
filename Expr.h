@@ -7,6 +7,7 @@
 
 // TODO: Organise elements in proper private and public scopes.
 #include <string>
+#include "pointer.h"
 #include <iostream>
 
 class Val;
@@ -18,15 +19,15 @@ bool has_variable();
 std::string to_string(bool isPretty);
 
 
-virtual Expr *subst(std::string var, Expr *e) = 0;
+virtual PTR(Expr) subst(std::string var, PTR(Expr) (e)) = 0;
 
 virtual void print(std::ostream &out) = 0;
 
 virtual void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence) = 0;
 
-virtual bool equals(Expr *e) = 0;
+virtual bool equals ( PTR(Expr) (e)) = 0;
 
-virtual Val *interp() = 0;
+virtual  PTR(Val) interp() = 0;
 };
 
 class NumExpr :
@@ -38,11 +39,10 @@ public:
 
 NumExpr(int val);
 
-bool equals(Expr *e);
+bool equals ( PTR(Expr) (e));
 
-Val *interp();
-
-Expr *subst(std::string var, Expr *e);
+ PTR(Val) interp();
+ PTR(Expr) subst(std::string var, PTR(Expr) (e));
 
 void print(std::ostream &out);
 
@@ -58,11 +58,10 @@ bool boolean;
 public:
 BoolExpr(bool boolean);
 
-bool equals(Expr *e);
+bool equals ( PTR(Expr) (e));
 
-Val *interp();
-
-Expr *subst(std::string var, Expr *e);
+ PTR(Val) interp();
+ PTR(Expr) subst(std::string var, PTR(Expr) (e));
 
 void print(std::ostream &out);
 
@@ -72,17 +71,14 @@ void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPr
 
 class AddExpr :
 public Expr {
-public:
-Expr *lhs;
-Expr *rhs;
+public: PTR(Expr) lhs; PTR(Expr) rhs;
 
-AddExpr(Expr *lhs, Expr *rhs);
+AddExpr (PTR(Expr) lhs, PTR(Expr) rhs);
 
-bool equals(Expr *e);
+bool equals ( PTR(Expr) (e));
 
-Val *interp();
-
-Expr *subst(std::string var, Expr *e);
+ PTR(Val) interp();
+ PTR(Expr) subst(std::string var, PTR(Expr) (e));
 
 void print(std::ostream &out);
 
@@ -91,17 +87,14 @@ void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPr
 
 class MultExpr :
 public Expr {
-public:
-Expr *lhs;
-Expr *rhs;
+public: PTR(Expr) lhs; PTR(Expr) rhs;
 
-MultExpr(Expr *lhs, Expr *rhs);
+MultExpr (PTR(Expr) lhs, PTR(Expr) rhs);
 
-bool equals(Expr *e);
+bool equals ( PTR(Expr) (e));
 
-Val *interp();
-
-Expr *subst(std::string var, Expr *e);
+ PTR(Val) interp();
+ PTR(Expr) subst(std::string var, PTR(Expr) (e));
 
 void print(std::ostream &out);
 
@@ -115,11 +108,10 @@ std::string val;
 
 VarExpr(std::string val);
 
-bool equals(Expr *e);
+bool equals ( PTR(Expr) (e));
 
-Val *interp();
-
-Expr *subst(std::string var, Expr *e);
+ PTR(Val) interp();
+ PTR(Expr) subst(std::string var, PTR(Expr) (e));
 
 void print(std::ostream &out);
 
@@ -129,37 +121,31 @@ void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPr
 class LetExpr :
 public Expr {
 public:
-VarExpr *lhs;
-Expr *rhs;
-Expr *in;
+ PTR(VarExpr) lhs; PTR(Expr) rhs; PTR(Expr) in;
 
-LetExpr(VarExpr *lhs, Expr *rhs, Expr *in);
-
-Expr *subst(std::string var, Expr *e);
+LetExpr(PTR(VarExpr) lhs, PTR(Expr) rhs, PTR(Expr) in);
+ PTR(Expr) subst(std::string var, PTR(Expr) (e));
 
 void print(std::ostream &out);
 
 void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 
-bool equals(Expr *e);
+bool equals ( PTR(Expr) (e));
 
-Val *interp();
+ PTR(Val) interp();
 
 };
 
 class EqualExpr :
 public Expr {
-public:
-Expr *lhs;
-Expr *rhs;
+public: PTR(Expr) lhs; PTR(Expr) rhs;
 
-EqualExpr(Expr *lhs, Expr *rhs);
+EqualExpr (PTR(Expr) lhs, PTR(Expr) rhs);
 
-bool equals(Expr *e);
+bool equals ( PTR(Expr) (e));
 
-Val *interp();
-
-Expr *subst(std::string var, Expr *e);
+ PTR(Val) interp();
+ PTR(Expr) subst(std::string var, PTR(Expr) (e));
 
 void print(std::ostream &out);
 
@@ -168,64 +154,55 @@ void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPr
 
 class IfExpr :
 public Expr {
-public:
-Expr *ifExpr;
-Expr *thenExpr;
-Expr *elseExpr;
+public: PTR(Expr) ifExpr; PTR(Expr) thenExpr; PTR(Expr) elseExpr;
 
-IfExpr(Expr *ifExpr, Expr *thenExpr, Expr *elseExpr);
-
-Expr *subst(std::string var, Expr *e);
+IfExpr (PTR(Expr) ifExpr, PTR(Expr) thenExpr, PTR(Expr) elseExpr);
+ PTR(Expr) subst(std::string var, PTR(Expr) (e));
 
 void print(std::ostream &out);
 
 void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 
-bool equals(Expr *e);
+bool equals ( PTR(Expr) (e));
 
-Val *interp();
+ PTR(Val) interp();
 
 };
 
 class FunExpr :
 public Expr {
 
-std::string formal_arg;
-Expr *body;
+std::string formal_arg; PTR(Expr) body;
 
 public:
-FunExpr(std::string formal_arg, Expr *body);
+FunExpr(std::string formal_arg, PTR(Expr) body);
 
-bool equals(Expr *e);
+bool equals ( PTR(Expr) (e));
 
-Val *interp();
+ PTR(Val) interp();
 
 void print(std::ostream &out);
 
 void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
-
-Expr *subst(std::string var, Expr *e);
+ PTR(Expr) subst(std::string var, PTR(Expr) (e));
 };
 
 class CallExpr :
 public Expr {
-
-Expr *to_be_called;
-Expr *actual_arg;
+     PTR(Expr) to_be_called; PTR(Expr) actual_arg;
 
 public:
 
-CallExpr(Expr *to_be_called, Expr *actual_arg);
+CallExpr (PTR(Expr) to_be_called, PTR(Expr) actual_arg);
 
-bool equals(Expr *e);
+bool equals ( PTR(Expr) (e));
 
-Val *interp();
+ PTR(Val) interp();
 
 void print(std::ostream &out);
 
 void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
-
-Expr *subst(std::string var, Expr *e);
+ PTR(Expr) subst(std::string var, PTR(Expr) (e));
 
 };
 

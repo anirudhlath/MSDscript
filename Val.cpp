@@ -11,8 +11,8 @@ NumVal::NumVal(int num) {
     this->num = num;
 }
 
-bool NumVal::equals(Val *rhs) {
-    auto *rhsNum = dynamic_cast<NumVal *>(rhs);
+bool NumVal::equals( PTR(Val) rhs) {
+    PTR(NumVal) rhsNum = dynamic_cast< PTR(NumVal) >(rhs);
     if (rhsNum == nullptr) {
         return false;
     }
@@ -21,14 +21,14 @@ bool NumVal::equals(Val *rhs) {
     }
 }
 
-Val *NumVal::add_to(Val *rhs) {
-    auto *rhsNum = dynamic_cast<NumVal *>(rhs);
+ PTR(Val) NumVal::add_to( PTR(Val) rhs) {
+     PTR(NumVal) rhsNum = dynamic_cast< PTR(NumVal) >(rhs);
     if (rhsNum == nullptr) { throw std::runtime_error("Addition of non-number value."); }
     return new NumVal(this->num + rhsNum->num);
 }
 
-Val *NumVal::mult_to(Val *rhs) {
-    auto *rhsNum = dynamic_cast<NumVal *>(rhs);
+ PTR(Val) NumVal::mult_to( PTR(Val) rhs) {
+     PTR(NumVal) rhsNum = dynamic_cast< PTR(NumVal) >(rhs);
     if (rhsNum == nullptr) { throw std::runtime_error("Multiplication of non-number value."); }
     return new NumVal(this->num * rhsNum->num);
 }
@@ -37,11 +37,11 @@ std::string NumVal::to_string() {
     return std::to_string(this->num);
 }
 
-Expr *NumVal::to_expr() {
+ PTR(Expr) NumVal::to_expr() {
     return new NumExpr(this->num);
 }
 
-Val *NumVal::call(Val *actual_arg) {
+ PTR(Val) NumVal::call( PTR(Val) actual_arg) {
     throw std::runtime_error("A non-function value cannot be called.");
 }
 
@@ -50,12 +50,12 @@ BoolVal::BoolVal(bool boolean) {
     this->boolean = boolean;
 }
 
-Expr *BoolVal::to_expr() {
+ PTR(Expr) BoolVal::to_expr() {
     return new BoolExpr(this->boolean);
 }
 
-bool BoolVal::equals(Val *rhs) {
-    auto *rhsBool = dynamic_cast<BoolVal *>(rhs);
+bool BoolVal::equals( PTR(Val) rhs) {
+    PTR(BoolVal) rhsBool = dynamic_cast<PTR(BoolVal) >(rhs);
     if (rhsBool == nullptr) {
         return false;
     }
@@ -64,11 +64,11 @@ bool BoolVal::equals(Val *rhs) {
     }
 }
 
-Val *BoolVal::add_to(Val *rhs) {
+ PTR(Val) BoolVal::add_to( PTR(Val) rhs) {
     throw std::runtime_error("Addition cannot be performed on a boolean-value.");
 }
 
-Val *BoolVal::mult_to(Val *rhs) {
+ PTR(Val) BoolVal::mult_to( PTR(Val) rhs) {
     throw std::runtime_error("Multiplication cannot be performed on a boolean-value.");
 }
 
@@ -81,22 +81,22 @@ std::string BoolVal::to_string() {
     }
 }
 
-Val *BoolVal::call(Val *actual_arg) {
+ PTR(Val) BoolVal::call( PTR(Val) actual_arg) {
     throw std::runtime_error("A non-function value cannot be called.");
 }
 
 // FunVal
-FunVal::FunVal(std::string formal_arg, Expr *body) {
+FunVal::FunVal(std::string formal_arg,  PTR(Expr) body) {
     this->formal_arg = formal_arg;
     this->body = body;
 }
 
-Expr *FunVal::to_expr() {
+ PTR(Expr) FunVal::to_expr() {
     return new FunExpr(this->formal_arg, this->body);
 }
 
-bool FunVal::equals(Val *rhs) {
-    FunVal *expr = dynamic_cast<FunVal *>(rhs);
+bool FunVal::equals( PTR(Val) rhs) {
+    PTR(FunVal) expr = dynamic_cast<PTR(FunVal) >(rhs);
     if (expr == nullptr) {
         return false;
     }
@@ -106,11 +106,11 @@ bool FunVal::equals(Val *rhs) {
 
 }
 
-Val *FunVal::add_to(Val *rhs) {
+ PTR(Val) FunVal::add_to( PTR(Val) rhs) {
     throw std::runtime_error("Addition cannot be performed on a function-value.");
 }
 
-Val *FunVal::mult_to(Val *rhs) {
+ PTR(Val) FunVal::mult_to( PTR(Val) rhs) {
     throw std::runtime_error("Multiplication cannot be performed on a function-value.");
 }
 
@@ -118,7 +118,7 @@ std::string FunVal::to_string() {
     return (new FunExpr(this->formal_arg, this->body))->to_string(true);
 }
 
-Val *FunVal::call(Val *actual_arg) {
+ PTR(Val) FunVal::call( PTR(Val) actual_arg) {
     return body->subst(formal_arg, actual_arg->to_expr())->interp();
 }
 
@@ -126,10 +126,10 @@ Val *FunVal::call(Val *actual_arg) {
 // TESTS
 // TODO: NumVal
 TEST_CASE("NumVal") {
-    Val *num1 = new NumVal(5);
-    Val *num2 = new NumVal(15);
-    Val *num1d = new NumVal(5);
-    Val *bool1 = new BoolVal(true);
+     PTR(Val) num1 = new NumVal(5);
+     PTR(Val) num2 = new NumVal(15);
+     PTR(Val) num1d = new NumVal(5);
+     PTR(Val) bool1 = new BoolVal(true);
 
     CHECK(num1->to_expr()->equals(new NumExpr(5)));
     CHECK(num1->equals(num1) == true);
@@ -146,10 +146,10 @@ TEST_CASE("NumVal") {
 }
 
 TEST_CASE("BoolVal") {
-    Val *bool1 = new BoolVal(true);
-    Val *bool2 = new BoolVal(false);
-    Val *bool3 = new BoolVal(false);
-    Val *num1 = new NumVal(5);
+     PTR(Val) bool1 = new BoolVal(true);
+     PTR(Val) bool2 = new BoolVal(false);
+     PTR(Val) bool3 = new BoolVal(false);
+     PTR(Val) num1 = new NumVal(5);
 
     CHECK(bool1->to_string() == "_true");
     CHECK(bool2->to_string() == "_false");
@@ -169,10 +169,10 @@ TEST_CASE("BoolVal") {
 }
 
 TEST_CASE("FunVal") {
-    Val *bool1 = new BoolVal(true);
-    Val *fun1 = new FunVal("fact", new NumExpr(2));
-    Val *fun1d = new FunVal("fact", new NumExpr(2));
-    Val *fun2 = new FunVal("fact", new NumExpr(1));
+     PTR(Val) bool1 = new BoolVal(true);
+     PTR(Val) fun1 = new FunVal("fact", new NumExpr(2));
+     PTR(Val) fun1d = new FunVal("fact", new NumExpr(2));
+     PTR(Val) fun2 = new FunVal("fact", new NumExpr(1));
 
     CHECK(fun1->equals(fun1));
     CHECK(fun1->equals(fun1d));
