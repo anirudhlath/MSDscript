@@ -10,7 +10,7 @@
 
 class Expr;
 
-class Val {
+CLASS(Val) {
 public:
     virtual PTR(Expr)to_expr() = 0;
 

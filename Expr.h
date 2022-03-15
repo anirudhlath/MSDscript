@@ -12,7 +12,7 @@
 
 class Val;
 
-class Expr {
+CLASS(Expr) {
 public:
     bool has_variable();
 
