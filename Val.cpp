@@ -8,7 +8,7 @@
 
 // NumVal
 NumVal::NumVal(int num) {
-    THIS->num = num;
+    this->num = num;
 }
 
 bool NumVal::equals(PTR(Val)rhs) {
@@ -17,28 +17,28 @@ bool NumVal::equals(PTR(Val)rhs) {
         return false;
     }
     else {
-        return THIS->num == rhsNum->num;
+        return this->num == rhsNum->num;
     }
 }
 
 PTR(Val)NumVal::add_to(PTR(Val)rhs) {
     PTR(NumVal)rhsNum = CAST(NumVal)(rhs);
     if (rhsNum == nullptr) { throw std::runtime_error("Addition of non-number value."); }
-    return NEW (NumVal)(THIS->num + rhsNum->num);
+    return NEW (NumVal)(this->num + rhsNum->num);
 }
 
 PTR(Val)NumVal::mult_to(PTR(Val)rhs) {
     PTR(NumVal)rhsNum = CAST(NumVal)(rhs);
     if (rhsNum == nullptr) { throw std::runtime_error("Multiplication of non-number value."); }
-    return NEW (NumVal)(THIS->num * rhsNum->num);
+    return NEW (NumVal)(this->num * rhsNum->num);
 }
 
 std::string NumVal::to_string() {
-    return std::to_string(THIS->num);
+    return std::to_string(this->num);
 }
 
 PTR(Expr)NumVal::to_expr() {
-    return NEW (NumExpr)(THIS->num);
+    return NEW (NumExpr)(this->num);
 }
 
 PTR(Val)NumVal::call(PTR(Val)actual_arg) {
@@ -47,11 +47,11 @@ PTR(Val)NumVal::call(PTR(Val)actual_arg) {
 
 // BoolVal
 BoolVal::BoolVal(bool boolean) {
-    THIS->boolean = boolean;
+    this->boolean = boolean;
 }
 
 PTR(Expr)BoolVal::to_expr() {
-    return NEW (BoolExpr)(THIS->boolean);
+    return NEW (BoolExpr)(this->boolean);
 }
 
 bool BoolVal::equals(PTR(Val)rhs) {
@@ -60,7 +60,7 @@ bool BoolVal::equals(PTR(Val)rhs) {
         return false;
     }
     else {
-        return THIS->boolean == rhsBool->boolean;
+        return this->boolean == rhsBool->boolean;
     }
 }
 
@@ -73,7 +73,7 @@ PTR(Val)BoolVal::mult_to(PTR(Val)rhs) {
 }
 
 std::string BoolVal::to_string() {
-    if (THIS->boolean) {
+    if (this->boolean) {
         return "_true";
     }
     else {
@@ -87,12 +87,12 @@ PTR(Val)BoolVal::call(PTR(Val)actual_arg) {
 
 // FunVal
 FunVal::FunVal(std::string formal_arg, PTR(Expr)body) {
-    THIS->formal_arg = formal_arg;
-    THIS->body = body;
+    this->formal_arg = formal_arg;
+    this->body = body;
 }
 
 PTR(Expr)FunVal::to_expr() {
-    return NEW (FunExpr)(THIS->formal_arg, THIS->body);
+    return NEW (FunExpr)(this->formal_arg, this->body);
 }
 
 bool FunVal::equals(PTR(Val)rhs) {
@@ -101,7 +101,7 @@ bool FunVal::equals(PTR(Val)rhs) {
         return false;
     }
     else {
-        return THIS->formal_arg == expr->formal_arg && THIS->body->equals(expr->body);
+        return this->formal_arg == expr->formal_arg && this->body->equals(expr->body);
     }
 
 }
@@ -115,7 +115,7 @@ PTR(Val)FunVal::mult_to(PTR(Val)rhs) {
 }
 
 std::string FunVal::to_string() {
-    return (NEW (FunExpr)(THIS->formal_arg, THIS->body))->to_string(true);
+    return (NEW (FunExpr)(this->formal_arg, this->body))->to_string(true);
 }
 
 PTR(Val)FunVal::call(PTR(Val)actual_arg) {
