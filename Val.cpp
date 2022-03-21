@@ -86,7 +86,7 @@ PTR(Val)BoolVal::call(PTR(Val)actual_arg) {
 }
 
 // FunVal
-FunVal::FunVal(std::string formal_arg, PTR(Expr) body, PTR(Env) env = Env::empty) {
+FunVal::FunVal(std::string formal_arg, PTR(Expr) body, PTR(Env) env) {
     this->formal_arg = formal_arg;
     this->body = body;
     this->env = env;
@@ -171,9 +171,9 @@ TEST_CASE("BoolVal") {
 
 TEST_CASE("FunVal") {
     PTR(Val)bool1 = NEW (BoolVal)(true);
-    PTR(Val)fun1 = NEW (FunVal)("fact", NEW (NumExpr)(2));
-    PTR(Val)fun1d = NEW (FunVal)("fact", NEW (NumExpr)(2));
-    PTR(Val)fun2 = NEW (FunVal)("fact", NEW (NumExpr)(1));
+    PTR(Val)fun1 = NEW (FunVal)("fact", NEW (NumExpr)(2), Env::empty);
+    PTR(Val)fun1d = NEW (FunVal)("fact", NEW (NumExpr)(2), Env::empty);
+    PTR(Val)fun2 = NEW (FunVal)("fact", NEW (NumExpr)(1), Env::empty);
 
     CHECK(fun1->equals(fun1));
     CHECK(fun1->equals(fun1d));

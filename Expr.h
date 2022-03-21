@@ -109,7 +109,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val)interp(PTR(Env) env);
+    PTR(Val) interp(PTR(Env) env = Env::empty);
 
     void print(std::ostream &out);
 

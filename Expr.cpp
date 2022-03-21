@@ -5,6 +5,7 @@
 #include "Expr.h"
 #include "catch.hpp"
 #include "Val.h"
+#include "Env.h"
 #include <stdexcept>
 #include <sstream>
 
@@ -187,7 +188,7 @@ bool LetExpr::equals(PTR(Expr)e) {
 
 PTR(Val)LetExpr::interp(PTR(Env) env) {
     PTR(Val) rhs_val = rhs->interp(env);
-    PTR(Env) new_env = NEW(ExtendedEnv)(lhs->to_string(true), rhs_val, env);
+    PTR(Env) new_env = NEW(ExtendedEnv)(lhs->to_string(false), rhs_val, env);
     return in->interp(new_env);
 }
 
@@ -471,7 +472,7 @@ TEST_CASE("Expressions") {
     CHECK(var1->equals(var1) == true);
     CHECK(var1->equals(var1d) == true);
     CHECK(var1->equals(var2) == false);
-    CHECK_THROWS_WITH((NEW(VarExpr)("x"))->interp(), "Error occurred, a variable cannot be interpreted.");
+    CHECK_THROWS_WITH((NEW(VarExpr)("x"))->interp(), "free variable: x");
 //    CHECK(var1->has_variable() == true);
 /*    CHECK(var1->subst("hello", var2)->equals(var2));
     CHECK(var1->subst("hell", var2)->equals(var1));*/
@@ -614,17 +615,17 @@ TEST_CASE("Function Expressions") {
     CHECK(e1->equals(e1d));
 
     PTR(Expr)e2 = NEW (FunExpr)("x", NEW (VarExpr)("y"));
-    PTR(Val)v2 = NEW (FunVal)("x", NEW (VarExpr)("y"));
+    PTR(Val)v2 = NEW (FunVal)("x", NEW (VarExpr)("y"), Env::empty);
     PTR(Expr)p2 = NEW (FunExpr)("x", NEW (NumExpr)(2));
 //    CHECK(e2->subst("y", NEW(NumExpr)(2))->equals(p2));
     CHECK(e2->interp()->equals(v2));
 
     PTR(Expr)e3 = NEW (FunExpr)("x", NEW (AddExpr)(NEW (VarExpr)("y"), NEW (NumExpr)(1)));
-    PTR(Val)v3 = NEW (FunVal)("x", NEW (AddExpr)(NEW (VarExpr)("y"), NEW (NumExpr)(1)));
+    PTR(Val)v3 = NEW (FunVal)("x", NEW (AddExpr)(NEW (VarExpr)("y"), NEW (NumExpr)(1)), Env::empty);
     CHECK(e3->interp()->equals(v3));
 
     PTR(Expr)e4 = NEW (FunExpr)("x", NEW (AddExpr)(NEW (NumExpr)(1), NEW (NumExpr)(1)));
-    PTR(Val)v4 = NEW (FunVal)("x", NEW (AddExpr)(NEW (NumExpr)(1), NEW (NumExpr)(1)));
+    PTR(Val)v4 = NEW (FunVal)("x", NEW (AddExpr)(NEW (NumExpr)(1), NEW (NumExpr)(1)), Env::empty);
     CHECK(e4->interp()->equals(v4));
 
     PTR(Expr)one = NEW (NumExpr)(1);
@@ -646,7 +647,7 @@ TEST_CASE("Function Expressions") {
 //    CHECK(e7->subst("y", NEW(NumExpr)(2))->equals(p7));
 
     CHECK(e5->interp()->equals(NEW(NumVal)(1)));
-    CHECK_THROWS_WITH(e6->interp(), "Error occurred, a variable cannot be interpreted.");
+    CHECK_THROWS_WITH(e6->interp(), "free variable: y");
 }
 
 TEST_CASE("Equality Tests") {
