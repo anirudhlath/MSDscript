@@ -86,9 +86,10 @@ PTR(Val)BoolVal::call(PTR(Val)actual_arg) {
 }
 
 // FunVal
-FunVal::FunVal(std::string formal_arg, PTR(Expr)body) {
+FunVal::FunVal(std::string formal_arg, PTR(Expr) body, PTR(Env) env = Env::empty) {
     this->formal_arg = formal_arg;
     this->body = body;
+    this->env = env;
 }
 
 PTR(Expr)FunVal::to_expr() {
@@ -119,7 +120,7 @@ std::string FunVal::to_string() {
 }
 
 PTR(Val)FunVal::call(PTR(Val)actual_arg) {
-    return body->subst(formal_arg, actual_arg->to_expr())->interp();
+    return body->interp(NEW(ExtendedEnv)(formal_arg, actual_arg, env));
 }
 
 

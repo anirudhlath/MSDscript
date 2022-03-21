@@ -13,4 +13,4 @@ add_executable(
         Parser.h
         Val.cpp
         Val.h
-        main.cpp pointer.h)
+        main.cpp pointer.h Env.cpp Env.h)

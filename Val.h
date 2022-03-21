@@ -7,6 +7,7 @@
 
 #include <string>
 #include "pointer.h"
+#include "Env.h"
 
 class Expr;
 
@@ -64,10 +65,11 @@ public:
 class FunVal : public Val {
 
     std::string formal_arg;
-    PTR(Expr)body;
+    PTR(Expr) body;
+    PTR(Env) env;
 
 public:
-    FunVal(std::string formal_arg, PTR(Expr)body);
+    FunVal(std::string formal_arg, PTR(Expr) body, PTR(Env) env);
 
     PTR(Expr)to_expr();
 
