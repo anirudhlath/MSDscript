@@ -65,11 +65,11 @@ public:
 class FunVal : public Val {
 
     std::string formal_arg;
-    PTR(Expr) body;
-    PTR(Env) env;
+    PTR(Expr)body;
+    PTR(Env)env;
 
 public:
-    FunVal(std::string formal_arg, PTR(Expr) body, PTR(Env) env);
+    FunVal(std::string formal_arg, PTR(Expr)body, PTR(Env)env);
 
     PTR(Expr)to_expr();
 

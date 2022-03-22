@@ -503,13 +503,16 @@ TEST_CASE("Parse Functions") {
     CHECK(parse_str("_let x = 1 _in x + 1")->interp()->equals(NEW(NumVal)(2)));
     CHECK(parse_str("_let x = 1 _in _let x = 2 _in x + 1")->interp()->equals(NEW(NumVal)(3)));
     CHECK(parse_str("_let x = 1 _in _let x = 2 _in _if x == 2 _then x+1 _else x")->interp()->equals(NEW(NumVal)(3)));
+    CHECK(parse_str("_let x = _fun (x) _fun (y) _if y == 1 _then 1 _else y * x(x)(y + -1) _in x(x)(10)")->interp()
+                  ->equals(NEW
+                                   (NumVal)(3628800)));
     CHECK(
             parse_str("_let factrl = _fun (factrl)\n"
-                    "                _fun (x)\n"
-                    "                  _if x == 1\n"
-                    "                  _then 1\n"
-                    "                  _else x * factrl(factrl)(x + -1)\n"
-                    "_in  factrl(factrl)(10)")->interp()->equals(NEW(NumVal)(3628800)));
+                      "                _fun (x)\n"
+                      "                  _if x == 1\n"
+                      "                  _then 1\n"
+                      "                  _else x * factrl(factrl)(x + -1)\n"
+                      "_in  factrl(factrl)(10)")->interp()->equals(NEW(NumVal)(3628800)));
 }
 
 

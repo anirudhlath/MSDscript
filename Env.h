@@ -11,13 +11,13 @@ class Val;
 
 CLASS(Env) {
 public:
-    static PTR(Env) empty;
+    static PTR(Env)empty;
 
-    virtual PTR(Val) lookup(std::string find_name) = 0;
+    virtual PTR(Val)lookup(std::string find_name) = 0;
 };
 
 class EmptyEnv : public Env {
-    PTR(Val) lookup(std::string find_name) {
+    PTR(Val)lookup(std::string find_name) {
         throw std::runtime_error("free variable: "
                                  + find_name);
     }
@@ -25,15 +25,15 @@ class EmptyEnv : public Env {
 
 class ExtendedEnv : public Env {
     std::string name;
-    PTR(Val) val;
-    PTR(Env) rest;
+    PTR(Val)val;
+    PTR(Env)rest;
 
 public:
     ExtendedEnv(std::string name,
-                PTR(Val) val,
-                PTR(Env) rest);
+                PTR(Val)val,
+                PTR(Env)rest);
 
-    PTR(Val) lookup(std::string find_name) {
+    PTR(Val)lookup(std::string find_name) {
         if (find_name == name) {
             return val;
         }

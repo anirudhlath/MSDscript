@@ -48,7 +48,7 @@ bool NumExpr::equals(PTR(Expr)e) {
     }
 }
 
-PTR(Val)NumExpr::interp(PTR(Env) env) {
+PTR(Val)NumExpr::interp(PTR(Env)env) {
     return NEW (NumVal)(this->val);
 }
 
@@ -77,7 +77,7 @@ bool AddExpr::equals(PTR(Expr)e) {
     }
 }
 
-PTR(Val)AddExpr::interp(PTR(Env) env) {
+PTR(Val)AddExpr::interp(PTR(Env)env) {
     return this->lhs->interp(env)->add_to(this->rhs->interp(env));
 }
 
@@ -117,7 +117,7 @@ bool MultExpr::equals(PTR(Expr)e) {
     }
 }
 
-PTR(Val)MultExpr::interp(PTR(Env) env) {
+PTR(Val)MultExpr::interp(PTR(Env)env) {
     return this->lhs->interp(env)->mult_to(this->rhs->interp(env));
 }
 
@@ -156,7 +156,7 @@ bool VarExpr::equals(PTR(Expr)e) {
     }
 }
 
-PTR(Val)VarExpr::interp(PTR(Env) env) {
+PTR(Val)VarExpr::interp(PTR(Env)env) {
     return env->lookup(this->val);
 }
 
@@ -186,9 +186,9 @@ bool LetExpr::equals(PTR(Expr)e) {
     }
 }
 
-PTR(Val)LetExpr::interp(PTR(Env) env) {
-    PTR(Val) rhs_val = rhs->interp(env);
-    PTR(Env) new_env = NEW(ExtendedEnv)(lhs->to_string(false), rhs_val, env);
+PTR(Val)LetExpr::interp(PTR(Env)env) {
+    PTR(Val)rhs_val = rhs->interp(env);
+    PTR(Env)new_env = NEW(ExtendedEnv)(lhs->to_string(false), rhs_val, env);
     return in->interp(new_env);
 }
 
@@ -245,7 +245,7 @@ bool BoolExpr::equals(PTR(Expr)e) {
     }
 }
 
-PTR(Val)BoolExpr::interp(PTR(Env) env) {
+PTR(Val)BoolExpr::interp(PTR(Env)env) {
     return NEW (BoolVal)(this->boolean);
 }
 
@@ -273,7 +273,7 @@ bool EqualExpr::equals(PTR(Expr)e) {
     }
 }
 
-PTR(Val)EqualExpr::interp(PTR(Env) env) {
+PTR(Val)EqualExpr::interp(PTR(Env)env) {
     return NEW (BoolVal)(this->lhs->interp(env)->equals(this->rhs->interp(env)));
 }
 
@@ -324,7 +324,7 @@ bool IfExpr::equals(PTR(Expr)e) {
     }
 }
 
-PTR(Val)IfExpr::interp(PTR(Env) env) {
+PTR(Val)IfExpr::interp(PTR(Env)env) {
     PTR(Val)expr = ifExpr->interp(env);
     if (expr->equals(NEW (BoolVal)(true))) {
         return thenExpr->interp(env);
@@ -384,7 +384,7 @@ bool FunExpr::equals(PTR(Expr)e) {
     }
 }
 
-PTR(Val)FunExpr::interp(PTR(Env) env) {
+PTR(Val)FunExpr::interp(PTR(Env)env) {
     return NEW (FunVal)(this->formal_arg, this->body, env);
 }
 
@@ -443,8 +443,8 @@ void CallExpr::pretty_print(std::ostream &out, int precedence, int &n_position, 
     out << ')';
 }
 
-PTR(Val)CallExpr::interp(PTR(Env) env) {
-    return to_be_called->interp()->call(actual_arg->interp());
+PTR(Val)CallExpr::interp(PTR(Env)env) {
+    return to_be_called->interp(env)->call(actual_arg->interp(env));
 }
 
 
@@ -488,7 +488,7 @@ TEST_CASE("Expressions") {
     CHECK(mult1->equals(mult2) == false);
     CHECK(mult2->equals(mult3) == true);
     CHECK(mult1->equals(mult4) == false);
-    CHECK(mult1->interp()->equals(NEW (NumVal) (6)) == true);
+    CHECK(mult1->interp()->equals(NEW(NumVal)(6)) == true);
 //    CHECK(mult1->has_variable() == false);
 //    CHECK(mult1->subst("x", mult3)->equals(mult1));
 
@@ -604,7 +604,7 @@ TEST_CASE("Let Subst Method") {
 //    CHECK(example5->subst("y", eight)->equals(solution5));
 }
 
-TEST_CASE("Function Expressions") {
+TEST_CASE("Function and Call Expressions") {
     PTR(Expr)e1 = NEW (FunExpr)("x", NEW (VarExpr)("x"));
     PTR(Expr)e1dx = NEW (FunExpr)("x", NEW (VarExpr)("y"));
     PTR(Expr)e1d = NEW (FunExpr)("x", NEW (VarExpr)("x"));
@@ -648,6 +648,8 @@ TEST_CASE("Function Expressions") {
 
     CHECK(e5->interp()->equals(NEW(NumVal)(1)));
     CHECK_THROWS_WITH(e6->interp(), "free variable: y");
+    CHECK(e5->equals(one) == false);
+    CHECK(e4->equals(one) == false);
 }
 
 TEST_CASE("Equality Tests") {
@@ -708,9 +710,11 @@ TEST_CASE("BoolExpr") {
     PTR(Expr)trueExpr1d = NEW (BoolExpr)(true);
     PTR(Expr)falseExpr1 = NEW (BoolExpr)(false);
     PTR(Expr)falseExpr1d = NEW (BoolExpr)(false);
+    PTR(Expr)num1 = NEW(NumExpr)(1);
 
     CHECK(trueExpr1->equals(trueExpr1));
     CHECK(trueExpr1->equals(trueExpr1d));
     CHECK(trueExpr1->equals(falseExpr1) == false);
+    CHECK(trueExpr1->equals(num1) == false);
 
 }

@@ -26,7 +26,10 @@ public:
 
     virtual bool equals(PTR(Expr)(e)) = 0;
 
-    virtual PTR(Val) interp( PTR(Env) env = Env::empty ) = 0;
+    // Troubleshooting tip: If you interp a free variable exception, then remove default value
+    // and check the if the implementation has any errors, the key is to pass in 'env' in all
+    // recursive calls.
+    virtual PTR(Val)interp(PTR(Env)env = Env::empty) = 0;
 };
 
 class NumExpr :
@@ -40,7 +43,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp(PTR(Env) env);
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
@@ -58,7 +61,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val)interp(PTR(Env) env);
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
@@ -76,7 +79,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val)interp(PTR(Env) env);
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
@@ -93,7 +96,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val)interp(PTR(Env) env);
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
@@ -109,7 +112,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp(PTR(Env) env = Env::empty);
+    PTR(Val)interp(PTR(Env)env = Env::empty);
 
     void print(std::ostream &out);
 
@@ -131,7 +134,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val)interp(PTR(Env) env);
+    PTR(Val)interp(PTR(Env)env);
 
 };
 
@@ -145,7 +148,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val)interp(PTR(Env) env);
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
@@ -167,7 +170,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val)interp(PTR(Env) env);
+    PTR(Val)interp(PTR(Env)env);
 
 };
 
@@ -182,7 +185,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val)interp(PTR(Env) env);
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
@@ -201,7 +204,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val)interp(PTR(Env) env);
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
