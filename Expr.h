@@ -9,17 +9,16 @@
 #include <string>
 #include "pointer.h"
 #include <iostream>
+#include "Env.h"
 
 class Val;
 
 CLASS(Expr) {
 public:
-    bool has_variable();
+//    bool has_variable();
 
     std::string to_string(bool isPretty);
 
-
-    virtual PTR(Expr) subst(std::string var, PTR(Expr)(e)) = 0;
 
     virtual void print(std::ostream &out) = 0;
 
@@ -27,7 +26,10 @@ public:
 
     virtual bool equals(PTR(Expr)(e)) = 0;
 
-    virtual PTR(Val) interp() = 0;
+    // Troubleshooting tip: If you interp a free variable exception, then remove default value
+    // and check the if the implementation has any errors, the key is to pass in 'env' in all
+    // recursive calls.
+    virtual PTR(Val)interp(PTR(Env)env = Env::empty) = 0;
 };
 
 class NumExpr :
@@ -41,9 +43,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp();
-
-    PTR(Expr) subst(std::string var, PTR(Expr)(e));
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
@@ -61,9 +61,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp();
-
-    PTR(Expr) subst(std::string var, PTR(Expr)(e));
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
@@ -74,16 +72,14 @@ public:
 class AddExpr :
         public Expr {
 public:
-    PTR(Expr) lhs;
-    PTR(Expr) rhs;
+    PTR(Expr)lhs;
+    PTR(Expr)rhs;
 
-    AddExpr(PTR(Expr) lhs, PTR(Expr) rhs);
+    AddExpr(PTR(Expr)lhs, PTR(Expr)rhs);
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp();
-
-    PTR(Expr) subst(std::string var, PTR(Expr)(e));
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
@@ -93,16 +89,14 @@ public:
 class MultExpr :
         public Expr {
 public:
-    PTR(Expr) lhs;
-    PTR(Expr) rhs;
+    PTR(Expr)lhs;
+    PTR(Expr)rhs;
 
-    MultExpr(PTR(Expr) lhs, PTR(Expr) rhs);
+    MultExpr(PTR(Expr)lhs, PTR(Expr)rhs);
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp();
-
-    PTR(Expr) subst(std::string var, PTR(Expr)(e));
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
@@ -118,9 +112,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp();
-
-    PTR(Expr) subst(std::string var, PTR(Expr)(e));
+    PTR(Val)interp(PTR(Env)env = Env::empty);
 
     void print(std::ostream &out);
 
@@ -130,13 +122,11 @@ public:
 class LetExpr :
         public Expr {
 public:
-    PTR(VarExpr) lhs;
-    PTR(Expr) rhs;
-    PTR(Expr) in;
+    PTR(VarExpr)lhs;
+    PTR(Expr)rhs;
+    PTR(Expr)in;
 
-    LetExpr(PTR(VarExpr) lhs, PTR(Expr) rhs, PTR(Expr) in);
-
-    PTR(Expr) subst(std::string var, PTR(Expr)(e));
+    LetExpr(PTR(VarExpr)lhs, PTR(Expr)rhs, PTR(Expr)in);
 
     void print(std::ostream &out);
 
@@ -144,23 +134,21 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp();
+    PTR(Val)interp(PTR(Env)env);
 
 };
 
 class EqualExpr :
         public Expr {
 public:
-    PTR(Expr) lhs;
-    PTR(Expr) rhs;
+    PTR(Expr)lhs;
+    PTR(Expr)rhs;
 
-    EqualExpr(PTR(Expr) lhs, PTR(Expr) rhs);
+    EqualExpr(PTR(Expr)lhs, PTR(Expr)rhs);
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp();
-
-    PTR(Expr) subst(std::string var, PTR(Expr)(e));
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
@@ -170,13 +158,11 @@ public:
 class IfExpr :
         public Expr {
 public:
-    PTR(Expr) ifExpr;
-    PTR(Expr) thenExpr;
-    PTR(Expr) elseExpr;
+    PTR(Expr)ifExpr;
+    PTR(Expr)thenExpr;
+    PTR(Expr)elseExpr;
 
-    IfExpr(PTR(Expr) ifExpr, PTR(Expr) thenExpr, PTR(Expr) elseExpr);
-
-    PTR(Expr) subst(std::string var, PTR(Expr)(e));
+    IfExpr(PTR(Expr)ifExpr, PTR(Expr)thenExpr, PTR(Expr)elseExpr);
 
     void print(std::ostream &out);
 
@@ -184,7 +170,7 @@ public:
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp();
+    PTR(Val)interp(PTR(Env)env);
 
 };
 
@@ -192,40 +178,38 @@ class FunExpr :
         public Expr {
 
     std::string formal_arg;
-    PTR(Expr) body;
+    PTR(Expr)body;
 
 public:
-    FunExpr(std::string formal_arg, PTR(Expr) body);
+    FunExpr(std::string formal_arg, PTR(Expr)body);
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp();
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
     void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 
-    PTR(Expr) subst(std::string var, PTR(Expr)(e));
 };
 
 class CallExpr :
         public Expr {
-    PTR(Expr) to_be_called;
-    PTR(Expr) actual_arg;
+    PTR(Expr)to_be_called;
+    PTR(Expr)actual_arg;
 
 public:
 
-    CallExpr(PTR(Expr) to_be_called, PTR(Expr) actual_arg);
+    CallExpr(PTR(Expr)to_be_called, PTR(Expr)actual_arg);
 
     bool equals(PTR(Expr)(e));
 
-    PTR(Val) interp();
+    PTR(Val)interp(PTR(Env)env);
 
     void print(std::ostream &out);
 
     void pretty_print(std::ostream &out, int precedence, int &n_position, bool letPrecedence);
 
-    PTR(Expr) subst(std::string var, PTR(Expr)(e));
 
 };
 
