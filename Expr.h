@@ -5,7 +5,6 @@
 #ifndef ASSIGNMENT02_EXPR_H
 #define ASSIGNMENT02_EXPR_H
 
-// TODO: Organise elements in proper private and public scopes.
 #include <string>
 #include "pointer.h"
 #include <iostream>
@@ -13,12 +12,13 @@
 
 class Val;
 
+
 CLASS(Expr) {
 public:
-//    bool has_variable();
-
+    /// to_string - This function will return a string of the expression, in a reduced form or full form.
+    /// \param isPretty true will print in reduced form and false will print in full form.
+    /// \return string form of the expression.
     std::string to_string(bool isPretty);
-
 
     virtual void print(std::ostream &out) = 0;
 
@@ -29,6 +29,7 @@ public:
     // Troubleshooting tip: If you interp a free variable exception, then remove default value
     // and check the if the implementation has any errors, the key is to pass in 'env' in all
     // recursive calls.
+
     virtual PTR(Val)interp(PTR(Env)env = Env::empty) = 0;
 };
 
