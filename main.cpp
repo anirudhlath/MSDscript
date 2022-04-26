@@ -6,8 +6,6 @@
 
 #include "catch.hpp"
 #include "Parser.h"
-#include "Expr.h"
-#include "Val.h"
 #include <iostream>
 
 void helper(int argc, char **argv);
@@ -50,7 +48,7 @@ void helper(int argc, char **argv) {
             if (argv[1] == INTERP) {
                 PTR(Expr)e = parse(cin);
                 try {
-                    cout << e->interp()->to_string() << endl;
+                    cout << e->interp() << endl;
                     exit(0);
                 }
                 catch (const runtime_error &error) {
